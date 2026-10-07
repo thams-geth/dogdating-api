@@ -1,0 +1,86 @@
+# =============================================================================
+# Local development stack: Postgres 17 + Redis 7.
+#
+# Versions are PINNED to minor. "postgres:17" would silently move under us and a
+# database that upgrades itself between two developers' machines is a debugging
+# session nobody enjoys.
+# =============================================================================
+
+name: dogdating-api
+
+services:
+  postgres:
+    image: postgres:17.2-alpine
+    container_name: dogdating-api-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: waggle
+      POSTGRES_USER: waggle
+      POSTGRES_PASSWORD: waggle
+      # Match the production collation so ORDER BY and LIKE behave identically.
+      # Getting this wrong locally means index behaviour differs from production,
+      # which is the worst class of "works on my machine".
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C.UTF-8"
+      # Asia/Kolkata deliberately NOT set: the database runs in UTC and the
+      # application renders local time. A database in local time is how a
+      # half-hour offset becomes a data bug.
+      TZ: UTC
+    command:
+      - postgres
+      # Modest but non-default: the seeded feed queries want more than the
+      # 128 MB default shared_buffers to stay in memory.
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - max_connections=100
+      # Log anything slower than 200 ms, so a missing index is visible in
+      # development rather than in the launch metro.
+      - -c
+      - log_min_duration_statement=200
+      - -c
+      - log_statement=none
+      - -c
+      - timezone=UTC
+    ports:
+      - "5433:5432"
+    volumes:
+      - waggle-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # `pg_isready` alone returns true before the database accepts queries on
+      # the target database, so the check names it explicitly.
+      test: ["CMD-SHELL", "pg_isready -U waggle -d waggle"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: dogdating-api-redis
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      # Bounded memory with LRU eviction. Everything Waggle keeps in Redis is a
+      # cache, a rate-limit bucket or an idempotency record, and all three are
+      # designed to survive eviction — see the failOpen/failClosed notes in
+      # src/infra/redis/redis.ts.
+      - --maxmemory
+      - 256mb
+      - --maxmemory-policy
+      - allkeys-lru
+    ports:
+      - "6380:6379"
+    volumes:
+      - waggle-redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
+volumes:
+  waggle-pgdata:
+  waggle-redisdata:
