@@ -26,3 +26,9 @@ npm run dev
 `npm run typecheck` and `npm run build` check the backend. Current endpoints are `GET /v1/health`, `GET /v1/ready` and `GET /v1/dogs/breeds`. All other endpoints in the plan are planned until marked implemented in the ledger.
 
 Migrations 0001–0011 came from the earlier Waggle backend. The migration runner rejects changed applied SQL. Add new migrations when implementing a module.
+
+## App configuration
+
+`GET /v1/app/countries` lists configured markets. `GET /v1/app/bootstrap?platform=android&buildNumber=1&countryCode=IN&locale=en-IN` returns country availability, update guidance and feature flags. India currently has `development` rollout; unbuilt product features are disabled. Reviewed legal documents and published store links are not configured yet.
+
+Run `npm test` for HTTP/configuration tests. [OpenAPI](docs/openapi.yaml) describes implemented routes. App release policy lives in `src/modules/app/policy.ts`; numeric build numbers avoid incorrect string comparisons such as treating build 9 as newer than build 12.

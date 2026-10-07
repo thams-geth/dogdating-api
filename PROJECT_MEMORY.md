@@ -34,3 +34,5 @@ Last updated: 7 October 2026. Read this with docs/IMPLEMENTATION.md at the start
 ## Next work
 
 Consult docs/IMPLEMENTATION.md for the current completed modules and exact continuation point. Production SMS, verification, media storage, app store IDs, public domains, reviewed legal text and launch city are still open product/operations inputs. Do not invent credentials, verified claims or production readiness.
+
+App lifecycle core delivered: countries/bootstrap, numeric version guidance, HTTP errors/readiness and six tests. OpenAPI only lists implemented routes. India is development-only; all product flags remain off. M02 auth/session core is next.
