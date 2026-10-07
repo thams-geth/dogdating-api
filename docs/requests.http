@@ -44,3 +44,24 @@ Authorization: Bearer {{accessToken}}
 ### Logout
 POST {{baseUrl}}/v1/auth/logout
 Authorization: Bearer {{accessToken}}
+
+### Resume onboarding (missing steps come from the server)
+GET {{baseUrl}}/v1/me/onboarding
+Authorization: Bearer {{accessToken}}
+
+### Save guardian declaration; this is NOT identity verification
+PUT {{baseUrl}}/v1/me/onboarding/preferences
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"countryCode":"IN","locale":"en-IN","mode":"pack","adultDeclared":true}
+
+### Read reviewed current terms; 404 until a document is published
+GET {{baseUrl}}/v1/legal/documents/terms?countryCode=IN&locale=en-IN
+
+### Preferences
+PATCH {{baseUrl}}/v1/me/preferences
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"readReceipts":false,"discoveryPaused":true}

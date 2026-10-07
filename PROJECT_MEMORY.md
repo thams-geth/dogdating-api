@@ -1,6 +1,6 @@
 # Project memory
 
-Last updated: 7 October 2026. Read this with docs/IMPLEMENTATION.md at the start of a session.
+Last updated: 8 October 2026. Read this with docs/IMPLEMENTATION.md at the start of a session.
 
 ## Confirmed user decisions
 
@@ -46,3 +46,5 @@ App lifecycle core delivered: countries/bootstrap, numeric version guidance, HTT
 - Test database: waggle_api_test at localhost:5433; tests clear its identity data and refuse DB names without `_test`.
 - Next module: M03 consent/onboarding followed by M04 household and dog ownership. All plan endpoints beyond documented OpenAPI paths remain unimplemented.
 - Pending answer about launch mode remains an assumption, not approval for breeding or human dating.
+
+M03 delivered: immutable published policy documents (no legal text seeded), consent acceptance/withdrawal history, resumable live onboarding, active-dog selection and preferences. Migration 0013. Adult self-declaration never awards verification. Historical completion does not replace current eligibility. Next: M04 household/dog profile module.

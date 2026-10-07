@@ -65,3 +65,11 @@ Integration tests refuse databases whose names do not end in `_test`. They verif
 Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
 
 Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: consent and resumable onboarding, households and dog profiles; then media/verification, home/discovery, likes/connections, chat and notifications.
+
+## Consent and onboarding
+
+`GET /v1/me/onboarding` returns saved preferences, the selected dog, missing prerequisites and a next action. Save the adult self-declaration with `PUT /v1/me/onboarding/preferences`; it does not grant an identity or age-verification badge. Select a dog with `PUT /v1/me/active-dog` and `{ "dogId": "..." }` (or null to clear).
+
+`GET/POST /v1/me/consents` reads/accepts document versions; `DELETE /v1/me/consents/{purpose}` records withdrawal. `GET /v1/legal/documents/{kind}` serves published, immutable text, optionally by version. **No legal text is seeded.** Until reviewed documents, approved photos, location and guardian verification exist, completion returns 409 and progress explains what is missing. Tests use labeled synthetic evidence in the test database only.
+
+`GET/PATCH /v1/me/preferences` controls discovery pause and read receipts. Discovery cannot be enabled with incomplete onboarding. Clients must use the current `ready`/`missing` fields: historical `completedAt` alone is insufficient after evidence expires or a policy changes. Media, verification and location-collection APIs are still upcoming modules.

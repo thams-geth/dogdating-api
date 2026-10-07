@@ -10,6 +10,8 @@ import { breedRoutes } from './modules/breeds/breeds.routes.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { AuthService } from './modules/auth/auth.service.js';
 import { DevelopmentOtpSender } from './modules/auth/otp-sender.js';
+import { OnboardingService } from './modules/onboarding/onboarding.service.js';
+import { legalRoutes,onboardingRoutes } from './modules/onboarding/onboarding.routes.js';
 import { config } from './config.js';
 
 export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService } = {}) {
@@ -30,7 +32,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0012']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0013']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -42,6 +44,9 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   const auth = deps.auth ?? (config.OTP_MODE === 'development' && config.AUTH_SECRET
     ? new AuthService(database, config.AUTH_SECRET, new DevelopmentOtpSender(config.NODE_ENV)) : undefined);
   app.use('/v1', authRoutes(auth));
+  const onboarding=new OnboardingService(database);
+  app.use('/v1/legal',legalRoutes(onboarding));
+  app.use('/v1/me',onboardingRoutes(onboarding,auth));
   app.use(notFound);
   app.use(errorHandler);
   return app;

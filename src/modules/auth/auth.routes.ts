@@ -1,3 +1,4 @@
+import { authenticate } from '../../http/authenticate.js';
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { asyncHandler } from '../../http/async-handler.js';
@@ -22,12 +23,7 @@ export function authRoutes(service?: AuthService): Router {
   }));
   router.post('/auth/otp/verify', limiter, asyncHandler(async (req, res) => res.json(await service!.verifyOtp(verifyOtpSchema.parse(req.body)))));
   router.post('/auth/refresh', limiter, asyncHandler(async (req, res) => res.json(await service!.refresh(refreshSchema.parse(req.body).refreshToken))));
-  router.use(asyncHandler(async (req, res, next) => {
-    const header = req.headers.authorization;
-    if (!header?.startsWith('Bearer ') || header.length > 4096) throw new ApiError(401, 'unauthenticated', 'A bearer token is required.');
-    res.locals.principal = await service!.authenticate(header.slice(7));
-    next();
-  }));
+  router.use(authenticate(service));
   const principal = (locals: Record<string, unknown>) => locals.principal as Principal;
   router.post('/auth/logout', asyncHandler(async (_req, res) => { await service!.logout(principal(res.locals)); res.sendStatus(204); }));
   router.post('/auth/logout-all', asyncHandler(async (_req, res) => { await service!.logoutAll(principal(res.locals)); res.sendStatus(204); }));

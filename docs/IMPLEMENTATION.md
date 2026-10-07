@@ -1,6 +1,6 @@
 # Implementation ledger
 
-Updated: 7 October 2026. Endpoint inventory lives in API_PLAN.md; this file records delivered behavior.
+Updated: 8 October 2026. Endpoint inventory lives in API_PLAN.md; this file records delivered behavior.
 
 | Module | State | Evidence / next work |
 | --- | --- | --- |
@@ -10,7 +10,8 @@ Updated: 7 October 2026. Endpoint inventory lives in API_PLAN.md; this file reco
 | M01 remaining content/rollout | Planned | Areas/waitlist, published legal documents, staff release controls and enforced minimum-build gate |
 | M02 authentication/session core | Complete for local development | OTP signup/login, refresh rotation/reuse revocation, logout/all, own-session list/revoke, GET/PATCH me; 17 PostgreSQL integration tests |
 | M02 production/recovery extensions | Planned | Production SMS + DLT, shared IP/device rate limits, security audit events, phone-change/recovery, provider reconciliation |
-| M03–M12 launch modules | Planned | Implement in dependency order in API_PLAN.md |
+| M03 consent/onboarding core | Complete | Versioned immutable policy text, acceptance/withdrawal evidence, resumable prerequisites, active-dog ownership checks and private preferences; 6 new database tests |
+| M04–M12 launch modules | Planned | Implement in dependency order in API_PLAN.md |
 | M13–M16 growth/expansion | Planned | Feature/country gates apply |
 
 ## Definition of module completion
@@ -19,7 +20,7 @@ Routes and contracts are documented; migrations reviewed/applied; input validati
 
 ## Session handoff
 
-Next: implement M03 consent/resumable onboarding and M04 households/dog profiles. Keep consent text/version and launch city as explicit unresolved inputs; local development can use labeled drafts, public launch cannot. Research and product docs supersede the external NestJS plan for this Express repository. Pending founder answer: playdates only vs playdates+breeding vs human dating at launch.
+Next: implement M04 households/dog profiles. Keep consent text/version and launch city as explicit unresolved inputs; local development can use labeled drafts, public launch cannot. Research and product docs supersede the external NestJS plan for this Express repository. Pending founder answer: playdates only vs playdates+breeding vs human dating at launch.
 
 ## Latest verification
 
@@ -32,3 +33,5 @@ Next: implement M03 consent/resumable onboarding and M04 households/dog profiles
 ## Explicit gaps
 
 M01 does not yet deliver areas/waitlists, reviewed legal documents, staff release controls or request-level update enforcement. M02's default provider is disabled; local setup explicitly enables terminal codes for synthetic users. No live SMS, adult verification, social login, phone-change/recovery or product onboarding is claimed. IP throttling is per process; OTP phone cooldown and attempt limits persist in PostgreSQL. Existing raw phone columns require infrastructure encryption/access controls and an explicit retention policy before launch.
+
+M03 verification: build/typecheck and all 23 integration tests passed before commit. Migrations now include 0013. Published legal text is intentionally unseeded; completion requires evidence from future media, location and verification modules. No public launch eligibility is manufactured.

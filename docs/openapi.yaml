@@ -322,7 +322,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: &a1
+          schema: &a2
             type: string
             format: uuid
       responses:
@@ -364,6 +364,214 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/legal/documents/{kind}:
+    get:
+      operationId: legalDocument
+      description: Read current or historical published text. Draft, missing and
+        future documents return 404. No legal text seeded.
+      parameters:
+        - name: kind
+          in: path
+          required: true
+          schema:
+            enum: &a1
+              - terms
+              - privacy
+              - community
+              - location
+              - marketing
+        - name: countryCode
+          in: query
+          schema:
+            const: IN
+            default: IN
+        - name: locale
+          in: query
+          schema:
+            const: en-IN
+            default: en-IN
+        - name: version
+          in: query
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 60
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LegalDocument"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me/onboarding:
+    get:
+      operationId: onboarding
+      description: Live prerequisites; prior completion does not override missing or
+        expired evidence.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Onboarding"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me/onboarding/preferences:
+    put:
+      operationId: saveOnboardingPreferences
+      description: Persist self-declaration and preferences; never awards verification.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OnboardingPreferences"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Onboarding"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me/onboarding/complete:
+    post:
+      operationId: completeOnboarding
+      description: 409 if any server-evaluated prerequisite is missing.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyBody"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Onboarding"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me/consents:
+    get:
+      operationId: consents
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentState"
+        default:
+          $ref: "#/components/responses/Problem"
+    post:
+      operationId: acceptConsent
+      description: Accept current published document once. Repeated acceptance does
+        not duplicate evidence.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsentInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentState"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me/consents/{purpose}:
+    delete:
+      operationId: withdrawConsent
+      description: Append withdrawal; required/location withdrawal pauses discovery.
+        Repeating is harmless.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: purpose
+          in: path
+          required: true
+          schema:
+            enum: *a1
+      responses:
+        "204":
+          description: Success
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me/active-dog:
+    put:
+      operationId: selectActiveDog
+      description: Select an active household dog or clear with null. Checks accepted
+        membership.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActiveDogInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Onboarding"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me/preferences:
+    get:
+      operationId: userPreferences
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPreferences"
+        default:
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: saveUserPreferences
+      description: Enabling discovery requires current complete onboarding.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPreferencesPatch"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPreferences"
         default:
           $ref: "#/components/responses/Problem"
 components:
@@ -471,7 +679,7 @@ components:
         code:
           type: string
           pattern: ^\d{6}$
-        deviceId: *a1
+        deviceId: *a2
         displayName:
           type: string
           minLength: 1
@@ -501,7 +709,7 @@ components:
         expiresIn:
           type: integer
           const: 900
-        userId: *a1
+        userId: *a2
     ProfileUpdate:
       type: object
       additionalProperties: false
@@ -532,7 +740,7 @@ components:
         - residencyRegion
         - createdAt
       properties:
-        id: *a1
+        id: *a2
         displayName:
           type: string
         phoneE164Masked:
@@ -568,8 +776,8 @@ components:
               - expiresAt
               - current
             properties:
-              id: *a1
-              deviceId: *a1
+              id: *a2
+              deviceId: *a2
               createdAt:
                 type: string
                 format: date-time
@@ -578,6 +786,162 @@ components:
                 format: date-time
               current:
                 type: boolean
+    OnboardingPreferences:
+      type: object
+      additionalProperties: false
+      required:
+        - countryCode
+        - locale
+        - mode
+        - adultDeclared
+      properties:
+        countryCode:
+          const: IN
+        locale:
+          const: en-IN
+        mode:
+          const: pack
+        adultDeclared: &a3
+          type: boolean
+    ConsentInput:
+      type: object
+      additionalProperties: false
+      required:
+        - documentId
+      properties:
+        documentId: &a5
+          type: string
+          format: uuid
+    ActiveDogInput:
+      type: object
+      additionalProperties: false
+      required:
+        - dogId
+      properties:
+        dogId:
+          type:
+            - string
+            - "null"
+          format: uuid
+    UserPreferences:
+      type: object
+      additionalProperties: false
+      required:
+        - discoveryPaused
+        - readReceipts
+      properties:
+        discoveryPaused: *a3
+        readReceipts: *a3
+    UserPreferencesPatch:
+      type: object
+      additionalProperties: false
+      required: []
+      properties:
+        discoveryPaused: *a3
+        readReceipts: *a3
+      minProperties: 1
+    Onboarding:
+      type: object
+      additionalProperties: false
+      required:
+        - rulesVersion
+        - ready
+        - missing
+        - nextAction
+        - activeDogId
+        - completedAt
+        - preferences
+      properties:
+        rulesVersion:
+          const: 1
+        ready: *a3
+        missing:
+          type: array
+          items: &a6
+            type: string
+        nextAction: &a4
+          type:
+            - string
+            - "null"
+        activeDogId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        completedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        preferences:
+          $ref: "#/components/schemas/OnboardingPreferences"
+    ConsentState:
+      type: object
+      additionalProperties: false
+      required:
+        - consents
+      properties:
+        consents:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - purpose
+              - required
+              - currentDocumentId
+              - currentVersion
+              - status
+              - acceptedDocumentId
+              - current
+              - recordedAt
+            properties:
+              purpose:
+                enum: *a1
+              required: *a3
+              currentDocumentId: *a4
+              currentVersion: *a4
+              status:
+                enum:
+                  - accepted
+                  - withdrawn
+                  - not-accepted
+              acceptedDocumentId: *a4
+              current: *a3
+              recordedAt:
+                type:
+                  - string
+                  - "null"
+                format: date-time
+    LegalDocument:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - purpose
+        - version
+        - countryCode
+        - locale
+        - body
+        - contentSha256
+        - publishedAt
+      properties:
+        id: *a5
+        purpose:
+          enum: *a1
+        version: *a6
+        countryCode: *a6
+        locale: *a6
+        body: *a6
+        contentSha256: *a6
+        publishedAt:
+          type: string
+          format: date-time
+    EmptyBody:
+      type: object
+      additionalProperties: false
+      required: []
+      properties: {}
   securitySchemes:
     bearerAuth:
       type: http
