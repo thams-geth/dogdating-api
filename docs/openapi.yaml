@@ -10,147 +10,576 @@ paths:
     get:
       operationId: health
       responses:
-        '200':
+        "200":
           description: Process is live
           content:
             application/json:
               schema:
                 type: object
-                required: [status]
+                required:
+                  - status
                 properties:
-                  status: { const: ok }
+                  status:
+                    const: ok
   /v1/ready:
     get:
       operationId: readiness
       responses:
-        '200': { description: Database and required schema are ready }
-        '503': { $ref: '#/components/responses/Problem' }
+        "200":
+          description: Database and required schema are ready
+        "503":
+          $ref: "#/components/responses/Problem"
   /v1/app/countries:
     get:
       operationId: countries
       responses:
-        '200':
-          description: Markets with rollout and locale settings; development is not a public launch
+        "200":
+          description: Markets with rollout and locale settings; development is not a
+            public launch
           content:
             application/json:
               schema:
                 type: object
-                required: [countries]
+                required:
+                  - countries
                 properties:
                   countries:
                     type: array
-                    items: { $ref: '#/components/schemas/Country' }
+                    items:
+                      $ref: "#/components/schemas/Country"
   /v1/app/bootstrap:
     get:
       operationId: bootstrap
       parameters:
-        - { name: platform, in: query, required: true, schema: { type: string, enum: [android, ios] } }
-        - { name: buildNumber, in: query, required: true, schema: { type: integer, minimum: 1, maximum: 9999999999 } }
-        - { name: countryCode, in: query, schema: { type: string, pattern: '^[A-Z]{2}$', default: IN } }
-        - { name: locale, in: query, schema: { type: string, minLength: 2, maxLength: 35, default: en-IN } }
+        - name: platform
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: buildNumber
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 9999999999
+        - name: countryCode
+          in: query
+          schema:
+            type: string
+            pattern: ^[A-Z]{2}$
+            default: IN
+        - name: locale
+          in: query
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 35
+            default: en-IN
       responses:
-        '200':
+        "200":
           description: Effective country, update policy and feature availability
           content:
             application/json:
               schema:
                 type: object
-                required: [policyRevision, maintenance, country, effectiveLocale, update, features, legal]
+                required:
+                  - policyRevision
+                  - maintenance
+                  - country
+                  - effectiveLocale
+                  - update
+                  - features
+                  - legal
                 properties:
-                  policyRevision: { type: string }
-                  maintenance: { type: boolean }
+                  policyRevision:
+                    type: string
+                  maintenance:
+                    type: boolean
                   country:
                     oneOf:
-                      - { $ref: '#/components/schemas/Country' }
+                      - $ref: "#/components/schemas/Country"
                       - type: object
-                        required: [countryCode, rollout]
+                        required:
+                          - countryCode
+                          - rollout
                         properties:
-                          countryCode: { type: string }
-                          rollout: { const: unavailable }
-                  effectiveLocale: { type: string }
+                          countryCode:
+                            type: string
+                          rollout:
+                            const: unavailable
+                  effectiveLocale:
+                    type: string
                   update:
                     type: object
-                    required: [action, minimumBuild, latestBuild, storeUrl]
+                    required:
+                      - action
+                      - minimumBuild
+                      - latestBuild
+                      - storeUrl
                     properties:
-                      action: { enum: [none, recommended, required] }
-                      minimumBuild: { type: integer }
-                      latestBuild: { type: integer }
-                      storeUrl: { type: [string, 'null'], format: uri }
+                      action:
+                        enum:
+                          - none
+                          - recommended
+                          - required
+                      minimumBuild:
+                        type: integer
+                      latestBuild:
+                        type: integer
+                      storeUrl:
+                        type:
+                          - string
+                          - "null"
+                        format: uri
                   features:
                     type: object
                     properties:
-                      pack: { type: boolean }
-                      lineage: { type: boolean }
-                      spark: { type: boolean }
-                      billing: { type: boolean }
+                      pack:
+                        type: boolean
+                      lineage:
+                        type: boolean
+                      spark:
+                        type: boolean
+                      billing:
+                        type: boolean
                   legal:
                     type: object
                     description: Null until reviewed documents are published
                     properties:
-                      termsVersion: { type: [string, 'null'] }
-                      privacyVersion: { type: [string, 'null'] }
-                      communityVersion: { type: [string, 'null'] }
-        '400': { $ref: '#/components/responses/Problem' }
+                      termsVersion:
+                        type:
+                          - string
+                          - "null"
+                      privacyVersion:
+                        type:
+                          - string
+                          - "null"
+                      communityVersion:
+                        type:
+                          - string
+                          - "null"
+        "400":
+          $ref: "#/components/responses/Problem"
   /v1/dogs/breeds:
     get:
       operationId: breeds
       responses:
-        '200':
+        "200":
           description: Public breed reference catalogue
           content:
             application/json:
               schema:
                 type: object
-                required: [breeds]
+                required:
+                  - breeds
                 properties:
                   breeds:
                     type: array
                     items:
                       type: object
-                      required: [id, name, sizeClass, typicalEnergy, requiredHealthTests, conformationFlags]
+                      required:
+                        - id
+                        - name
+                        - sizeClass
+                        - typicalEnergy
+                        - requiredHealthTests
+                        - conformationFlags
                       properties:
-                        id: { type: string, format: uuid }
-                        name: { type: string }
-                        sizeClass: { type: string }
-                        typicalEnergy: { type: [integer, 'null'] }
-                        requiredHealthTests: { type: array, items: { type: string } }
-                        conformationFlags: { type: array, items: { type: string } }
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        sizeClass:
+                          type: string
+                        typicalEnergy:
+                          type:
+                            - integer
+                            - "null"
+                        requiredHealthTests:
+                          type: array
+                          items:
+                            type: string
+                        conformationFlags:
+                          type: array
+                          items:
+                            type: string
+  /v1/auth/otp/request:
+    post:
+      operationId: requestOtp
+      description: Generic acceptance; per-phone cooldown/limit suppression and
+        provider failure have the same response. Development sender only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestOtp"
+      responses:
+        "202":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - status
+                properties:
+                  status:
+                    const: accepted
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/auth/otp/verify:
+    post:
+      operationId: verifyOtp
+      description: Verify once; displayName required only for new accounts. New
+        accounts remain pending onboarding.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOtp"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/auth/refresh:
+    post:
+      operationId: refresh
+      description: Rotate refresh token; reuse revokes the family. Clients must
+        serialize refresh requests.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Refresh"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/auth/logout:
+    post:
+      operationId: logout
+      description: Revoke current session family.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Completed without a response body
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/auth/logout-all:
+    post:
+      operationId: logoutAll
+      description: Revoke all current user sessions.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Completed without a response body
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/auth/sessions:
+    get:
+      operationId: sessions
+      description: List active device sessions belonging to current user, maximum 100.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sessions"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/auth/sessions/{id}:
+    delete:
+      operationId: revokeSession
+      description: Revoke one of the current user's session families. Inaccessible
+        sessions return 404.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: &a1
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Completed without a response body
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/me:
+    get:
+      operationId: me
+      description: Private guardian profile; phone masked.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        default:
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: updateMe
+      description: Allowlisted name, locale and timezone edits. No verification, role
+        or status edits.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        default:
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
       description: Structured API error; status/code/detail depend on the failure
       content:
         application/problem+json:
-          schema: { $ref: '#/components/schemas/Problem' }
+          schema:
+            $ref: "#/components/schemas/Problem"
   schemas:
     Problem:
       type: object
-      required: [type, code, title, status, detail, requestId]
+      required:
+        - type
+        - code
+        - title
+        - status
+        - detail
+        - requestId
       properties:
-        type: { type: string }
-        code: { type: string }
-        title: { type: string }
-        status: { type: integer }
-        detail: { type: string }
-        requestId: { type: string, format: uuid }
+        type:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        requestId:
+          type: string
+          format: uuid
         errors:
           type: array
           items:
             type: object
             properties:
-              path: { type: string }
-              code: { type: string }
+              path:
+                type: string
+              code:
+                type: string
     Country:
       type: object
-      required: [countryCode, name, rollout, callingCode, currency, distanceUnit, defaultLocale, supportedLocales, defaultTimezone, minimumAge]
+      required:
+        - countryCode
+        - name
+        - rollout
+        - callingCode
+        - currency
+        - distanceUnit
+        - defaultLocale
+        - supportedLocales
+        - defaultTimezone
+        - minimumAge
       properties:
-        countryCode: { type: string }
-        name: { type: string }
-        rollout: { type: string, enum: [development] }
-        callingCode: { type: string }
-        currency: { type: string }
-        distanceUnit: { type: string }
-        defaultLocale: { type: string }
-        supportedLocales: { type: array, items: { type: string } }
-        defaultTimezone: { type: string }
-        minimumAge: { type: integer }
+        countryCode:
+          type: string
+        name:
+          type: string
+        rollout:
+          type: string
+          enum:
+            - development
+        callingCode:
+          type: string
+        currency:
+          type: string
+        distanceUnit:
+          type: string
+        defaultLocale:
+          type: string
+        supportedLocales:
+          type: array
+          items:
+            type: string
+        defaultTimezone:
+          type: string
+        minimumAge:
+          type: integer
+    RequestOtp:
+      type: object
+      additionalProperties: false
+      required:
+        - phoneE164
+      properties:
+        phoneE164:
+          type: string
+          pattern: ^\+91[6-9]\d{9}$
+        countryCode:
+          const: IN
+          default: IN
+    VerifyOtp:
+      type: object
+      additionalProperties: false
+      required:
+        - phoneE164
+        - code
+        - deviceId
+      properties:
+        phoneE164:
+          type: string
+          pattern: ^\+[1-9]\d{6,14}$
+        code:
+          type: string
+          pattern: ^\d{6}$
+        deviceId: *a1
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+    Refresh:
+      type: object
+      additionalProperties: false
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          maxLength: 80
+    TokenPair:
+      type: object
+      additionalProperties: false
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+        - userId
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          const: 900
+        userId: *a1
+    ProfileUpdate:
+      type: object
+      additionalProperties: false
+      required: []
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        locale:
+          enum:
+            - en-IN
+        timezone:
+          type: string
+          maxLength: 64
+      minProperties: 1
+    Me:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - displayName
+        - phoneE164Masked
+        - locale
+        - timezone
+        - status
+        - countryCode
+        - residencyRegion
+        - createdAt
+      properties:
+        id: *a1
+        displayName:
+          type: string
+        phoneE164Masked:
+          type: string
+        locale:
+          type: string
+        timezone:
+          type: string
+        status:
+          type: string
+        countryCode:
+          type: string
+        residencyRegion:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    Sessions:
+      type: object
+      additionalProperties: false
+      required:
+        - sessions
+      properties:
+        sessions:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - deviceId
+              - createdAt
+              - expiresAt
+              - current
+            properties:
+              id: *a1
+              deviceId: *a1
+              createdAt:
+                type: string
+                format: date-time
+              expiresAt:
+                type: string
+                format: date-time
+              current:
+                type: boolean
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

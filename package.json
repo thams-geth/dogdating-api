@@ -12,7 +12,10 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test test/unit/*.test.ts",
-    "migrate": "tsx src/db/migrate.ts"
+    "migrate": "tsx src/db/migrate.ts",
+    "test:integration": "node --import tsx --test --test-concurrency=1 test/integration/*.test.ts",
+    "setup:dev": "node scripts/setup-dev.mjs",
+    "check:openapi": "node scripts/check-openapi.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
@@ -29,6 +32,7 @@
     "@types/supertest": "^7.2.1",
     "supertest": "^7.3.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "yaml": "^2.9.1"
   }
 }

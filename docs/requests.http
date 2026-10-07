@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:3000
+@phone = +919000100000
+@deviceId = 11111111-1111-4111-8111-111111111111
+@otp = REPLACE_FROM_LOCAL_TERMINAL
+@accessToken = REPLACE_FROM_VERIFY_RESPONSE
+@refreshToken = REPLACE_FROM_VERIFY_RESPONSE
+
+### Configuration
+GET {{baseUrl}}/v1/app/bootstrap?platform=android&buildNumber=1&countryCode=IN&locale=en-IN
+
+### Request OTP; requires npm run setup:dev locally
+POST {{baseUrl}}/v1/auth/otp/request
+Content-Type: application/json
+
+{"phoneE164":"{{phone}}","countryCode":"IN"}
+
+### Verify / sign up; replace OTP with local terminal code
+POST {{baseUrl}}/v1/auth/otp/verify
+Content-Type: application/json
+
+{"phoneE164":"{{phone}}","code":"{{otp}}","deviceId":"{{deviceId}}","displayName":"Test Guardian"}
+
+### Read private profile
+GET {{baseUrl}}/v1/me
+Authorization: Bearer {{accessToken}}
+
+### Edit allowed fields
+PATCH {{baseUrl}}/v1/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"displayName":"My Name","locale":"en-IN","timezone":"Asia/Kolkata"}
+
+### Refresh; replace both saved tokens after this request. Reusing old refresh revokes the family.
+POST {{baseUrl}}/v1/auth/refresh
+Content-Type: application/json
+
+{"refreshToken":"{{refreshToken}}"}
+
+### Own device sessions
+GET {{baseUrl}}/v1/auth/sessions
+Authorization: Bearer {{accessToken}}
+
+### Logout
+POST {{baseUrl}}/v1/auth/logout
+Authorization: Bearer {{accessToken}}

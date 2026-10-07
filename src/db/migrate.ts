@@ -3,11 +3,12 @@ import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { pool } from './pool.js';
+import type { Pool } from 'pg';
 
 const migrationsDir = resolve(fileURLToPath(new URL('../../migrations/', import.meta.url)));
 
-export async function migrate(): Promise<void> {
-  const client = await pool.connect();
+export async function migrate(database: Pool = pool): Promise<void> {
+  const client = await database.connect();
   try {
     await client.query('SELECT pg_advisory_lock($1)', [8791701]);
     await client.query('CREATE SCHEMA IF NOT EXISTS ops');
@@ -47,8 +48,8 @@ export async function migrate(): Promise<void> {
       }
     }
   } finally {
-    await client.query('SELECT pg_advisory_unlock($1)', [8791701]);
-    client.release();
+    try { await client.query('SELECT pg_advisory_unlock($1)', [8791701]); }
+    finally { client.release(); }
   }
 }
 

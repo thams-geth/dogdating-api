@@ -35,4 +35,14 @@ Last updated: 7 October 2026. Read this with docs/IMPLEMENTATION.md at the start
 
 Consult docs/IMPLEMENTATION.md for the current completed modules and exact continuation point. Production SMS, verification, media storage, app store IDs, public domains, reviewed legal text and launch city are still open product/operations inputs. Do not invent credentials, verified claims or production readiness.
 
-App lifecycle core delivered: countries/bootstrap, numeric version guidance, HTTP errors/readiness and six tests. OpenAPI only lists implemented routes. India is development-only; all product flags remain off. M02 auth/session core is next.
+App lifecycle core delivered: countries/bootstrap, numeric version guidance, HTTP errors/readiness and six tests. OpenAPI only lists implemented routes. India is development-only; all product flags remain off. M02 auth/session core is now delivered for local development.
+
+## Latest handoff
+
+- Research/plan commit: 898efff. App lifecycle core commit: f4236eb. Auth module commit is the next commit after those; use git log for its exact hash.
+- Auth delivered: OTP request/verify, refresh with reuse detection, logout/all, own-device session list/revoke, private GET/PATCH me. New accounts stay pending.
+- Eight unit/HTTP tests and 17 database integration tests passed; migration 0012 added. Never treat passing local tests as production readiness.
+- `npm run setup:dev` enables a local-only sender and generates `.env` secret. Do not print the secret. Real SMS adapter, DLT, shared rate limits and auth audit events are still needed.
+- Test database: waggle_api_test at localhost:5433; tests clear its identity data and refuse DB names without `_test`.
+- Next module: M03 consent/onboarding followed by M04 household and dog ownership. All plan endpoints beyond documented OpenAPI paths remain unimplemented.
+- Pending answer about launch mode remains an assumption, not approval for breeding or human dating.
