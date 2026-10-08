@@ -204,3 +204,22 @@ Content-Type: application/json
 ### List own outgoing blocks
 GET {{baseUrl}}/v1/me/blocks?limit=20
 Authorization: Bearer {{accessToken}}
+
+### Home: current dog, missing tasks and honest section availability
+GET {{baseUrl}}/v1/home
+Authorization: Bearer {{accessToken}}
+
+### Explicit whole-city opt-in (PUT replaces preference values; include any other desired filters)
+PUT {{baseUrl}}/v1/dogs/{{dogId}}/preferences
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"allowCityOnly":true}
+
+### Development feed (requires explicit server configuration and current eligibility)
+GET {{baseUrl}}/v1/feed?dogId={{dogId}}&mode=pack&limit=20
+Authorization: Bearer {{accessToken}}
+
+### Discovery profile: token must come from this actor's feed card
+GET {{baseUrl}}/v1/dogs/{{targetDogId}}/profile?dogId={{dogId}}&impressionToken={{impressionToken}}
+Authorization: Bearer {{accessToken}}

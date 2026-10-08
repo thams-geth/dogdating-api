@@ -24,7 +24,7 @@ OpenAPI documents implemented operations. API_PLAN.md includes future operations
 
 ## Pagination
 
-Households, dogs, areas and health records accept `limit` (default 20, maximum 50) and opaque `cursor`. Responses return a named array and `nextCursor` (null at the end). Send that token unchanged. Cursors are scoped to their list/user/filter; reset them after changing filters or accounts. UUID ordering is stable traversal, not newest-first ordering. Other lists such as breeds, consent purposes, photo slots and sessions do not use this contract unless their endpoint says so.
+Households, dogs, areas and health records accept `limit` (default 20, maximum 50) and opaque `cursor`. Responses return a named array and `nextCursor` (null at the end). Send that token unchanged. Cursors are scoped to their list/user/filter; reset them after changing filters or accounts. UUID ordering is stable traversal, not newest-first ordering. Discovery uses its own signed, ten-minute snapshot cursor (up to 2048 characters); restart it after actor settings change or token expiry. Other lists such as breeds, consent purposes, photo slots and device sessions do not use this contract unless their endpoint says so.
 
 ## Errors
 

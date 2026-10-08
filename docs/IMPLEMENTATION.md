@@ -7,28 +7,28 @@ Updated: 8 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 | Baseline | Complete | Express/TypeScript, PostgreSQL migrations; d0b4746 |
 | Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
 | M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
-| M01 rollout/content extensions | Planned | Areas/waitlist, staff release administration, enforced update gates; bootstrap legal-version hints remain unconfigured |
+| M01 rollout/content extensions | Planned | Waitlist enrollment, staff release administration, enforced update gates; bootstrap legal-version hints remain unconfigured |
 | M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me; 23e75eb |
 | M02 production/recovery | Planned | SMS + DLT, shared throttling, security audit events, phone-change/recovery |
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
 | M04 household/dog profile core | Complete | Ownership, roles/invites, drafts, breed mix, structured temperament, preferences/schedule, gated publishing, pause, memorialisation, beacons |
 | M04 manual location | Complete | Public area lookup; consented household city selection/read/clear; roles, 24-hour limit and live onboarding checks |
-| M04 GPS/discovery/transfer extensions | Planned | Encrypted GPS/displaced anchor, public profile with block/privacy/anti-scraping checks; two-party transfer |
+| M04 GPS/transfer extensions | Planned | Encrypted GPS/displaced anchor and two-party transfer; M06 now provides impression-scoped profile projection |
 | M05 private photo foundation | Complete for local development | Real JPEG/PNG uploads, checksum/type/size checks, EXIF removal, status/order/deletion and retryable cleanup; pending moderation only |
 | M05 verification intake / health metadata | Complete as a foundation | Request/status/withdrawal, requester permissions, deduplication, limits and private self-reported health records; no badges granted |
 | M05 production integrations | Planned | Object storage, scan/moderation, approved-photo delivery, identity/document provider, signed webhooks and authorized reviewer grants |
-| M06 home/discovery | In progress | Live eligibility and household-wide block enforcement |
+| M06 home/discovery foundation | Complete for opt-in development | Home/tasks, city-only metadata feed, signed snapshots/impressions, live publisher eligibility, bilateral blocks/preferences, profile projection and durable exposure limits |
 | M11 blocking foundation | Complete | Private paginated block list, idempotent block/unblock; existing cross-household matches/conversations close |
 | M07–M12 remaining launch modules | Planned | Likes/connections, chat, notifications, meetups, reports/privacy/support, staff operations |
 | M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 55 PostgreSQL integration tests passed (63 total).
+- Typecheck/build passed; 8 unit/HTTP tests and 65 PostgreSQL integration tests passed (73 total).
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
-- Migrations through 0017. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 66 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- Migrations through 0018. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- 71 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions
@@ -43,7 +43,7 @@ The launch-mode question remains unanswered. Playdates/walks are provisional; th
 
 ## Next session
 
-Build M06 home/discovery with block/privacy foundations and city-only location handling, keeping media/verification gates closed until production integrations exist. Before enabling a provider, document credentials/configuration, callback verification, storage restrictions and production availability. Keep legal text, actual launch city and provider selection as explicit inputs rather than fabricated configuration.
+Build M07 likes/connections with impression validation, live bilateral blocks, atomic matching and idempotency; then M08 messaging. Keep public discovery gates closed until production dependencies are ready. Before enabling a provider, document credentials/configuration, callback verification, storage restrictions and production availability. Keep legal text, actual launch city and provider selection as explicit inputs rather than fabricated configuration.
 
 ## Definition of module completion
 
@@ -59,4 +59,8 @@ All 16 modules have docs/handovers/Mxx.md, with current status, screen flow and 
 
 Location verification: five database tests cover public rollout/search/cursor semantics, current consent, country/role checks, concurrent throttling, deletion and live readiness. Manual location stores metro_id only; it never generates precise distance or GPS claims. Consent withdrawal remains per-user and does not delete shared location.
 
-Blocking tests cover private lists, cursor scope, validation, reciprocal concurrency, idempotency and persistent match/conversation closure after unblock. Discovery enforcement follows in M06; future relationship/message operations must check live blocks.
+Blocking tests cover private lists, cursor scope, validation, reciprocal concurrency, idempotency and persistent match/conversation closure after unblock. M06 feed/profile enforcement is implemented; future relationship/message operations must check live blocks.
+
+Discovery verification: ten integration tests cover live consent/publisher/verification/photo/account gates, household-wide block directions, matching filters, whole-city opt-in, scoped and expired tokens, stable pagination, changed context, durable quotas and truthful home states. New dog publications record published_by. Old publications with no publisher stay hidden until republished. Source-provided identity verification and reviewed legal content are not fabricated.
+
+Remaining discovery gaps: cloud photo delivery/moderation, provider verification and account activation, public rollout, GPS/distance matching, full home counters and automated cleanup scheduling. DISCOVERY_MODE=development is off by default and forbidden in production; bootstrap flags remain false. A city-only opt-in explicitly overrides radius filtering with unknown distance.

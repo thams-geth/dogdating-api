@@ -18,7 +18,8 @@
     "check:openapi": "node scripts/check-openapi.mjs",
     "media:cleanup": "tsx src/modules/media/cleanup.ts",
     "docs:handovers": "node scripts/generate-handovers.mjs",
-    "check:handovers": "node scripts/generate-handovers.mjs --check"
+    "check:handovers": "node scripts/generate-handovers.mjs --check",
+    "discovery:cleanup": "tsx src/modules/discovery/cleanup.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

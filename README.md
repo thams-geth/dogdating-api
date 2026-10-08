@@ -69,9 +69,9 @@ Integration tests refuse databases whose names do not end in `_test`. They verif
 
 ## Database and module workflow
 
-Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata; 0013 adds consent/onboarding; 0014 adds invitations and dog drafts; 0015 adds photo uploads; 0016 adds verification intake and health-record deletion metadata; 0017 adds manual location state. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
+Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata; 0013 adds consent/onboarding; 0014 adds invitations and dog drafts; 0015 adds photo uploads; 0016 adds verification intake and health-record deletion metadata; 0017 adds manual location state; 0018 adds publisher-bound discovery eligibility and feed sessions. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
 
-Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: home/discovery and its blocking/privacy prerequisites; production media/moderation and verification integration remain launch dependencies.
+Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: likes/connections and messaging; production media/moderation and verification integration remain launch dependencies.
 
 ## Consent and onboarding
 
@@ -91,7 +91,7 @@ Create/list dog drafts at `/v1/dogs`; household members can read `/v1/dogs/{id}`
 
 `POST /publish`, `/pause`, `/memorialise`, and `POST/DELETE /beacon` manage visibility and walking-now status. Publishing requires this dog to be selected and its guardian's live onboarding checks to pass. A beacon also requires discovery enabled and lasts at most 90 minutes. Memorialisation is owner-only and cannot be reversed with profile edits. Editing core profile details returns a published dog to draft; identity or breed changes revoke existing dog-verification grants so stale claims cannot survive edits.
 
-Household/dog lists use `limit` (default 20, maximum 50) and a user/list-scoped `nextCursor`, ordered by UUID. `GET /v1/dogs/{id}` is a private household view; public discovery profiles, dog transfers and precise GPS capture are still pending. Publication is a stored lifecycle state, not proof that future discovery safety/consent checks may be skipped.
+Household/dog lists use `limit` (default 20, maximum 50) and a user/list-scoped `nextCursor`, ordered by UUID. `GET /v1/dogs/{id}` is a private household view; discovery profiles now have a separate impression-scoped route; dog transfers and precise GPS capture are still pending. Publication is a stored lifecycle state, not proof that future discovery safety/consent checks may be skipped.
 
 ## Private photo uploads
 
@@ -134,3 +134,22 @@ Identical saves are idempotent; a different selection is allowed once per 24 hou
 ## Blocking
 
 `POST /v1/me/blocks` with `{ "userId": "..." }` blocks another user idempotently (204). `GET /v1/me/blocks` lists only your outgoing blocks with standard pagination; `DELETE /v1/me/blocks/{userId}` removes your block idempotently. The other direction remains effective. Existing active cross-household matches are blocked and conversations close; unblocking does not restore them. Shared household membership is not removed. Maximum 500 outgoing blocks. See the [safety handover](docs/handovers/M11.md).
+
+## Home and development discovery
+
+`GET /v1/home` returns the selected dog, live onboarding tasks and discovery availability. Connections, messages, meetup and notification sections explicitly return `not_implemented` with null values until those modules exist.
+
+Discovery is off by default. `DISCOVERY_MODE=development` with `AUTH_SECRET` enables the development metadata feed; this mode cannot run in production. It does not enable bootstrap's public product flags. Eligible test evidence belongs only in the dedicated test database; do not fabricate verification or legal content in development accounts to bypass missing providers.
+
+- `GET /v1/feed?dogId=...&mode=pack&limit=20&cursor=...`
+- `GET /v1/feed/empty-reason?dogId=...`
+- `GET /v1/dogs/{targetId}/profile?dogId={actorId}&impressionToken=...`
+- `GET /v1/dogs/{id}/discovery-preferences`
+
+Use `PUT /v1/dogs/{id}/preferences` with `allowCityOnly: true` to explicitly opt into the whole city. Both dogs need this preference. Distance is unknown; kilometre buckets cannot be enforced from a manual city selection. Cards include approved-photo metadata, with `mediaDelivery: unavailable`; image delivery remains pending.
+
+Discovery additionally requires an active account with verified adulthood, current guardian evidence and consent, an eligible published dog, and current editor membership. This is stricter than merely saving an adult declaration or reaching onboarding readiness. Publishing now records the consenting publisher; legacy published dogs must be republished before becoming eligible. These checks, bilateral household blocks and matching preferences are evaluated on every feed/profile read.
+
+Ranking uses energy similarity, shared play styles, size and overlapping same-timezone schedules. Signed ten-minute snapshots contain up to 200 IDs; pages recheck current privacy and preserve snapshot order. Changed actor settings require restarting. A card's impression token is bound to caller, actor, target and mode; it cannot authorize a stale/ineligible profile. Redact query tokens from request logs.
+
+Limits are persisted: 60 new feed snapshots/hour/user and 200 distinct exposed dogs per UTC day. Run `npm run discovery:cleanup` regularly to remove sessions older than a day and prior-day exposure records. No scheduler is configured yet. See [M06 handover](docs/handovers/M06.md) for response shapes, reasons, recovery and wireframes.

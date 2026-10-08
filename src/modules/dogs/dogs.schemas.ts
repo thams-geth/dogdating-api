@@ -21,7 +21,7 @@ const scale=z.number().int().min(1).max(5);
 export const temperamentSchema=z.object({questionnaireVersion:z.literal(1),energy:scale,
  playStyle:z.array(styles).min(1).max(5).refine(unique),dogReactivity:scale,humanReactivity:scale,resourceGuarding:scale,
  recallReliability:scale,sizeTolerance:z.array(sizes).min(1).max(5).refine(unique),needsToKnow:z.string().trim().max(500).default(''),}).strict();
-export const dogPreferencesSchema=z.object({maxDistanceBucket:z.enum(['under_2_km','km_2_5','km_5_10','km_10_25','over_25_km']).default('km_5_10'),
+export const dogPreferencesSchema=z.object({allowCityOnly:z.boolean().default(false),maxDistanceBucket:z.enum(['under_2_km','km_2_5','km_5_10','km_10_25','over_25_km']).default('km_5_10'),
  sizeClasses:z.array(sizes).max(5).refine(unique).default([]),ageMinMonths:z.number().int().min(0).max(360).nullable().default(null),ageMaxMonths:z.number().int().min(0).max(360).nullable().default(null),
  energyMin:scale.nullable().default(null),energyMax:scale.nullable().default(null),playStyles:z.array(styles).max(5).refine(unique).default([]),
  minVerificationTier:z.number().int().min(0).max(4).default(1),parallelWalkOnly:z.boolean().default(false),acceptsReactive:z.boolean().default(false),})

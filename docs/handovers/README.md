@@ -9,7 +9,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 | M03 | [Guardian profile, consent and resumable onboarding](M03.md) | Implemented foundation; see limitations | 12 |
 | M04 | [Households and dog profiles](M04.md) | Implemented foundation; see limitations | 25 |
 | M05 | [Uploads and verification](M05.md) | Implemented foundation; see limitations | 13 |
-| M06 | [Home and discovery](M06.md) | Not implemented | 0 |
+| M06 | [Home and discovery](M06.md) | Implemented foundation; see limitations | 5 |
 | M07 | [Likes, connections and entitlements](M07.md) | Not implemented | 0 |
 | M08 | [Messages and realtime](M08.md) | Not implemented | 0 |
 | M09 | [Notifications and devices](M09.md) | Not implemented | 0 |
@@ -35,7 +35,7 @@ flowchart TD
   H -->|No| I["Show missing step or dependency unavailable"]
   I --> G
   H -->|Yes| J["M04: Publish / enable discovery preference"]
-  J -. planned .-> K["M06: Home and discovery"]
+  J --> K["M06: Home and discovery - development"]
   K -. planned .-> L["M07: Likes and connections"]
   L -. planned .-> M["M08: Messages"]
   M -. planned .-> N["M10: Meetups"]

@@ -21,7 +21,7 @@ export class DogsRepository {
   const temperament=(await tx.query(`SELECT questionnaire_version AS "questionnaireVersion",energy,play_style AS "playStyle",
    dog_reactivity AS "dogReactivity",human_reactivity AS "humanReactivity",resource_guarding AS "resourceGuarding",
    recall_reliability AS "recallReliability",size_tolerance AS "sizeTolerance",needs_to_know AS "needsToKnow" FROM graph.dog_temperament WHERE dog_id=$1`,[id])).rows[0]??null;
-  const preferences=(await tx.query(`SELECT max_distance_bucket AS "maxDistanceBucket",size_classes AS "sizeClasses",age_min_months AS "ageMinMonths",
+  const preferences=(await tx.query(`SELECT allow_city_only AS "allowCityOnly",max_distance_bucket AS "maxDistanceBucket",size_classes AS "sizeClasses",age_min_months AS "ageMinMonths",
    age_max_months AS "ageMaxMonths",energy_min AS "energyMin",energy_max AS "energyMax",play_styles AS "playStyles",
    min_verification_tier AS "minVerificationTier",parallel_walk_only AS "parallelWalkOnly",accepts_reactive AS "acceptsReactive" FROM graph.match_preferences WHERE dog_id=$1`,[id])).rows[0]??null;
   const windows=(await tx.query(`SELECT day_of_week AS "dayOfWeek",start_min AS "startMin",end_min AS "endMin" FROM graph.dog_availability

@@ -26,8 +26,10 @@ import { LocationService } from './modules/location/location.service.js';
 import { areaRoutes, locationRoutes } from './modules/location/location.routes.js';
 import { BlocksService } from './modules/safety/blocks.service.js';
 import { blockRoutes } from './modules/safety/blocks.routes.js';
+import { DiscoveryService } from './modules/discovery/discovery.service.js';
+import { discoveryRoutes } from './modules/discovery/discovery.routes.js';
 
-export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage } = {}) {
+export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage; discoverySecret?: string } = {}) {
   const database = deps.database ?? pool;
   const app = express();
   app.disable('x-powered-by');
@@ -45,7 +47,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0017']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0018']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -74,6 +76,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   const photos = deps.photoStorage ?? (config.MEDIA_MODE === 'local' ? new LocalPhotoStorage(config.MEDIA_LOCAL_DIR, config.NODE_ENV) : undefined);
   app.use('/v1', mediaRoutes(new MediaService(database, photos), auth));
   app.use('/v1', verificationRoutes(new VerificationService(database), auth));
+  app.use('/v1',discoveryRoutes(new DiscoveryService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
   app.use(notFound);
   app.use(errorHandler);
   return app;

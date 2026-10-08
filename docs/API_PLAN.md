@@ -136,6 +136,8 @@ Uploads remain quarantined until scan/moderation; strip EXIF, cap pixel counts, 
 
 ### M06 — Home and discovery [L]
 
+Current delivery: home with explicit unavailable future sections, opt-in development city-only metadata feed, empty reasons, effective preferences and impression-scoped profile reads. Active verified-adult accounts and current evidence are required. Both dogs must opt in with allowCityOnly; no kilometre distance is inferred. Production rollout and photo delivery remain blocked.
+
 | Method + path | Access | Purpose |
 | --- | --- | --- |
 | GET `/home?dogId=` | U | Selected dog, tasks, unread counts, connections, next meetup; honest partial-section status |
@@ -156,7 +158,7 @@ No arbitrary GPS/radius probe on the feed. Exclude self, household dogs, blocked
 | DELETE `/matches/{id}` | Participant | Immediate unmatch; close message permission |
 | GET `/me/entitlements` | U | Server-computed capabilities, remaining quotas, reset time |
 
-Plan default inherited from Waggle: unverified users may browse but cannot like/message; verified free users receive 12 interests per local day. Treat this as configurable product policy needing funnel validation. Incoming-like visibility must not promise a paid feature before billing exists. Canonical pair uniqueness plus row/advisory locks and transactions ensure reciprocal concurrent likes produce one match and one conversation; do not solve this solely with cache locks. A block overrides subscription or match state.
+Historical Waggle proposal: unverified users may browse but cannot like/message. Current M06 implementation is stricter: discovery requires active verified-adult accounts with live guardian evidence; unverified users receive onboarding tasks only. The future liking policy still needs implementation; verified free users receive 12 interests per local day. Treat this as configurable product policy needing funnel validation. Incoming-like visibility must not promise a paid feature before billing exists. Canonical pair uniqueness plus row/advisory locks and transactions ensure reciprocal concurrent likes produce one match and one conversation; do not solve this solely with cache locks. A block overrides subscription or match state.
 
 ### M08 — Messages and realtime [L; attachments G]
 

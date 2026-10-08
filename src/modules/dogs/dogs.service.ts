@@ -59,11 +59,11 @@ export class DogsService {
  });}
  preferences(userId:string,id:string,v:z.infer<typeof dogPreferencesSchema>){return transaction(this.db,async tx=>{
   this.editable(await this.repo.lock(tx,id,userId,editors));
-  await tx.query(`INSERT INTO graph.match_preferences(dog_id,max_distance_bucket,size_classes,age_min_months,age_max_months,energy_min,energy_max,play_styles,min_verification_tier,parallel_walk_only,accepts_reactive)
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT(dog_id) DO UPDATE SET max_distance_bucket=excluded.max_distance_bucket,size_classes=excluded.size_classes,
+  await tx.query(`INSERT INTO graph.match_preferences(dog_id,allow_city_only,max_distance_bucket,size_classes,age_min_months,age_max_months,energy_min,energy_max,play_styles,min_verification_tier,parallel_walk_only,accepts_reactive)
+   VALUES ($1,$12,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT(dog_id) DO UPDATE SET allow_city_only=excluded.allow_city_only,max_distance_bucket=excluded.max_distance_bucket,size_classes=excluded.size_classes,
    age_min_months=excluded.age_min_months,age_max_months=excluded.age_max_months,energy_min=excluded.energy_min,energy_max=excluded.energy_max,play_styles=excluded.play_styles,
    min_verification_tier=excluded.min_verification_tier,parallel_walk_only=excluded.parallel_walk_only,accepts_reactive=excluded.accepts_reactive,updated_at=now()`,
-   [id,v.maxDistanceBucket,v.sizeClasses,v.ageMinMonths,v.ageMaxMonths,v.energyMin,v.energyMax,v.playStyles,v.minVerificationTier,v.parallelWalkOnly,v.acceptsReactive]);
+   [id,v.maxDistanceBucket,v.sizeClasses,v.ageMinMonths,v.ageMaxMonths,v.energyMin,v.energyMax,v.playStyles,v.minVerificationTier,v.parallelWalkOnly,v.acceptsReactive,v.allowCityOnly]);
   return this.repo.detail(tx,id);
  });}
  availability(userId:string,id:string,v:z.infer<typeof availabilitySchema>){return transaction(this.db,async tx=>{
@@ -86,8 +86,8 @@ export class DogsService {
    const progress=await this.onboarding.snapshot(tx,userId);
    if(!progress.ready || progress.activeDogId!==id)throw new ApiError(409,'publication-incomplete','Select this dog and complete the required onboarding steps before publishing.');
   }
-  await tx.query(`UPDATE graph.dogs SET publication_state=$2,status=CASE WHEN $3 THEN 'memorialised'::graph.dog_status ELSE status END,
-    memorialised_at=CASE WHEN $3 THEN now() ELSE memorialised_at END,updated_at=now() WHERE id=$1`,[id,action==='publish'?'published':'paused',action==='memorialise']);
+  await tx.query(`UPDATE graph.dogs SET published_by=CASE WHEN $2='published' THEN $4::uuid ELSE published_by END,publication_state=$2,status=CASE WHEN $3 THEN 'memorialised'::graph.dog_status ELSE status END,
+    memorialised_at=CASE WHEN $3 THEN now() ELSE memorialised_at END,updated_at=now() WHERE id=$1`,[id,action==='publish'?'published':'paused',action==='memorialise',userId]);
   if(action!=='publish')await tx.query('DELETE FROM graph.dog_availability WHERE dog_id=$1 AND beacon_until IS NOT NULL',[id]);
   await tx.query("INSERT INTO ops.audit_log(actor_user_id,actor_kind,action,subject_type,subject_id) VALUES ($1,'user',$2,'dog',$3)",[userId,`dog.${action}`,id]);
   return this.repo.detail(tx,id);

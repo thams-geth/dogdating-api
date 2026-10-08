@@ -28,7 +28,7 @@ Historical input lives in /Users/thamaraiselvan/Dog dating/waggle-plan and /User
 
 - PostgreSQL: dogdating-api-postgres, localhost:5433, database/user waggle. Redis configured on 6380, not used yet.
 - Ports 5432/6379 belong to campusone. Do not touch unrelated containers/databases.
-- Migrations 0001–0011 inherited; 0012 auth metadata, 0013 consent/onboarding, 0014 dog drafts/invitations; 0015 private photo uploads; 0016 verification intake; 0017 manual location. Add migrations; never rewrite applied SQL.
+- Migrations 0001–0011 inherited; 0012 auth metadata, 0013 consent/onboarding, 0014 dog drafts/invitations; 0015 private photo uploads; 0016 verification intake; 0017 manual location; 0018 discovery. Add migrations; never rewrite applied SQL.
 - TEST_DATABASE_URL must name a dedicated DB ending in _test. Local test DB waggle_api_test uses port 5433. Tests clear its fixture identity/household data.
 - npm run setup:dev generates an ignored local secret and opts into terminal-only OTP for synthetic numbers. Do not print secrets or enable this in production.
 - A previous compiled server may still own port 3000. Do not assume it serves the latest code; use npm run dev or restart only the known Waggle process.
@@ -39,12 +39,12 @@ Historical input lives in /Users/thamaraiselvan/Dog dating/waggle-plan and /User
 - 5da00c6 consent and resumable onboarding. Published policy rows are immutable; no legal content is seeded. Adult declaration is not verification. Active dog selection always rechecks household membership. Live missing steps override historical completedAt.
 - Household/dog core follows 5da00c6; use git log for exact hash. Roles, manual phone-bound invitations, last-owner protection, private dog drafts, declared breed mix, structured temperament, filters/schedule, gated publication/pause/memorialisation/beacons.
 - Household writes lock the household before checking membership. Multi-resource operations lock user before household; avoid reversing this order. Profile edits reset publication; identity/breed changes revoke dog tiers.
-- Public discovery profiles, precise GPS capture, transfer and twelve-question temperament scoring are not implemented. Manual city selection is implemented.
-- Local checks: 8 unit/HTTP + 55 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
+- Impression-scoped discovery profiles and manual city selection are implemented. Precise GPS capture, transfer and twelve-question temperament scoring remain pending.
+- Local checks: 8 unit/HTTP + 65 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
 
 ## Next work
 
-Home/discovery with blocking/privacy prerequisites and explicit city-only location semantics; production media moderation and verification integrations still required before opening discovery. Read the implementation ledger first. New public discovery must enforce live consent, blocking, visibility and verification; a published row alone does not authorize disclosure. Keep module docs and commits current.
+M07 likes/connections, then M08 messaging; production media moderation and verification integrations still required before opening discovery. Read the implementation ledger first. New public discovery must enforce live consent, blocking, visibility and verification; a published row alone does not authorize disclosure. Keep module docs and commits current.
 
 ## Photo foundation handoff
 
@@ -52,7 +52,7 @@ Home/discovery with blocking/privacy prerequisites and explicit city-only locati
 
 ## Verification handoff
 
-Guardian requests bind to caller; dog requests require editor membership. Active requests deduplicate, max 3 new requests/user/day. Health metadata is explicitly self_reported; dates validated, 100 live/dog and 10 new/dog/day. Removing reviewed evidence revokes health tiers and publication. Future health eligibility must check deleted_at, verified_at and live expiry; future callbacks must recheck membership, request state and current identity. No identity documents or numbers are accepted. Tests now total 63; OpenAPI has 66 operations. Next concrete shared-platform task: home/discovery with current prerequisites enforced and blocking/privacy foundations.
+Guardian requests bind to caller; dog requests require editor membership. Active requests deduplicate, max 3 new requests/user/day. Health metadata is explicitly self_reported; dates validated, 100 live/dog and 10 new/dog/day. Removing reviewed evidence revokes health tiers and publication. Future health eligibility must check deleted_at, verified_at and live expiry; future callbacks must recheck membership, request state and current identity. No identity documents or numbers are accepted. Tests now total 73; OpenAPI has 71 operations. Next concrete shared-platform task: likes/connections with current eligibility and blocks enforced.
 
 ## Location and developer handover
 
@@ -62,4 +62,12 @@ User requires handover per module from now on. All 16 have docs/handovers/Mxx.md
 
 ## Blocking foundation
 
-M11 POST/GET /me/blocks and DELETE /me/blocks/{userId} implemented. Max 500 outgoing, private list, idempotent, reciprocal blocks use sorted user locks. Existing cross-household matches/conversations close; unblock never restores. Shared household membership is not removed. Next work in progress: M06 enforcement and home/feed.
+ec2f80b: M11 POST/GET /me/blocks and DELETE /me/blocks/{userId} implemented. Max 500 outgoing, private list, idempotent, reciprocal blocks use sorted user locks. Existing cross-household matches/conversations close; unblock never restores. Shared household membership is not removed. M06 now enforces blocks on feed/profile reads.
+
+## Discovery handoff
+
+M06 home/feed/empty-reason/discovery-preferences and impression-scoped profile implemented after ec2f80b; use git log for exact hash. DISCOVERY_MODE=development + AUTH_SECRET, off by default and forbidden in production. Bootstrap flags remain false. Cards provide approved-photo metadata only, mediaDelivery=unavailable. Home future counters are explicitly not_implemented/null.
+
+0018 adds published_by, allow_city_only=false default, live eligibility views, snapshot sessions and daily exposure rows. Publishing attributes current editor; old publications need republish. Actor and publisher need active account, is_adult_verified, current guardian tier and current four policy consents. Never fabricate these in ordinary local accounts. Both dogs require allowCityOnly=true, with distance unknown and radius filtering explicitly not applied.
+
+Snapshot IDs ranked by energy/style/size/same-timezone schedule; 200 max, ten-minute signed cursor, every page/profile rechecks current eligibility and bilateral household blocks. Limits 60 snapshots/hour and 200 distinct dog exposures/user/UTC day. npm run discovery:cleanup clears day-old sessions/prior-day reads; no scheduler. M07 must verify impression scope/expiry AND recheck eligibility/blocks and serialize relationship writes consistently with blocking; signed impressions are not standing permission. Existing blocked/ended matches are excluded and never silently restored.

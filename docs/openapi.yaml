@@ -1776,6 +1776,168 @@ paths:
           schema:
             type: string
             format: uuid
+  /v1/home:
+    get:
+      operationId: getHome
+      summary: Own selected-dog dashboard with truthful unavailable sections
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Home"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/feed:
+    get:
+      operationId: getDiscoveryFeed
+      summary: Development city-only metadata feed with live eligibility and signed
+        snapshot pagination
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: mode
+          in: query
+          schema:
+            const: pack
+            default: pack
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 2048
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryFeed"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/feed/empty-reason:
+    get:
+      operationId: getDiscoveryEmptyReason
+      summary: Actionable own-actor state without revealing excluded candidates
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  reason:
+                    enum:
+                      - discovery_disabled
+                      - select_dog
+                      - onboarding_incomplete
+                      - discovery_paused
+                      - account_not_eligible
+                      - dog_not_published
+                      - city_discovery_not_enabled
+                      - dog_not_eligible
+                      - no_eligible_dogs
+                      - end_of_feed
+                      - null
+                  missing:
+                    type: array
+                    items:
+                      type: string
+                  scope:
+                    const: city
+                required:
+                  - reason
+                  - missing
+                  - scope
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/profile:
+    get:
+      operationId: getDiscoveryProfile
+      summary: Impression-scoped target projection with fresh privacy checks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: dogId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - name: impressionToken
+          in: query
+          required: true
+          schema:
+            type: string
+            maxLength: 2048
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryCard"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/discovery-preferences:
+    get:
+      operationId: getDiscoveryPreferences
+      summary: Editor-only stored matching preferences, effective city scope and quotas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryPreferences"
+        default:
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
@@ -2698,6 +2860,7 @@ components:
         - minVerificationTier
         - parallelWalkOnly
         - acceptsReactive
+        - allowCityOnly
       properties:
         maxDistanceBucket:
           enum:
@@ -2768,6 +2931,9 @@ components:
           type: boolean
           default: false
         acceptsReactive:
+          type: boolean
+          default: false
+        allowCityOnly:
           type: boolean
           default: false
     DogPreferencesInput:
@@ -2844,6 +3010,9 @@ components:
           type: boolean
           default: false
         acceptsReactive:
+          type: boolean
+          default: false
+        allowCityOnly:
           type: boolean
           default: false
     Availability:
@@ -3415,6 +3584,437 @@ components:
         - area
         - updatedAt
         - canChangeAt
+    DiscoveryCard:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sex:
+          enum:
+            - male
+            - female
+        sizeClass:
+          enum:
+            - toy
+            - small
+            - medium
+            - large
+            - giant
+        ageMonths:
+          type: integer
+          minimum: 0
+        bio:
+          type:
+            - string
+            - "null"
+        temperament:
+          type: object
+          additionalProperties: false
+          properties:
+            energy:
+              type: integer
+              minimum: 1
+              maximum: 5
+            playStyle:
+              type: array
+              items:
+                enum:
+                  - wrestle
+                  - chase
+                  - parallel
+                  - fetch
+                  - sniff
+            dogReactivity:
+              type: integer
+              minimum: 1
+              maximum: 5
+            humanReactivity:
+              type: integer
+              minimum: 1
+              maximum: 5
+          required:
+            - energy
+            - playStyle
+            - dogReactivity
+            - humanReactivity
+        verificationTier:
+          type: integer
+          minimum: 1
+          maximum: 4
+        guardian:
+          type: object
+          additionalProperties: false
+          properties:
+            id:
+              type: string
+              format: uuid
+            displayName:
+              type: string
+          required:
+            - id
+            - displayName
+        distance:
+          const: unknown
+        locationPrecision:
+          const: city
+        photos:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id:
+                type: string
+                format: uuid
+              width:
+                type:
+                  - integer
+                  - "null"
+              height:
+                type:
+                  - integer
+                  - "null"
+            required:
+              - id
+              - width
+              - height
+        mediaDelivery:
+          const: unavailable
+      required:
+        - id
+        - name
+        - sex
+        - sizeClass
+        - ageMonths
+        - bio
+        - temperament
+        - verificationTier
+        - guardian
+        - distance
+        - locationPrecision
+        - photos
+        - mediaDelivery
+    FeedCard:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sex:
+          enum:
+            - male
+            - female
+        sizeClass:
+          enum:
+            - toy
+            - small
+            - medium
+            - large
+            - giant
+        ageMonths:
+          type: integer
+          minimum: 0
+        bio:
+          type:
+            - string
+            - "null"
+        temperament:
+          type: object
+          additionalProperties: false
+          properties:
+            energy:
+              type: integer
+              minimum: 1
+              maximum: 5
+            playStyle:
+              type: array
+              items:
+                enum:
+                  - wrestle
+                  - chase
+                  - parallel
+                  - fetch
+                  - sniff
+            dogReactivity:
+              type: integer
+              minimum: 1
+              maximum: 5
+            humanReactivity:
+              type: integer
+              minimum: 1
+              maximum: 5
+          required:
+            - energy
+            - playStyle
+            - dogReactivity
+            - humanReactivity
+        verificationTier:
+          type: integer
+          minimum: 1
+          maximum: 4
+        guardian:
+          type: object
+          additionalProperties: false
+          properties:
+            id:
+              type: string
+              format: uuid
+            displayName:
+              type: string
+          required:
+            - id
+            - displayName
+        distance:
+          const: unknown
+        locationPrecision:
+          const: city
+        photos:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id:
+                type: string
+                format: uuid
+              width:
+                type:
+                  - integer
+                  - "null"
+              height:
+                type:
+                  - integer
+                  - "null"
+            required:
+              - id
+              - width
+              - height
+        mediaDelivery:
+          const: unavailable
+        impressionToken:
+          type: string
+          maxLength: 2048
+      required:
+        - id
+        - name
+        - sex
+        - sizeClass
+        - ageMonths
+        - bio
+        - temperament
+        - verificationTier
+        - guardian
+        - distance
+        - locationPrecision
+        - photos
+        - mediaDelivery
+        - impressionToken
+    DiscoveryFeed:
+      type: object
+      additionalProperties: false
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeedCard"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        emptyReason:
+          enum:
+            - discovery_disabled
+            - select_dog
+            - onboarding_incomplete
+            - discovery_paused
+            - account_not_eligible
+            - dog_not_published
+            - city_discovery_not_enabled
+            - dog_not_eligible
+            - no_eligible_dogs
+            - end_of_feed
+            - null
+        missing:
+          type: array
+          items:
+            type: string
+        scope:
+          const: city
+      required:
+        - cards
+        - nextCursor
+        - emptyReason
+        - missing
+        - scope
+    Home:
+      type: object
+      additionalProperties: false
+      properties:
+        dog:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                publicationState:
+                  enum:
+                    - draft
+                    - published
+                    - paused
+              required:
+                - id
+                - name
+                - publicationState
+            - type: "null"
+        onboarding:
+          $ref: "#/components/schemas/Onboarding"
+        discovery:
+          type: object
+          additionalProperties: false
+          properties:
+            available:
+              type: boolean
+            reason:
+              enum:
+                - discovery_disabled
+                - select_dog
+                - onboarding_incomplete
+                - discovery_paused
+                - account_not_eligible
+                - dog_not_published
+                - city_discovery_not_enabled
+                - dog_not_eligible
+                - no_eligible_dogs
+                - end_of_feed
+                - null
+            scope:
+              const: city
+            distance:
+              const: unknown
+            mediaDelivery:
+              const: unavailable
+          required:
+            - available
+            - reason
+            - scope
+            - distance
+            - mediaDelivery
+        sections:
+          type: object
+          additionalProperties: false
+          properties:
+            connections:
+              type: object
+              additionalProperties: false
+              properties:
+                status:
+                  const: not_implemented
+                value:
+                  type: "null"
+              required:
+                - status
+                - value
+            messages:
+              type: object
+              additionalProperties: false
+              properties:
+                status:
+                  const: not_implemented
+                value:
+                  type: "null"
+              required:
+                - status
+                - value
+            meetup:
+              type: object
+              additionalProperties: false
+              properties:
+                status:
+                  const: not_implemented
+                value:
+                  type: "null"
+              required:
+                - status
+                - value
+            notifications:
+              type: object
+              additionalProperties: false
+              properties:
+                status:
+                  const: not_implemented
+                value:
+                  type: "null"
+              required:
+                - status
+                - value
+          required:
+            - connections
+            - messages
+            - meetup
+            - notifications
+      required:
+        - dog
+        - onboarding
+        - discovery
+        - sections
+    DiscoveryPreferences:
+      type: object
+      additionalProperties: false
+      properties:
+        preferences:
+          $ref: "#/components/schemas/DogPreferences"
+        effective:
+          type: object
+          additionalProperties: false
+          properties:
+            scope:
+              const: city
+            distance:
+              const: unknown
+            distanceBucketApplied:
+              const: false
+          required:
+            - scope
+            - distance
+            - distanceBucketApplied
+        limits:
+          type: object
+          additionalProperties: false
+          properties:
+            pageSize:
+              const: 50
+            snapshotSize:
+              const: 200
+            distinctDogsPerDay:
+              const: 200
+            refreshesPerHour:
+              const: 60
+            tokenLifetimeSeconds:
+              const: 600
+          required:
+            - pageSize
+            - snapshotSize
+            - distinctDogsPerDay
+            - refreshesPerHour
+            - tokenLifetimeSeconds
+        mode:
+          const: pack
+      required:
+        - preferences
+        - effective
+        - limits
+        - mode
   securitySchemes:
     bearerAuth:
       type: http
