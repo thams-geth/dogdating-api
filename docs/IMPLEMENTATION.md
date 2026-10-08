@@ -64,3 +64,7 @@ Blocking tests cover private lists, cursor scope, validation, reciprocal concurr
 Discovery verification: ten integration tests cover live consent/publisher/verification/photo/account gates, household-wide block directions, matching filters, whole-city opt-in, scoped and expired tokens, stable pagination, changed context, durable quotas and truthful home states. New dog publications record published_by. Old publications with no publisher stay hidden until republished. Source-provided identity verification and reviewed legal content are not fabricated.
 
 Remaining discovery gaps: cloud photo delivery/moderation, provider verification and account activation, public rollout, GPS/distance matching, full home counters and automated cleanup scheduling. DISCOVERY_MODE=development is off by default and forbidden in production; bootstrap flags remain false. A city-only opt-in explicitly overrides radius filtering with unknown distance.
+
+## M07 connections delivered (8 October 2026)
+
+Impression-bound pack interests/passes, sent/received likes, withdrawal, atomic mutual connections, unmatch and free daily entitlements are implemented. Migration 0019 adds durable interest budgets and idempotency receipts. Social writes serialize with blocking. Development discovery prerequisites remain required; production integrations remain unavailable. See docs/handovers/M07.md for contracts and wire diagram. Next: M08 messaging.

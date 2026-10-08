@@ -1,4 +1,5 @@
 import type { Pool } from 'pg';
+import { socialLock } from '../../db/social-lock.js';
 import { transaction } from '../../db/transaction.js';
 import { ApiError } from '../../middleware/error.js';
 import { decodeCursor, page } from '../../http/pagination.js';
@@ -13,6 +14,7 @@ export class BlocksService {
     return { blocks: result.items.map(row => ({userId: row.id, createdAt: row.createdAt})), nextCursor: result.nextCursor };
   }
   add(userId: string, targetId: string) { return transaction(this.db, async tx => {
+    await socialLock(tx);
     if (userId === targetId) throw new ApiError(400, 'self-block', 'You cannot block yourself.');
     // Stable user lock order serializes reciprocal blocks. No household locks are acquired.
     await tx.query('SELECT id FROM identity.users WHERE id=ANY($1::uuid[]) ORDER BY id FOR UPDATE', [[userId,targetId]]);
@@ -35,6 +37,7 @@ export class BlocksService {
     await tx.query("INSERT INTO ops.audit_log(actor_user_id,actor_kind,action,subject_type,subject_id) VALUES ($1,'user','user.block','user',$2)", [userId,targetId]);
   }); }
   remove(userId: string, targetId: string) { return transaction(this.db, async tx => {
+    await socialLock(tx);
     await tx.query('SELECT id FROM identity.users WHERE id=$1 FOR UPDATE', [userId]);
     const result = await tx.query('DELETE FROM safety.blocks WHERE blocker_user_id=$1 AND blocked_user_id=$2', [userId,targetId]);
     if (result.rowCount) await tx.query("INSERT INTO ops.audit_log(actor_user_id,actor_kind,action,subject_type,subject_id) VALUES ($1,'user','user.unblock','user',$2)", [userId,targetId]);

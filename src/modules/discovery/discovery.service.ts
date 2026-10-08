@@ -13,7 +13,7 @@ export class DiscoveryService {
   private readonly onboarding=new OnboardingRepository();private readonly dogs=new DogsRepository();private readonly repo=new DiscoveryRepository();
   private readonly tokens?:DiscoveryTokens;
   constructor(private readonly db:Pool, secret?:string){if(secret)this.tokens=new DiscoveryTokens(secret);}
-  private async actor(tx:PoolClient,userId:string,dogId?:string){
+  async actor(tx:PoolClient,userId:string,dogId?:string){
     await this.onboarding.lockUser(tx,userId);
     const preference=(await tx.query('SELECT active_dog_id,discovery_paused FROM identity.user_preferences WHERE user_id=$1',[userId])).rows[0]!;
     if(dogId&&dogId!==preference.active_dog_id)throw new ApiError(409,'active-dog-required','Select this dog before using discovery.');

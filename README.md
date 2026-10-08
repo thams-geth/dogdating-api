@@ -153,3 +153,7 @@ Discovery additionally requires an active account with verified adulthood, curre
 Ranking uses energy similarity, shared play styles, size and overlapping same-timezone schedules. Signed ten-minute snapshots contain up to 200 IDs; pages recheck current privacy and preserve snapshot order. Changed actor settings require restarting. A card's impression token is bound to caller, actor, target and mode; it cannot authorize a stale/ineligible profile. Redact query tokens from request logs.
 
 Limits are persisted: 60 new feed snapshots/hour/user and 200 distinct exposed dogs per UTC day. Run `npm run discovery:cleanup` regularly to remove sessions older than a day and prior-day exposure records. No scheduler is configured yet. See [M06 handover](docs/handovers/M06.md) for response shapes, reasons, recovery and wireframes.
+
+## M07 connections delivered (8 October 2026)
+
+Impression-bound pack interests/passes, sent/received likes, withdrawal, atomic mutual connections, unmatch and free daily entitlements are implemented. Migration 0019 adds durable interest budgets and idempotency receipts. Social writes serialize with blocking. Development discovery prerequisites remain required; production integrations remain unavailable. See docs/handovers/M07.md for contracts and wire diagram. Next: M08 messaging.

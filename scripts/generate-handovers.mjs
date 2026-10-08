@@ -10,6 +10,7 @@ const sections = [...plan.matchAll(/^### (M\d+) — (.+)\n([\s\S]*?)(?=^### M|^#
 const ids = Object.keys(notes).sort();
 const operations = Object.fromEntries(ids.map(id => [id, []]));
 function moduleFor(path) {
+  if (/^\/v1\/(decisions|likes(?:\/|$)|matches(?:\/|$)|me\/entitlements)/.test(path)) return 'M07';
   if (['/v1/home','/v1/feed','/v1/feed/empty-reason'].includes(path) || /\/dogs\/\{id\}\/(profile|discovery-preferences)$/.test(path)) return 'M06';
   if (path.startsWith('/v1/me/blocks')) return 'M11';
   if (/^\/v1\/(health|ready|app\/.*|dogs\/breeds)$/.test(path)) return 'M01';

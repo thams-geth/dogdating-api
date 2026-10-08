@@ -1,4 +1,6 @@
 import express from 'express';
+import { ConnectionsService } from './modules/connections/connections.service.js';
+import { connectionRoutes } from './modules/connections/connections.routes.js';
 import { randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
 import { pool } from './db/pool.js';
@@ -47,7 +49,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0018']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0019']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -77,6 +79,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1', mediaRoutes(new MediaService(database, photos), auth));
   app.use('/v1', verificationRoutes(new VerificationService(database), auth));
   app.use('/v1',discoveryRoutes(new DiscoveryService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
+  app.use('/v1',connectionRoutes(new ConnectionsService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
   app.use(notFound);
   app.use(errorHandler);
   return app;
