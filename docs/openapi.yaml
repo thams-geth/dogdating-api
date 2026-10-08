@@ -322,7 +322,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: &a6
+          schema: &a7
             type: string
             format: uuid
       responses:
@@ -1247,6 +1247,176 @@ paths:
                 $ref: "#/components/schemas/PhotoStatus"
         default:
           $ref: "#/components/responses/Problem"
+  /v1/verifications:
+    post:
+      operationId: requestVerification
+      summary: Record verification intent; same active request is returned on retry,
+        no provider or badge is created
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        "201":
+          description: Record verification intent; same active request is returned on
+            retry, no provider or badge is created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationStatus"
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerificationIntake"
+  /v1/verifications/{id}:
+    get:
+      operationId: getVerification
+      summary: Read requester-only status; dog membership is also required
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: &a6
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Read requester-only status; dog membership is also required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationStatus"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/verifications/{id}/withdraw:
+    post:
+      operationId: withdrawVerification
+      summary: Idempotently withdraw an open request
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: *a6
+      responses:
+        "200":
+          description: Idempotently withdraw an open request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationStatus"
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
+  /v1/dogs/{dogId}/health-records:
+    post:
+      operationId: addHealthRecord
+      summary: Save a self-reported health record; no identity documents or
+        verification fields accepted
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: path
+          required: true
+          schema: *a6
+      responses:
+        "201":
+          description: Save a self-reported health record; no identity documents or
+            verification fields accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthRecord"
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HealthRecordInput"
+    get:
+      operationId: listHealthRecords
+      summary: List private household health records; expired evidence remains marked
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: path
+          required: true
+          schema: *a6
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 400
+      responses:
+        "200":
+          description: List private household health records; expired evidence remains
+            marked
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/HealthRecord"
+                  nextCursor:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - records
+                  - nextCursor
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{dogId}/health-records/{id}:
+    delete:
+      operationId: deleteHealthRecord
+      summary: Idempotently remove a record; reviewed evidence removal revokes dog
+        health tiers and resets publication
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: path
+          required: true
+          schema: *a6
+        - name: id
+          in: path
+          required: true
+          schema: *a6
+      responses:
+        "204":
+          description: Idempotently remove a record; reviewed evidence removal revokes dog
+            health tiers and resets publication
+        default:
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
@@ -1352,7 +1522,7 @@ components:
         code:
           type: string
           pattern: ^\d{6}$
-        deviceId: *a6
+        deviceId: *a7
         displayName:
           type: string
           minLength: 1
@@ -1382,7 +1552,7 @@ components:
         expiresIn:
           type: integer
           const: 900
-        userId: *a6
+        userId: *a7
     ProfileUpdate:
       type: object
       additionalProperties: false
@@ -1413,7 +1583,7 @@ components:
         - residencyRegion
         - createdAt
       properties:
-        id: *a6
+        id: *a7
         displayName:
           type: string
         phoneE164Masked:
@@ -1449,8 +1619,8 @@ components:
               - expiresAt
               - current
             properties:
-              id: *a6
-              deviceId: *a6
+              id: *a7
+              deviceId: *a7
               createdAt:
                 type: string
                 format: date-time
@@ -1474,7 +1644,7 @@ components:
           const: en-IN
         mode:
           const: pack
-        adultDeclared: &a7
+        adultDeclared: &a8
           type: boolean
     ConsentInput:
       type: object
@@ -1482,7 +1652,7 @@ components:
       required:
         - documentId
       properties:
-        documentId: &a9
+        documentId: &a10
           type: string
           format: uuid
     ActiveDogInput:
@@ -1503,15 +1673,15 @@ components:
         - discoveryPaused
         - readReceipts
       properties:
-        discoveryPaused: *a7
-        readReceipts: *a7
+        discoveryPaused: *a8
+        readReceipts: *a8
     UserPreferencesPatch:
       type: object
       additionalProperties: false
       required: []
       properties:
-        discoveryPaused: *a7
-        readReceipts: *a7
+        discoveryPaused: *a8
+        readReceipts: *a8
       minProperties: 1
     Onboarding:
       type: object
@@ -1527,12 +1697,12 @@ components:
       properties:
         rulesVersion:
           const: 1
-        ready: *a7
+        ready: *a8
         missing:
           type: array
-          items: &a10
+          items: &a11
             type: string
-        nextAction: &a8
+        nextAction: &a9
           type:
             - string
             - "null"
@@ -1571,16 +1741,16 @@ components:
             properties:
               purpose:
                 enum: *a1
-              required: *a7
-              currentDocumentId: *a8
-              currentVersion: *a8
+              required: *a8
+              currentDocumentId: *a9
+              currentVersion: *a9
               status:
                 enum:
                   - accepted
                   - withdrawn
                   - not-accepted
-              acceptedDocumentId: *a8
-              current: *a7
+              acceptedDocumentId: *a9
+              current: *a8
               recordedAt:
                 type:
                   - string
@@ -1599,14 +1769,14 @@ components:
         - contentSha256
         - publishedAt
       properties:
-        id: *a9
+        id: *a10
         purpose:
           enum: *a1
-        version: *a10
-        countryCode: *a10
-        locale: *a10
-        body: *a10
-        contentSha256: *a10
+        version: *a11
+        countryCode: *a11
+        locale: *a11
+        body: *a11
+        contentSha256: *a11
         publishedAt:
           type: string
           format: date-time
@@ -1636,7 +1806,7 @@ components:
         - updatedAt
       properties:
         id: *a3
-        name: &a12
+        name: &a13
           type:
             - string
             - "null"
@@ -1646,10 +1816,10 @@ components:
             - co_guardian
             - walker
             - view_only
-        createdAt: &a11
+        createdAt: &a12
           type: string
           format: date-time
-        updatedAt: *a11
+        updatedAt: *a12
     Households:
       type: object
       additionalProperties: false
@@ -1661,7 +1831,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Household"
-        nextCursor: *a12
+        nextCursor: *a13
     Members:
       type: object
       additionalProperties: false
@@ -1680,7 +1850,7 @@ components:
               - acceptedAt
             properties:
               userId: *a3
-              displayName: &a27
+              displayName: &a28
                 type: string
               role:
                 enum:
@@ -1688,7 +1858,7 @@ components:
                   - co_guardian
                   - walker
                   - view_only
-              acceptedAt: *a11
+              acceptedAt: *a12
     MemberRole:
       type: object
       additionalProperties: false
@@ -1729,7 +1899,7 @@ components:
         inviteToken:
           type: string
           pattern: ^[A-Za-z0-9_-]{43}$
-        expiresAt: *a11
+        expiresAt: *a12
         delivery:
           const: manual-share
     CreateDog:
@@ -1741,44 +1911,44 @@ components:
         - sex
         - sizeClass
       properties:
-        name: &a14
+        name: &a15
           type: string
           minLength: 1
           maxLength: 40
-        sex: &a15
+        sex: &a16
           enum:
             - male
             - female
-        sizeClass: &a16
+        sizeClass: &a17
           enum:
             - toy
             - small
             - medium
             - large
             - giant
-        dateOfBirth: &a13
+        dateOfBirth: &a14
           type:
             - string
             - "null"
           format: date
-        dobPrecision: &a17
+        dobPrecision: &a18
           enum:
             - exact
             - month
             - year
             - estimate
-        neutered: &a18
+        neutered: &a19
           type:
             - boolean
             - "null"
-        neuteredAt: *a13
-        weightG: &a19
+        neuteredAt: *a14
+        weightG: &a20
           type:
             - integer
             - "null"
           minimum: 500
           maximum: 120000
-        bio: &a20
+        bio: &a21
           type:
             - string
             - "null"
@@ -1789,15 +1959,15 @@ components:
       additionalProperties: false
       required: []
       properties:
-        name: *a14
-        sex: *a15
-        sizeClass: *a16
-        dateOfBirth: *a13
-        dobPrecision: *a17
-        neutered: *a18
-        neuteredAt: *a13
-        weightG: *a19
-        bio: *a20
+        name: *a15
+        sex: *a16
+        sizeClass: *a17
+        dateOfBirth: *a14
+        dobPrecision: *a18
+        neutered: *a19
+        neuteredAt: *a14
+        weightG: *a20
+        bio: *a21
       minProperties: 1
     DogSummary:
       type: object
@@ -1821,28 +1991,28 @@ components:
       properties:
         id: *a3
         householdId: *a3
-        name: *a14
-        sex: *a15
-        sizeClass: *a16
-        dateOfBirth: *a13
-        dobPrecision: *a17
-        neutered: *a18
-        neuteredAt: *a13
-        weightG: *a19
-        bio: *a20
-        status: &a25
+        name: *a15
+        sex: *a16
+        sizeClass: *a17
+        dateOfBirth: *a14
+        dobPrecision: *a18
+        neutered: *a19
+        neuteredAt: *a14
+        weightG: *a20
+        bio: *a21
+        status: &a26
           enum:
             - active
             - rehomed
             - memorialised
             - removed
-        publicationState: &a26
+        publicationState: &a27
           enum:
             - draft
             - published
             - paused
-        createdAt: *a11
-        updatedAt: *a11
+        createdAt: *a12
+        updatedAt: *a12
     Dogs:
       type: object
       additionalProperties: false
@@ -1854,7 +2024,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DogSummary"
-        nextCursor: *a12
+        nextCursor: *a13
     DogBreedsInput:
       type: object
       additionalProperties: false
@@ -1890,16 +2060,16 @@ components:
         - recallReliability
         - sizeTolerance
         - needsToKnow
-      properties: &a22
+      properties: &a23
         questionnaireVersion:
           const: 1
-        energy: &a21
+        energy: &a22
           type: integer
           minimum: 1
           maximum: 5
         playStyle:
           type: array
-          items: &a23
+          items: &a24
             enum:
               - wrestle
               - chase
@@ -1909,13 +2079,13 @@ components:
           minItems: 1
           maxItems: 5
           uniqueItems: true
-        dogReactivity: *a21
-        humanReactivity: *a21
-        resourceGuarding: *a21
-        recallReliability: *a21
+        dogReactivity: *a22
+        humanReactivity: *a22
+        resourceGuarding: *a22
+        recallReliability: *a22
         sizeTolerance:
           type: array
-          items: *a16
+          items: *a17
           minItems: 1
           maxItems: 5
           uniqueItems: true
@@ -1935,7 +2105,7 @@ components:
         - resourceGuarding
         - recallReliability
         - sizeTolerance
-      properties: *a22
+      properties: *a23
     DogPreferences:
       type: object
       additionalProperties: false
@@ -1950,7 +2120,7 @@ components:
         - minVerificationTier
         - parallelWalkOnly
         - acceptsReactive
-      properties: &a24
+      properties: &a25
         maxDistanceBucket:
           enum:
             - under_2_km
@@ -1961,7 +2131,7 @@ components:
           default: km_5_10
         sizeClasses:
           type: array
-          items: *a16
+          items: *a17
           maxItems: 5
           uniqueItems: true
           default: []
@@ -1995,7 +2165,7 @@ components:
           default: null
         playStyles:
           type: array
-          items: *a23
+          items: *a24
           maxItems: 5
           uniqueItems: true
           default: []
@@ -2014,7 +2184,7 @@ components:
       type: object
       additionalProperties: false
       required: []
-      properties: *a24
+      properties: *a25
     Availability:
       type: object
       additionalProperties: false
@@ -2064,7 +2234,7 @@ components:
       required:
         - beaconUntil
       properties:
-        beaconUntil: *a11
+        beaconUntil: *a12
     Dog:
       type: object
       additionalProperties: false
@@ -2091,19 +2261,19 @@ components:
       properties:
         id: *a3
         householdId: *a3
-        name: *a14
-        sex: *a15
-        sizeClass: *a16
-        dateOfBirth: *a13
-        dobPrecision: *a17
-        neutered: *a18
-        neuteredAt: *a13
-        weightG: *a19
-        bio: *a20
-        status: *a25
-        publicationState: *a26
-        createdAt: *a11
-        updatedAt: *a11
+        name: *a15
+        sex: *a16
+        sizeClass: *a17
+        dateOfBirth: *a14
+        dobPrecision: *a18
+        neutered: *a19
+        neuteredAt: *a14
+        weightG: *a20
+        bio: *a21
+        status: *a26
+        publicationState: *a27
+        createdAt: *a12
+        updatedAt: *a12
         breeds:
           type: array
           items:
@@ -2116,7 +2286,7 @@ components:
               - source
             properties:
               breedId: *a3
-              name: *a27
+              name: *a28
               percentage:
                 type:
                   - integer
@@ -2158,7 +2328,7 @@ components:
     PhotoStatus:
       type: object
       additionalProperties: false
-      properties: &a28
+      properties: &a29
         id: *a5
         dogId: *a5
         ordinal:
@@ -2197,7 +2367,7 @@ components:
         createdAt:
           type: string
           format: date-time
-      required: &a29
+      required: &a30
         - id
         - dogId
         - ordinal
@@ -2211,8 +2381,8 @@ components:
       allOf:
         - type: object
           additionalProperties: true
-          properties: *a28
-          required: *a29
+          properties: *a29
+          required: *a30
         - type: object
           properties:
             upload:
@@ -2236,6 +2406,136 @@ components:
                 - contentType
           required:
             - upload
+    VerificationIntake:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          properties:
+            kind:
+              const: guardian
+          required:
+            - kind
+        - type: object
+          additionalProperties: false
+          properties:
+            kind:
+              const: dog
+            dogId: *a6
+          required:
+            - kind
+            - dogId
+    VerificationStatus:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *a6
+        subjectType:
+          enum:
+            - user
+            - dog
+        subjectId: *a6
+        targetTier:
+          type: integer
+          enum:
+            - 1
+            - 2
+        state:
+          enum:
+            - pending
+            - in_review
+            - needs_more_info
+            - approved
+            - rejected
+            - expired
+            - withdrawn
+        reasonCode:
+          type:
+            - string
+            - "null"
+        createdAt: &a31
+          type: string
+          format: date-time
+        updatedAt: *a31
+        nextAction:
+          enum:
+            - none
+            - awaiting_provider_setup
+            - awaiting_review
+            - contact_support
+      required:
+        - id
+        - subjectType
+        - subjectId
+        - targetTier
+        - state
+        - reasonCode
+        - createdAt
+        - updatedAt
+        - nextAction
+    HealthRecordInput:
+      type: object
+      additionalProperties: false
+      properties:
+        recordType: &a32
+          enum:
+            - vaccination
+            - rabies
+            - deworming
+            - hip_score
+            - elbow_score
+            - eye_exam
+            - cardiac_exam
+            - dna_panel
+            - vet_exam
+        testedAt: &a33
+          type: string
+          format: date
+        expiresAt: &a34
+          type:
+            - string
+            - "null"
+          format: date
+        resultCode: &a35
+          type:
+            - string
+            - "null"
+          pattern: ^[a-z0-9_]{1,40}$
+      required:
+        - recordType
+        - testedAt
+    HealthRecord:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *a6
+        dogId: *a6
+        recordType: *a32
+        testedAt: *a33
+        expiresAt: *a34
+        resultCode: *a35
+        verifiedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        createdAt: *a31
+        provenance:
+          enum:
+            - self_reported
+            - reviewed
+        expired:
+          type: boolean
+      required:
+        - id
+        - dogId
+        - recordType
+        - testedAt
+        - expiresAt
+        - resultCode
+        - verifiedAt
+        - createdAt
+        - provenance
+        - expired
   securitySchemes:
     bearerAuth:
       type: http

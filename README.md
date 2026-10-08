@@ -41,6 +41,8 @@ If port 3000 is already occupied, stop your previous Waggle process or set `PORT
 | Consent and onboarding | Published legal documents, consent history/withdrawal, progress/completion, preferences and active dog; see below |
 | Households | Creation, membership roles, invitations and acceptance; see below |
 | Dog profiles | Drafts, breeds, temperament, matching preferences, availability and publication lifecycle; see below |
+| Private photos | Upload, status, order, deletion and local cleanup; see below |
+| Verification/health | Request/status/withdrawal and self-reported health records; see below |
 
 Bootstrap example: `/v1/app/bootstrap?platform=android&buildNumber=1&countryCode=IN&locale=en-IN`. India is marked `development`; unbuilt product features remain disabled. Published store links, reviewed legal documents, rollout administration and enforced minimum-build gates are pending. Release policy is currently reviewed code in `src/modules/app/policy.ts`.
 
@@ -65,9 +67,9 @@ Integration tests refuse databases whose names do not end in `_test`. They verif
 
 ## Database and module workflow
 
-Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata; 0013 adds consent/onboarding; 0014 adds invitations and dog drafts. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
+Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata; 0013 adds consent/onboarding; 0014 adds invitations and dog drafts; 0015 adds photo uploads; 0016 adds verification intake and health-record deletion metadata. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
 
-Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: media/verification and private location capture, then home/discovery, likes/connections, chat and notifications.
+Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: private location capture, production media/moderation and verification integration, then home/discovery, likes/connections, chat and notifications.
 
 ## Consent and onboarding
 
@@ -75,7 +77,7 @@ Each completed module gets relevant tests, contract/examples, updated docs/memor
 
 `GET/POST /v1/me/consents` reads/accepts document versions; `DELETE /v1/me/consents/{purpose}` records withdrawal. `GET /v1/legal/documents/{kind}` serves published, immutable text, optionally by version. **No legal text is seeded.** Until reviewed documents, approved photos, location and guardian verification exist, completion returns 409 and progress explains what is missing. Tests use labeled synthetic evidence in the test database only.
 
-`GET/PATCH /v1/me/preferences` controls discovery pause and read receipts. Discovery cannot be enabled with incomplete onboarding. Clients must use the current `ready`/`missing` fields: historical `completedAt` alone is insufficient after evidence expires or a policy changes. Media, verification and location-collection APIs are still upcoming modules.
+`GET/PATCH /v1/me/preferences` controls discovery pause and read receipts. Discovery cannot be enabled with incomplete onboarding. Clients must use the current `ready`/`missing` fields: historical `completedAt` alone is insufficient after evidence expires or a policy changes. Photo uploads and verification intake are available below; moderation approval, verified grants and location capture remain prerequisites.
 
 ## Households and dog profiles
 
@@ -102,3 +104,13 @@ Inputs are capped at 8 MiB and 20 megapixels, decoded and re-encoded as JPEG up 
 Use `GET /v1/dogs/{dogId}/media`, `GET /v1/media/{id}`, `PATCH /v1/dogs/{dogId}/media/order` (`mediaIds`: every live photo exactly once), and `DELETE /v1/dogs/{dogId}/media/{id}`. Responses contain metadata only; no photo download endpoint is enabled. Deletion resets dog publication and cancels its beacon.
 
 Run `npm run media:cleanup` regularly while using local uploads. Each run handles up to 100 expired reservations or pending deletions and can safely be repeated. Storage failures retain a cleanup flag; a failed delete may already have hidden the photo. Production object storage, scanning/moderation workers, approved-photo delivery and automated scheduling remain upcoming integrations.
+
+## Verification intake and health records
+
+`POST /v1/verifications` accepts `{ "kind": "guardian" }` for the signed-in user or `{ "kind": "dog", "dogId": "..." }` for an owned/co-guarded dog. The server selects the target tier (1 or 2). Retries return the same active request; at most three new requests per user/day are allowed. Read it at `GET /v1/verifications/{id}` and withdraw an open request with `POST /v1/verifications/{id}/withdraw` and `{}`. Requests are private to their requester; dog requests also require current household membership.
+
+**Provider integration is not configured:** new requests return `pending` with `nextAction: awaiting_provider_setup`. This records intent only. No provider session, review SLA, verified badge, identity-document upload or webhook is available yet. Do not submit identity numbers/documents as profile photos.
+
+`POST/GET /v1/dogs/{dogId}/health-records` stores/lists private health metadata. Create with `recordType`, `testedAt`, optional `expiresAt`, and optional `resultCode`. Dates must be real, tests cannot predate birth or lie in the future, and expiry cannot predate the test. New records always have `provenance: self_reported` and no verification date; they never grant health badges. Lists use the standard `limit`/`cursor` pagination and explicitly mark expired records. Limits: 100 live records per dog and 10 creations per dog/day.
+
+Owners/co-guardians can `DELETE /v1/dogs/{dogId}/health-records/{id}`. Removal is idempotent and hides the record from household lists; retained database evidence follows the future retention/deletion policy. Removing reviewed evidence revokes dog health tiers (3+) and resets publication. Actual reviewer/provider integrations and document handling are still pending.

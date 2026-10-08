@@ -150,3 +150,28 @@ Content-Type: application/json
 ### List private photo metadata
 GET {{baseUrl}}/v1/dogs/{{dogId}}/media
 Authorization: Bearer {{accessToken}}
+
+### Request guardian verification (intent only until a provider is configured)
+POST {{baseUrl}}/v1/verifications
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"kind":"guardian"}
+
+### Request dog verification
+POST {{baseUrl}}/v1/verifications
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"kind":"dog","dogId":"{{dogId}}"}
+
+### Save self-reported vaccination metadata (never grants a badge)
+POST {{baseUrl}}/v1/dogs/{{dogId}}/health-records
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"recordType":"rabies","testedAt":"2026-01-01","expiresAt":"2027-01-01"}
+
+### Read private health records
+GET {{baseUrl}}/v1/dogs/{{dogId}}/health-records?limit=20
+Authorization: Bearer {{accessToken}}
