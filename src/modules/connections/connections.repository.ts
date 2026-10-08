@@ -3,6 +3,9 @@ import { ApiError } from '../../middleware/error.js';
 import { householdsBlocked } from '../../db/social-lock.js';
 export class ConnectionsRepository {
  async match(tx:PoolClient,userId:string,id:string,allowEnded=false){
+  await tx.query(`SELECT h.id FROM identity.households h WHERE h.id IN (
+   SELECT d.household_id FROM graph.dogs d JOIN meetup.matches m ON d.id IN (m.dog_a_id,m.dog_b_id) WHERE m.id=$1
+  ) ORDER BY h.id FOR UPDATE`,[id]);
   const row=(await tx.query(`SELECT m.id,m.dog_a_id AS "dogAId",m.dog_b_id AS "dogBId",m.state,m.created_at AS "createdAt",
    c.id AS "conversationId",a.household_id AS ha,b.household_id AS hb,a.status AS sa,b.status AS sb,
    a.deleted_at AS da,b.deleted_at AS db

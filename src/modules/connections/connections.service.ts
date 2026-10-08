@@ -80,13 +80,14 @@ export class ConnectionsService {
   await tx.query('UPDATE meetup.decisions SET withdrawn_at=coalesce(withdrawn_at,now()) WHERE id=$1',[id]);
  });}
  matches(userId:string,limit:number,cursor?:string){return transaction(this.db,async tx=>{
+  await socialLock(tx);
   const scope=`matches:${userId}`,after=decodeCursor(cursor,scope);
   const rows=(await tx.query(`SELECT m.id FROM meetup.matches m JOIN meetup.conversations c ON c.match_id=m.id JOIN meetup.conversation_members cm ON cm.conversation_id=c.id WHERE cm.user_id=$1 AND m.state='active' AND ($2::uuid IS NULL OR m.id>$2) ORDER BY m.id LIMIT $3`,[userId,after,limit+1])).rows;
   const result=page(rows,limit,scope),items=[];
   for(const row of result.items){try{items.push(this.repo.projection(await this.repo.match(tx,userId,row.id)));}catch(error){if(!(error instanceof ApiError&&error.status===404))throw error;}}
   return {items,nextCursor:result.nextCursor};
  });}
- match(userId:string,id:string){return transaction(this.db,async tx=>this.repo.projection(await this.repo.match(tx,userId,id)));}
+ match(userId:string,id:string){return transaction(this.db,async tx=>{await socialLock(tx);return this.repo.projection(await this.repo.match(tx,userId,id));});}
  unmatch(userId:string,id:string){return transaction(this.db,async tx=>{
   await socialLock(tx);await this.repo.match(tx,userId,id,true);
   await tx.query("UPDATE meetup.matches SET state='ended',ended_at=now(),ended_by=$2,end_reason='unmatch' WHERE id=$1 AND state='active'",[id,userId]);

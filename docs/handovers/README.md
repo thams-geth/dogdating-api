@@ -11,7 +11,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 | M05 | [Uploads and verification](M05.md) | Implemented foundation; see limitations | 13 |
 | M06 | [Home and discovery](M06.md) | Implemented foundation; see limitations | 5 |
 | M07 | [Likes, connections and entitlements](M07.md) | Implemented foundation; see limitations | 8 |
-| M08 | [Messages and realtime](M08.md) | Not implemented | 0 |
+| M08 | [Messages and realtime](M08.md) | Implemented foundation; see limitations | 6 |
 | M09 | [Notifications and devices](M09.md) | Not implemented | 0 |
 | M10 | [Meetups and places](M10.md) | Not implemented | 0 |
 | M11 | [Trust, safety, privacy and support](M11.md) | Implemented foundation; see limitations | 3 |

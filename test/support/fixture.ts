@@ -1,3 +1,4 @@
+import type { MessageCipher } from '../../src/modules/messages/message-cipher.js';
 import { randomBytes,randomUUID } from 'node:crypto';
 import pg from 'pg';
 import { createApp } from '../../src/app.js';
@@ -5,14 +6,14 @@ import { AuthService } from '../../src/modules/auth/auth.service.js';
 import { migrate } from '../../src/db/migrate.js';
 import type { PhotoStorage } from '../../src/modules/media/media.storage.js';
 
-export function fixture(photoStorage?: PhotoStorage, discoverySecret?: string) {
+export function fixture(photoStorage?: PhotoStorage, discoverySecret?: string,messageCipher?:MessageCipher) {
   const connectionString=process.env.TEST_DATABASE_URL;
   if (!connectionString || !new URL(connectionString).pathname.endsWith('_test')) throw new Error('Use a dedicated TEST_DATABASE_URL ending in _test.');
   const database=new pg.Pool({connectionString,max:12});
   const codes=new Map<string,string>();
   const auth=new AuthService(database,randomBytes(48).toString('hex'),{async send(phone,code){codes.set(phone,code);}});
   let sequence=200000;
-  return { database,app:createApp({database,auth,photoStorage,discoverySecret}),
+  return { database,app:createApp({database,auth,photoStorage,discoverySecret,messageCipher}),
     async setup(){await migrate(database);await database.query('TRUNCATE identity.users,identity.otp_challenges,identity.households,identity.policy_documents CASCADE');},
     async close(){await database.end();},
     async user(){const phone=`+919000${sequence++}`;await auth.requestOtp(phone,'IN');const pair=await auth.verifyOtp({phoneE164:phone,code:codes.get(phone)!,deviceId:randomUUID(),displayName:'Test Guardian'});return {...pair,phone,header:`Bearer ${pair.accessToken}`};},

@@ -1,3 +1,8 @@
+import { RealtimeService } from './modules/messages/realtime.js';
+import { authenticate,currentUser } from './http/authenticate.js';
+import { MessagesService } from './modules/messages/messages.service.js';
+import { messageRoutes } from './modules/messages/messages.routes.js';
+import { LocalMessageCipher,type MessageCipher } from './modules/messages/message-cipher.js';
 import express from 'express';
 import { ConnectionsService } from './modules/connections/connections.service.js';
 import { connectionRoutes } from './modules/connections/connections.routes.js';
@@ -31,7 +36,7 @@ import { blockRoutes } from './modules/safety/blocks.routes.js';
 import { DiscoveryService } from './modules/discovery/discovery.service.js';
 import { discoveryRoutes } from './modules/discovery/discovery.routes.js';
 
-export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage; discoverySecret?: string } = {}) {
+export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage; discoverySecret?: string; messageCipher?: MessageCipher } = {}) {
   const database = deps.database ?? pool;
   const app = express();
   app.disable('x-powered-by');
@@ -49,7 +54,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0019']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0020']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -80,6 +85,15 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1', verificationRoutes(new VerificationService(database), auth));
   app.use('/v1',discoveryRoutes(new DiscoveryService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
   app.use('/v1',connectionRoutes(new ConnectionsService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
+  const messageCipher=deps.messageCipher ?? (config.MESSAGE_KEY?new LocalMessageCipher(config.MESSAGE_KEY,config.NODE_ENV):undefined);
+  const messages=new MessagesService(database,messageCipher);
+  app.use('/v1',messageRoutes(messages,auth));
+  const realtime=new RealtimeService(database,messages);
+  if(messageCipher)app.locals.realtime=realtime;
+  app.post('/v1/realtime/tickets',authenticate(auth),asyncHandler(async(_req,res)=>{
+    if(!messageCipher)throw new ApiError(503,'messaging-unavailable','Message encryption is not configured.');
+    res.status(201).json(await realtime.ticket(currentUser(res)));
+  }));
   app.use(notFound);
   app.use(errorHandler);
   return app;
