@@ -29,3 +29,9 @@ These notes distinguish source facts from our product decisions. India is the fi
 ## Research limits and follow-ups
 
 Provider prices, final launch city, launch language coverage, operating entity, support contacts, public domains and store package IDs are undecided. The original plan's international legal citations, unit economics, paid-tier limits and claimed market statistics are not revalidated here and are not imported as facts. A new country needs local review; a country flag is not legal clearance. Human dating, if selected, needs its own age, moderation, privacy and store-policy review.
+
+## Photo pipeline implementation — 8 October 2026
+
+- [OWASP File Upload Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html): authenticate uploads, allowlist formats, bound size, validate contents and keep private storage outside public serving paths. Image rewriting does not replace moderation or malware scanning.
+- [Sharp input options](https://sharp.pixelplumbing.com/api-constructor/) and [output options](https://sharp.pixelplumbing.com/api-output/): set an explicit pixel limit; decode and re-encode images without metadata retention. Implementation uses a 20-megapixel cap and a JPEG derivative capped at 1600×1600. These limits are product/operational choices.
+- Decision: local opt-in storage for development; metadata-only client reads and pending moderation until a reviewed production pipeline exists. Do not fabricate provider callbacks or approval results.

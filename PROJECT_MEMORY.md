@@ -28,7 +28,7 @@ Historical input lives in /Users/thamaraiselvan/Dog dating/waggle-plan and /User
 
 - PostgreSQL: dogdating-api-postgres, localhost:5433, database/user waggle. Redis configured on 6380, not used yet.
 - Ports 5432/6379 belong to campusone. Do not touch unrelated containers/databases.
-- Migrations 0001–0011 inherited; 0012 auth metadata, 0013 consent/onboarding, 0014 dog drafts/invitations. Add migrations; never rewrite applied SQL.
+- Migrations 0001–0011 inherited; 0012 auth metadata, 0013 consent/onboarding, 0014 dog drafts/invitations; 0015 private photo uploads. Add migrations; never rewrite applied SQL.
 - TEST_DATABASE_URL must name a dedicated DB ending in _test. Local test DB waggle_api_test uses port 5433. Tests clear its fixture identity/household data.
 - npm run setup:dev generates an ignored local secret and opts into terminal-only OTP for synthetic numbers. Do not print secrets or enable this in production.
 - A previous compiled server may still own port 3000. Do not assume it serves the latest code; use npm run dev or restart only the known Waggle process.
@@ -40,8 +40,12 @@ Historical input lives in /Users/thamaraiselvan/Dog dating/waggle-plan and /User
 - Household/dog core follows 5da00c6; use git log for exact hash. Roles, manual phone-bound invitations, last-owner protection, private dog drafts, declared breed mix, structured temperament, filters/schedule, gated publication/pause/memorialisation/beacons.
 - Household writes lock the household before checking membership. Multi-resource operations lock user before household; avoid reversing this order. Profile edits reset publication; identity/breed changes revoke dog tiers.
 - Public discovery profiles, private location capture, transfer and twelve-question temperament scoring are not implemented.
-- Local checks: 8 unit/HTTP + 34 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
+- Local checks: 8 unit/HTTP + 41 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
 
 ## Next work
 
 M05 media upload/moderation and verification, plus remaining private location prerequisite; then home/discovery. Read the implementation ledger first. New public discovery must enforce live consent, blocking, visibility and verification; a published row alone does not authorize disclosure. Keep module docs and commits current.
+
+## Photo foundation handoff
+
+Private photo uploads implemented after 5a71ef0; find exact module commit in git log. Opt-in MEDIA_MODE=local / MEDIA_LOCAL_DIR, local adapter forbidden in production. Only re-encoded JPEG bytes stored, no public content route, moderation remains pending. Use npm run media:cleanup regularly (100 items/run). Verification requests and health records are next. Production object storage/moderation/providers and private location capture still required.

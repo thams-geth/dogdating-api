@@ -13,17 +13,18 @@ Updated: 8 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
 | M04 household/dog profile core | Complete | Ownership, roles/invites, drafts, breed mix, structured temperament, preferences/schedule, gated publishing, pause, memorialisation, beacons |
 | M04 location/discovery/transfer extensions | Planned | Reviewed private location capture/anchor, public profile with block/privacy/anti-scraping checks; two-party transfer |
-| M05 media/verification | Next | Actual upload pipeline and provider/manual-review grants needed to finish the app flow |
+| M05 private photo foundation | Complete for local development | Real JPEG/PNG uploads, checksum/type/size checks, EXIF removal, status/order/deletion and retryable cleanup; pending moderation only |
+| M05 verification / production media | Next | Verification requests/health records next; production storage, scan/moderation, approved delivery and provider/reviewer grants remain required |
 | M06–M12 launch modules | Planned | Home/feed, likes/connections, chat, notifications, meetups, privacy/support, staff operations |
 | M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 34 PostgreSQL integration tests passed (42 total).
+- Typecheck/build passed; 8 unit/HTTP tests and 41 PostgreSQL integration tests passed (49 total).
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
-- Migrations through 0014. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 46 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- Migrations through 0015. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- 53 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions
@@ -43,3 +44,5 @@ Build M05 uploads/verification and the remaining private location prerequisite, 
 ## Definition of module completion
 
 Validate inputs and resource permissions, run relevant tests/typecheck/build, document implemented contracts and limits, update README/memory, and create a focused module commit. Mark submodules or external-provider dependencies explicitly rather than claiming the full product is complete.
+
+Photo foundation: MEDIA_MODE=local is opt-in and forbidden in production. npm run media:cleanup processes up to 100 expired/deleted objects per run. No pending photo content is served; no moderation approval route exists. Cleanup scheduling and production object storage are not configured. Seven photo tests cover real image processing, authorization, corruption, replay, expiry, ordering, deletion and cleanup retry.

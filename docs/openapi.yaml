@@ -322,7 +322,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: &a5
+          schema: &a6
             type: string
             format: uuid
       responses:
@@ -1056,6 +1056,197 @@ paths:
           description: Success
         default:
           $ref: "#/components/responses/Problem"
+  /v1/dogs/{dogId}/media/uploads:
+    post:
+      operationId: createPhotoUpload
+      summary: Reserve a private photo upload; local bearer PUT expires after 15 minutes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: path
+          required: true
+          schema: &a5
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Reserve a private photo upload; local bearer PUT expires after 15
+            minutes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhotoUploadCreated"
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhotoUpload"
+  /v1/dogs/{dogId}/media:
+    get:
+      operationId: listDogPhotos
+      summary: List household photo metadata; no storage keys or image URLs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: path
+          required: true
+          schema: *a5
+      responses:
+        "200":
+          description: List household photo metadata; no storage keys or image URLs
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  media:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PhotoStatus"
+                required:
+                  - media
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{dogId}/media/order:
+    patch:
+      operationId: orderDogPhotos
+      summary: Replace the complete live photo order
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: path
+          required: true
+          schema: *a5
+      responses:
+        "204":
+          description: Replace the complete live photo order
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                mediaIds:
+                  type: array
+                  items: *a5
+                  minItems: 1
+                  maxItems: 30
+                  uniqueItems: true
+              required:
+                - mediaIds
+  /v1/dogs/{dogId}/media/{id}:
+    delete:
+      operationId: deleteDogPhoto
+      summary: Delete photo, invalidate publication and schedule physical cleanup
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dogId
+          in: path
+          required: true
+          schema: *a5
+        - name: id
+          in: path
+          required: true
+          schema: *a5
+      responses:
+        "204":
+          description: Delete photo, invalidate publication and schedule physical cleanup
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/media/{id}/content:
+    put:
+      operationId: uploadPhotoContent
+      summary: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20
+        megapixels
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: *a5
+      responses:
+        "200":
+          description: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20
+            megapixels
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhotoStatus"
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/png:
+            schema:
+              type: string
+              format: binary
+  /v1/media/{id}/complete:
+    post:
+      operationId: completePhotoUpload
+      summary: Idempotently complete an uploaded photo; moderation remains pending
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: *a5
+      responses:
+        "200":
+          description: Idempotently complete an uploaded photo; moderation remains pending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhotoStatus"
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
+  /v1/media/{id}:
+    get:
+      operationId: getPhotoStatus
+      summary: Read household-scoped photo processing status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: *a5
+      responses:
+        "200":
+          description: Read household-scoped photo processing status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhotoStatus"
+        default:
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
@@ -1161,7 +1352,7 @@ components:
         code:
           type: string
           pattern: ^\d{6}$
-        deviceId: *a5
+        deviceId: *a6
         displayName:
           type: string
           minLength: 1
@@ -1191,7 +1382,7 @@ components:
         expiresIn:
           type: integer
           const: 900
-        userId: *a5
+        userId: *a6
     ProfileUpdate:
       type: object
       additionalProperties: false
@@ -1222,7 +1413,7 @@ components:
         - residencyRegion
         - createdAt
       properties:
-        id: *a5
+        id: *a6
         displayName:
           type: string
         phoneE164Masked:
@@ -1258,8 +1449,8 @@ components:
               - expiresAt
               - current
             properties:
-              id: *a5
-              deviceId: *a5
+              id: *a6
+              deviceId: *a6
               createdAt:
                 type: string
                 format: date-time
@@ -1283,7 +1474,7 @@ components:
           const: en-IN
         mode:
           const: pack
-        adultDeclared: &a6
+        adultDeclared: &a7
           type: boolean
     ConsentInput:
       type: object
@@ -1291,7 +1482,7 @@ components:
       required:
         - documentId
       properties:
-        documentId: &a8
+        documentId: &a9
           type: string
           format: uuid
     ActiveDogInput:
@@ -1312,15 +1503,15 @@ components:
         - discoveryPaused
         - readReceipts
       properties:
-        discoveryPaused: *a6
-        readReceipts: *a6
+        discoveryPaused: *a7
+        readReceipts: *a7
     UserPreferencesPatch:
       type: object
       additionalProperties: false
       required: []
       properties:
-        discoveryPaused: *a6
-        readReceipts: *a6
+        discoveryPaused: *a7
+        readReceipts: *a7
       minProperties: 1
     Onboarding:
       type: object
@@ -1336,12 +1527,12 @@ components:
       properties:
         rulesVersion:
           const: 1
-        ready: *a6
+        ready: *a7
         missing:
           type: array
-          items: &a9
+          items: &a10
             type: string
-        nextAction: &a7
+        nextAction: &a8
           type:
             - string
             - "null"
@@ -1380,16 +1571,16 @@ components:
             properties:
               purpose:
                 enum: *a1
-              required: *a6
-              currentDocumentId: *a7
-              currentVersion: *a7
+              required: *a7
+              currentDocumentId: *a8
+              currentVersion: *a8
               status:
                 enum:
                   - accepted
                   - withdrawn
                   - not-accepted
-              acceptedDocumentId: *a7
-              current: *a6
+              acceptedDocumentId: *a8
+              current: *a7
               recordedAt:
                 type:
                   - string
@@ -1408,14 +1599,14 @@ components:
         - contentSha256
         - publishedAt
       properties:
-        id: *a8
+        id: *a9
         purpose:
           enum: *a1
-        version: *a9
-        countryCode: *a9
-        locale: *a9
-        body: *a9
-        contentSha256: *a9
+        version: *a10
+        countryCode: *a10
+        locale: *a10
+        body: *a10
+        contentSha256: *a10
         publishedAt:
           type: string
           format: date-time
@@ -1445,7 +1636,7 @@ components:
         - updatedAt
       properties:
         id: *a3
-        name: &a11
+        name: &a12
           type:
             - string
             - "null"
@@ -1455,10 +1646,10 @@ components:
             - co_guardian
             - walker
             - view_only
-        createdAt: &a10
+        createdAt: &a11
           type: string
           format: date-time
-        updatedAt: *a10
+        updatedAt: *a11
     Households:
       type: object
       additionalProperties: false
@@ -1470,7 +1661,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Household"
-        nextCursor: *a11
+        nextCursor: *a12
     Members:
       type: object
       additionalProperties: false
@@ -1489,7 +1680,7 @@ components:
               - acceptedAt
             properties:
               userId: *a3
-              displayName: &a26
+              displayName: &a27
                 type: string
               role:
                 enum:
@@ -1497,7 +1688,7 @@ components:
                   - co_guardian
                   - walker
                   - view_only
-              acceptedAt: *a10
+              acceptedAt: *a11
     MemberRole:
       type: object
       additionalProperties: false
@@ -1538,7 +1729,7 @@ components:
         inviteToken:
           type: string
           pattern: ^[A-Za-z0-9_-]{43}$
-        expiresAt: *a10
+        expiresAt: *a11
         delivery:
           const: manual-share
     CreateDog:
@@ -1550,44 +1741,44 @@ components:
         - sex
         - sizeClass
       properties:
-        name: &a13
+        name: &a14
           type: string
           minLength: 1
           maxLength: 40
-        sex: &a14
+        sex: &a15
           enum:
             - male
             - female
-        sizeClass: &a15
+        sizeClass: &a16
           enum:
             - toy
             - small
             - medium
             - large
             - giant
-        dateOfBirth: &a12
+        dateOfBirth: &a13
           type:
             - string
             - "null"
           format: date
-        dobPrecision: &a16
+        dobPrecision: &a17
           enum:
             - exact
             - month
             - year
             - estimate
-        neutered: &a17
+        neutered: &a18
           type:
             - boolean
             - "null"
-        neuteredAt: *a12
-        weightG: &a18
+        neuteredAt: *a13
+        weightG: &a19
           type:
             - integer
             - "null"
           minimum: 500
           maximum: 120000
-        bio: &a19
+        bio: &a20
           type:
             - string
             - "null"
@@ -1598,15 +1789,15 @@ components:
       additionalProperties: false
       required: []
       properties:
-        name: *a13
-        sex: *a14
-        sizeClass: *a15
-        dateOfBirth: *a12
-        dobPrecision: *a16
-        neutered: *a17
-        neuteredAt: *a12
-        weightG: *a18
-        bio: *a19
+        name: *a14
+        sex: *a15
+        sizeClass: *a16
+        dateOfBirth: *a13
+        dobPrecision: *a17
+        neutered: *a18
+        neuteredAt: *a13
+        weightG: *a19
+        bio: *a20
       minProperties: 1
     DogSummary:
       type: object
@@ -1630,28 +1821,28 @@ components:
       properties:
         id: *a3
         householdId: *a3
-        name: *a13
-        sex: *a14
-        sizeClass: *a15
-        dateOfBirth: *a12
-        dobPrecision: *a16
-        neutered: *a17
-        neuteredAt: *a12
-        weightG: *a18
-        bio: *a19
-        status: &a24
+        name: *a14
+        sex: *a15
+        sizeClass: *a16
+        dateOfBirth: *a13
+        dobPrecision: *a17
+        neutered: *a18
+        neuteredAt: *a13
+        weightG: *a19
+        bio: *a20
+        status: &a25
           enum:
             - active
             - rehomed
             - memorialised
             - removed
-        publicationState: &a25
+        publicationState: &a26
           enum:
             - draft
             - published
             - paused
-        createdAt: *a10
-        updatedAt: *a10
+        createdAt: *a11
+        updatedAt: *a11
     Dogs:
       type: object
       additionalProperties: false
@@ -1663,7 +1854,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DogSummary"
-        nextCursor: *a11
+        nextCursor: *a12
     DogBreedsInput:
       type: object
       additionalProperties: false
@@ -1699,16 +1890,16 @@ components:
         - recallReliability
         - sizeTolerance
         - needsToKnow
-      properties: &a21
+      properties: &a22
         questionnaireVersion:
           const: 1
-        energy: &a20
+        energy: &a21
           type: integer
           minimum: 1
           maximum: 5
         playStyle:
           type: array
-          items: &a22
+          items: &a23
             enum:
               - wrestle
               - chase
@@ -1718,13 +1909,13 @@ components:
           minItems: 1
           maxItems: 5
           uniqueItems: true
-        dogReactivity: *a20
-        humanReactivity: *a20
-        resourceGuarding: *a20
-        recallReliability: *a20
+        dogReactivity: *a21
+        humanReactivity: *a21
+        resourceGuarding: *a21
+        recallReliability: *a21
         sizeTolerance:
           type: array
-          items: *a15
+          items: *a16
           minItems: 1
           maxItems: 5
           uniqueItems: true
@@ -1744,7 +1935,7 @@ components:
         - resourceGuarding
         - recallReliability
         - sizeTolerance
-      properties: *a21
+      properties: *a22
     DogPreferences:
       type: object
       additionalProperties: false
@@ -1759,7 +1950,7 @@ components:
         - minVerificationTier
         - parallelWalkOnly
         - acceptsReactive
-      properties: &a23
+      properties: &a24
         maxDistanceBucket:
           enum:
             - under_2_km
@@ -1770,7 +1961,7 @@ components:
           default: km_5_10
         sizeClasses:
           type: array
-          items: *a15
+          items: *a16
           maxItems: 5
           uniqueItems: true
           default: []
@@ -1804,7 +1995,7 @@ components:
           default: null
         playStyles:
           type: array
-          items: *a22
+          items: *a23
           maxItems: 5
           uniqueItems: true
           default: []
@@ -1823,7 +2014,7 @@ components:
       type: object
       additionalProperties: false
       required: []
-      properties: *a23
+      properties: *a24
     Availability:
       type: object
       additionalProperties: false
@@ -1873,7 +2064,7 @@ components:
       required:
         - beaconUntil
       properties:
-        beaconUntil: *a10
+        beaconUntil: *a11
     Dog:
       type: object
       additionalProperties: false
@@ -1900,19 +2091,19 @@ components:
       properties:
         id: *a3
         householdId: *a3
-        name: *a13
-        sex: *a14
-        sizeClass: *a15
-        dateOfBirth: *a12
-        dobPrecision: *a16
-        neutered: *a17
-        neuteredAt: *a12
-        weightG: *a18
-        bio: *a19
-        status: *a24
-        publicationState: *a25
-        createdAt: *a10
-        updatedAt: *a10
+        name: *a14
+        sex: *a15
+        sizeClass: *a16
+        dateOfBirth: *a13
+        dobPrecision: *a17
+        neutered: *a18
+        neuteredAt: *a13
+        weightG: *a19
+        bio: *a20
+        status: *a25
+        publicationState: *a26
+        createdAt: *a11
+        updatedAt: *a11
         breeds:
           type: array
           items:
@@ -1925,7 +2116,7 @@ components:
               - source
             properties:
               breedId: *a3
-              name: *a26
+              name: *a27
               percentage:
                 type:
                   - integer
@@ -1945,6 +2136,106 @@ components:
             - type: "null"
         availability:
           $ref: "#/components/schemas/Availability"
+    PhotoUpload:
+      type: object
+      additionalProperties: false
+      properties:
+        contentType:
+          enum:
+            - image/jpeg
+            - image/png
+        sizeBytes:
+          type: integer
+          minimum: 1
+          maximum: 8388608
+        sha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+      required:
+        - contentType
+        - sizeBytes
+        - sha256
+    PhotoStatus:
+      type: object
+      additionalProperties: false
+      properties: &a28
+        id: *a5
+        dogId: *a5
+        ordinal:
+          type: integer
+          minimum: 0
+          maximum: 29
+        width:
+          type:
+            - integer
+            - "null"
+        height:
+          type:
+            - integer
+            - "null"
+        moderationState:
+          enum:
+            - pending
+            - approved
+            - rejected
+            - quarantined
+        uploadState:
+          type:
+            - string
+            - "null"
+          enum:
+            - awaiting_upload
+            - uploaded
+            - completed
+            - deleted
+            - null
+        expiresAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required: &a29
+        - id
+        - dogId
+        - ordinal
+        - width
+        - height
+        - moderationState
+        - uploadState
+        - expiresAt
+        - createdAt
+    PhotoUploadCreated:
+      allOf:
+        - type: object
+          additionalProperties: true
+          properties: *a28
+          required: *a29
+        - type: object
+          properties:
+            upload:
+              type: object
+              additionalProperties: false
+              properties:
+                method:
+                  const: PUT
+                path:
+                  type: string
+                authentication:
+                  const: bearer
+                contentType:
+                  enum:
+                    - image/jpeg
+                    - image/png
+              required:
+                - method
+                - path
+                - authentication
+                - contentType
+          required:
+            - upload
   securitySchemes:
     bearerAuth:
       type: http

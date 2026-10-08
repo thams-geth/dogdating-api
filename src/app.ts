@@ -17,8 +17,11 @@ import { householdRoutes,invitationRoutes } from './modules/households/household
 import { DogsService } from './modules/dogs/dogs.service.js';
 import { dogRoutes } from './modules/dogs/dogs.routes.js';
 import { config } from './config.js';
+import { MediaService } from './modules/media/media.service.js';
+import { mediaRoutes } from './modules/media/media.routes.js';
+import { LocalPhotoStorage, type PhotoStorage } from './modules/media/media.storage.js';
 
-export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService } = {}) {
+export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage } = {}) {
   const database = deps.database ?? pool;
   const app = express();
   app.disable('x-powered-by');
@@ -36,7 +39,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0014']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0015']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -58,6 +61,8 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1/households',householdRoutes(households,auth));
   app.use('/v1/household-invitations',invitationRoutes(households,auth));
   app.use('/v1/dogs',dogRoutes(new DogsService(database),auth));
+  const photos = deps.photoStorage ?? (config.MEDIA_MODE === 'local' ? new LocalPhotoStorage(config.MEDIA_LOCAL_DIR, config.NODE_ENV) : undefined);
+  app.use('/v1', mediaRoutes(new MediaService(database, photos), auth));
   app.use(notFound);
   app.use(errorHandler);
   return app;

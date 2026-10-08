@@ -15,7 +15,8 @@
     "migrate": "tsx src/db/migrate.ts",
     "test:integration": "node --import tsx --test --test-concurrency=1 test/integration/*.test.ts",
     "setup:dev": "node scripts/setup-dev.mjs",
-    "check:openapi": "node scripts/check-openapi.mjs"
+    "check:openapi": "node scripts/check-openapi.mjs",
+    "media:cleanup": "tsx src/modules/media/cleanup.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
@@ -23,6 +24,7 @@
     "express-rate-limit": "^8.7.1",
     "jose": "^6.2.12",
     "pg": "^8.13.1",
+    "sharp": "^0.35.5",
     "zod": "^3.24.2"
   },
   "devDependencies": {

@@ -125,3 +125,28 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {}
+
+### Reserve a private photo (replace bytes/hash with values from your local photo)
+POST {{baseUrl}}/v1/dogs/{{dogId}}/media/uploads
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"contentType":"image/jpeg","sizeBytes":12345,"sha256":"REPLACE_WITH_64_LOWERCASE_HEX_SHA256"}
+
+### Upload original bytes, using the id returned by the reservation
+PUT {{baseUrl}}/v1/media/{{mediaId}}/content
+Authorization: Bearer {{accessToken}}
+Content-Type: image/jpeg
+
+< ./test-photo.jpg
+
+### Complete upload (still pending moderation)
+POST {{baseUrl}}/v1/media/{{mediaId}}/complete
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{}
+
+### List private photo metadata
+GET {{baseUrl}}/v1/dogs/{{dogId}}/media
+Authorization: Bearer {{accessToken}}

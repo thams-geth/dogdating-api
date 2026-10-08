@@ -88,3 +88,17 @@ Create/list dog drafts at `/v1/dogs`; household members can read `/v1/dogs/{id}`
 `POST /publish`, `/pause`, `/memorialise`, and `POST/DELETE /beacon` manage visibility and walking-now status. Publishing requires this dog to be selected and its guardian's live onboarding checks to pass. A beacon also requires discovery enabled and lasts at most 90 minutes. Memorialisation is owner-only and cannot be reversed with profile edits. Editing core profile details returns a published dog to draft; identity or breed changes revoke existing dog-verification grants so stale claims cannot survive edits.
 
 Household/dog lists use `limit` (default 20, maximum 50) and a user/list-scoped `nextCursor`, ordered by UUID. `GET /v1/dogs/{id}` is a private household view; public discovery profiles, dog transfers and household location capture are still pending. Publication is a stored lifecycle state, not proof that future discovery safety/consent checks may be skipped.
+
+## Private photo uploads
+
+Opt in locally with `MEDIA_MODE=local` in `.env` (default: disabled). Files go to ignored `.local/media`, or `MEDIA_LOCAL_DIR`. Local storage is forbidden in production and must never be exposed as static content.
+
+1. `POST /v1/dogs/{dogId}/media/uploads` with `contentType` (`image/jpeg` or `image/png`), `sizeBytes` and lowercase SHA-256 of the original bytes.
+2. Send those bytes to the returned `PUT /v1/media/{id}/content` path using the uploader's bearer token and exact content type. The reservation lasts 15 minutes; content can be submitted once. On a lost response, read status before retrying.
+3. `POST /v1/media/{id}/complete` with `{}` is idempotent. Completion records a durable **pending** moderation item; it does not approve the photo.
+
+Inputs are capped at 8 MiB and 20 megapixels, decoded and re-encoded as JPEG up to 1600×1600 with EXIF/GPS removed. Originals are not stored. There are 30 live slots per dog and 60 reservations per dog/day. Only owners/co-guardians can edit; sending bytes also requires the original uploader. Membership is checked on each call.
+
+Use `GET /v1/dogs/{dogId}/media`, `GET /v1/media/{id}`, `PATCH /v1/dogs/{dogId}/media/order` (`mediaIds`: every live photo exactly once), and `DELETE /v1/dogs/{dogId}/media/{id}`. Responses contain metadata only; no photo download endpoint is enabled. Deletion resets dog publication and cancels its beacon.
+
+Run `npm run media:cleanup` regularly while using local uploads. Each run handles up to 100 expired reservations or pending deletions and can safely be repeated. Storage failures retain a cleanup flag; a failed delete may already have hidden the photo. Production object storage, scanning/moderation workers, approved-photo delivery and automated scheduling remain upcoming integrations.
