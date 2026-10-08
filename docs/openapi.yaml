@@ -27,6 +27,16 @@ paths:
       responses:
         "200":
           description: Database and required schema are ready
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  status:
+                    const: ready
+                required:
+                  - status
         "503":
           $ref: "#/components/responses/Problem"
   /v1/app/countries:
@@ -322,7 +332,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: &a7
+          schema:
             type: string
             format: uuid
       responses:
@@ -376,7 +386,7 @@ paths:
           in: path
           required: true
           schema:
-            enum: &a1
+            enum:
               - terms
               - privacy
               - community
@@ -512,7 +522,12 @@ paths:
           in: path
           required: true
           schema:
-            enum: *a1
+            enum:
+              - terms
+              - privacy
+              - community
+              - location
+              - marketing
       responses:
         "204":
           description: Success
@@ -600,7 +615,7 @@ paths:
       operationId: listHouseholds
       security:
         - bearerAuth: []
-      parameters: &a4
+      parameters:
         - name: limit
           in: query
           schema:
@@ -628,11 +643,10 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - &a2
-          name: id
+        - name: id
           in: path
           required: true
-          schema: &a3
+          schema:
             type: string
             format: uuid
       responses:
@@ -650,7 +664,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -672,7 +691,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Success
@@ -690,11 +714,18 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: userId
           in: path
           required: true
-          schema: *a3
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -713,11 +744,18 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: userId
           in: path
           required: true
-          schema: *a3
+          schema:
+            type: string
+            format: uuid
       responses:
         "204":
           description: Success
@@ -731,7 +769,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -803,7 +846,19 @@ paths:
       operationId: listDogs
       security:
         - bearerAuth: []
-      parameters: *a4
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 400
       responses:
         "200":
           description: Success
@@ -821,7 +876,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Success
@@ -838,7 +898,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -861,7 +926,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -885,7 +955,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -909,7 +984,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -934,7 +1014,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -957,7 +1042,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -980,7 +1070,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -1004,7 +1099,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -1028,7 +1128,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -1050,7 +1155,12 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - *a2
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         "204":
           description: Success
@@ -1066,7 +1176,7 @@ paths:
         - name: dogId
           in: path
           required: true
-          schema: &a5
+          schema:
             type: string
             format: uuid
       responses:
@@ -1095,7 +1205,9 @@ paths:
         - name: dogId
           in: path
           required: true
-          schema: *a5
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: List household photo metadata; no storage keys or image URLs
@@ -1123,7 +1235,9 @@ paths:
         - name: dogId
           in: path
           required: true
-          schema: *a5
+          schema:
+            type: string
+            format: uuid
       responses:
         "204":
           description: Replace the complete live photo order
@@ -1139,7 +1253,9 @@ paths:
               properties:
                 mediaIds:
                   type: array
-                  items: *a5
+                  items:
+                    type: string
+                    format: uuid
                   minItems: 1
                   maxItems: 30
                   uniqueItems: true
@@ -1155,11 +1271,15 @@ paths:
         - name: dogId
           in: path
           required: true
-          schema: *a5
+          schema:
+            type: string
+            format: uuid
         - name: id
           in: path
           required: true
-          schema: *a5
+          schema:
+            type: string
+            format: uuid
       responses:
         "204":
           description: Delete photo, invalidate publication and schedule physical cleanup
@@ -1176,7 +1296,9 @@ paths:
         - name: id
           in: path
           required: true
-          schema: *a5
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20
@@ -1208,7 +1330,9 @@ paths:
         - name: id
           in: path
           required: true
-          schema: *a5
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Idempotently complete an uploaded photo; moderation remains pending
@@ -1237,7 +1361,9 @@ paths:
         - name: id
           in: path
           required: true
-          schema: *a5
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Read household-scoped photo processing status
@@ -1281,7 +1407,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: &a6
+          schema:
             type: string
             format: uuid
       responses:
@@ -1303,7 +1429,9 @@ paths:
         - name: id
           in: path
           required: true
-          schema: *a6
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Idempotently withdraw an open request
@@ -1333,7 +1461,9 @@ paths:
         - name: dogId
           in: path
           required: true
-          schema: *a6
+          schema:
+            type: string
+            format: uuid
       responses:
         "201":
           description: Save a self-reported health record; no identity documents or
@@ -1359,7 +1489,9 @@ paths:
         - name: dogId
           in: path
           required: true
-          schema: *a6
+          schema:
+            type: string
+            format: uuid
         - name: limit
           in: query
           schema:
@@ -1406,15 +1538,152 @@ paths:
         - name: dogId
           in: path
           required: true
-          schema: *a6
+          schema:
+            type: string
+            format: uuid
         - name: id
           in: path
           required: true
-          schema: *a6
+          schema:
+            type: string
+            format: uuid
       responses:
         "204":
           description: Idempotently remove a record; reviewed evidence removal revokes dog
             health tiers and resets publication
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/app/areas:
+    get:
+      operationId: listAreas
+      summary: List coarse areas; development and waitlist are not public launch
+        promises
+      security: []
+      parameters:
+        - name: countryCode
+          in: query
+          schema:
+            type: string
+            pattern: ^[A-Z]{2}$
+            default: IN
+        - name: query
+          in: query
+          schema:
+            type: string
+            maxLength: 80
+            default: ""
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 400
+      responses:
+        "200":
+          description: List coarse areas; development and waitlist are not public launch
+            promises
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  areas:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Area"
+                  nextCursor:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - areas
+                  - nextCursor
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/households/{id}/location:
+    get:
+      operationId: getHouseholdLocation
+      summary: Read private city-level household selection
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Read private city-level household selection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HouseholdLocation"
+        default:
+          $ref: "#/components/responses/Problem"
+    put:
+      operationId: setHouseholdLocation
+      summary: Select a city with current location consent; changes limited to once
+        per 24 hours
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Select a city with current location consent; changes limited to
+            once per 24 hours
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HouseholdLocation"
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                source:
+                  const: manual_area
+                areaId:
+                  type: string
+                  format: uuid
+              required:
+                - source
+                - areaId
+    delete:
+      operationId: clearHouseholdLocation
+      summary: Clear household location and reset dog publication; cooldown is retained
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Clear household location and reset dog publication; cooldown is
+            retained
         default:
           $ref: "#/components/responses/Problem"
 components:
@@ -1522,7 +1791,9 @@ components:
         code:
           type: string
           pattern: ^\d{6}$
-        deviceId: *a7
+        deviceId:
+          type: string
+          format: uuid
         displayName:
           type: string
           minLength: 1
@@ -1552,7 +1823,9 @@ components:
         expiresIn:
           type: integer
           const: 900
-        userId: *a7
+        userId:
+          type: string
+          format: uuid
     ProfileUpdate:
       type: object
       additionalProperties: false
@@ -1583,7 +1856,9 @@ components:
         - residencyRegion
         - createdAt
       properties:
-        id: *a7
+        id:
+          type: string
+          format: uuid
         displayName:
           type: string
         phoneE164Masked:
@@ -1619,8 +1894,12 @@ components:
               - expiresAt
               - current
             properties:
-              id: *a7
-              deviceId: *a7
+              id:
+                type: string
+                format: uuid
+              deviceId:
+                type: string
+                format: uuid
               createdAt:
                 type: string
                 format: date-time
@@ -1644,7 +1923,7 @@ components:
           const: en-IN
         mode:
           const: pack
-        adultDeclared: &a8
+        adultDeclared:
           type: boolean
     ConsentInput:
       type: object
@@ -1652,7 +1931,7 @@ components:
       required:
         - documentId
       properties:
-        documentId: &a10
+        documentId:
           type: string
           format: uuid
     ActiveDogInput:
@@ -1673,15 +1952,19 @@ components:
         - discoveryPaused
         - readReceipts
       properties:
-        discoveryPaused: *a8
-        readReceipts: *a8
+        discoveryPaused:
+          type: boolean
+        readReceipts:
+          type: boolean
     UserPreferencesPatch:
       type: object
       additionalProperties: false
       required: []
       properties:
-        discoveryPaused: *a8
-        readReceipts: *a8
+        discoveryPaused:
+          type: boolean
+        readReceipts:
+          type: boolean
       minProperties: 1
     Onboarding:
       type: object
@@ -1697,12 +1980,13 @@ components:
       properties:
         rulesVersion:
           const: 1
-        ready: *a8
+        ready:
+          type: boolean
         missing:
           type: array
-          items: &a11
+          items:
             type: string
-        nextAction: &a9
+        nextAction:
           type:
             - string
             - "null"
@@ -1740,17 +2024,33 @@ components:
               - recordedAt
             properties:
               purpose:
-                enum: *a1
-              required: *a8
-              currentDocumentId: *a9
-              currentVersion: *a9
+                enum:
+                  - terms
+                  - privacy
+                  - community
+                  - location
+                  - marketing
+              required:
+                type: boolean
+              currentDocumentId:
+                type:
+                  - string
+                  - "null"
+              currentVersion:
+                type:
+                  - string
+                  - "null"
               status:
                 enum:
                   - accepted
                   - withdrawn
                   - not-accepted
-              acceptedDocumentId: *a9
-              current: *a8
+              acceptedDocumentId:
+                type:
+                  - string
+                  - "null"
+              current:
+                type: boolean
               recordedAt:
                 type:
                   - string
@@ -1769,14 +2069,26 @@ components:
         - contentSha256
         - publishedAt
       properties:
-        id: *a10
+        id:
+          type: string
+          format: uuid
         purpose:
-          enum: *a1
-        version: *a11
-        countryCode: *a11
-        locale: *a11
-        body: *a11
-        contentSha256: *a11
+          enum:
+            - terms
+            - privacy
+            - community
+            - location
+            - marketing
+        version:
+          type: string
+        countryCode:
+          type: string
+        locale:
+          type: string
+        body:
+          type: string
+        contentSha256:
+          type: string
         publishedAt:
           type: string
           format: date-time
@@ -1805,8 +2117,10 @@ components:
         - createdAt
         - updatedAt
       properties:
-        id: *a3
-        name: &a13
+        id:
+          type: string
+          format: uuid
+        name:
           type:
             - string
             - "null"
@@ -1816,10 +2130,12 @@ components:
             - co_guardian
             - walker
             - view_only
-        createdAt: &a12
+        createdAt:
           type: string
           format: date-time
-        updatedAt: *a12
+        updatedAt:
+          type: string
+          format: date-time
     Households:
       type: object
       additionalProperties: false
@@ -1831,7 +2147,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Household"
-        nextCursor: *a13
+        nextCursor:
+          type:
+            - string
+            - "null"
     Members:
       type: object
       additionalProperties: false
@@ -1849,8 +2168,10 @@ components:
               - role
               - acceptedAt
             properties:
-              userId: *a3
-              displayName: &a28
+              userId:
+                type: string
+                format: uuid
+              displayName:
                 type: string
               role:
                 enum:
@@ -1858,7 +2179,9 @@ components:
                   - co_guardian
                   - walker
                   - view_only
-              acceptedAt: *a12
+              acceptedAt:
+                type: string
+                format: date-time
     MemberRole:
       type: object
       additionalProperties: false
@@ -1895,11 +2218,15 @@ components:
         - expiresAt
         - delivery
       properties:
-        invitationId: *a3
+        invitationId:
+          type: string
+          format: uuid
         inviteToken:
           type: string
           pattern: ^[A-Za-z0-9_-]{43}$
-        expiresAt: *a12
+        expiresAt:
+          type: string
+          format: date-time
         delivery:
           const: manual-share
     CreateDog:
@@ -1911,63 +2238,106 @@ components:
         - sex
         - sizeClass
       properties:
-        name: &a15
+        name:
           type: string
           minLength: 1
           maxLength: 40
-        sex: &a16
+        sex:
           enum:
             - male
             - female
-        sizeClass: &a17
+        sizeClass:
           enum:
             - toy
             - small
             - medium
             - large
             - giant
-        dateOfBirth: &a14
+        dateOfBirth:
           type:
             - string
             - "null"
           format: date
-        dobPrecision: &a18
+        dobPrecision:
           enum:
             - exact
             - month
             - year
             - estimate
-        neutered: &a19
+        neutered:
           type:
             - boolean
             - "null"
-        neuteredAt: *a14
-        weightG: &a20
+        neuteredAt:
+          type:
+            - string
+            - "null"
+          format: date
+        weightG:
           type:
             - integer
             - "null"
           minimum: 500
           maximum: 120000
-        bio: &a21
+        bio:
           type:
             - string
             - "null"
           maxLength: 300
-        householdId: *a3
+        householdId:
+          type: string
+          format: uuid
     UpdateDog:
       type: object
       additionalProperties: false
       required: []
       properties:
-        name: *a15
-        sex: *a16
-        sizeClass: *a17
-        dateOfBirth: *a14
-        dobPrecision: *a18
-        neutered: *a19
-        neuteredAt: *a14
-        weightG: *a20
-        bio: *a21
+        name:
+          type: string
+          minLength: 1
+          maxLength: 40
+        sex:
+          enum:
+            - male
+            - female
+        sizeClass:
+          enum:
+            - toy
+            - small
+            - medium
+            - large
+            - giant
+        dateOfBirth:
+          type:
+            - string
+            - "null"
+          format: date
+        dobPrecision:
+          enum:
+            - exact
+            - month
+            - year
+            - estimate
+        neutered:
+          type:
+            - boolean
+            - "null"
+        neuteredAt:
+          type:
+            - string
+            - "null"
+          format: date
+        weightG:
+          type:
+            - integer
+            - "null"
+          minimum: 500
+          maximum: 120000
+        bio:
+          type:
+            - string
+            - "null"
+          maxLength: 300
       minProperties: 1
     DogSummary:
       type: object
@@ -1989,30 +2359,75 @@ components:
         - createdAt
         - updatedAt
       properties:
-        id: *a3
-        householdId: *a3
-        name: *a15
-        sex: *a16
-        sizeClass: *a17
-        dateOfBirth: *a14
-        dobPrecision: *a18
-        neutered: *a19
-        neuteredAt: *a14
-        weightG: *a20
-        bio: *a21
-        status: &a26
+        id:
+          type: string
+          format: uuid
+        householdId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 40
+        sex:
+          enum:
+            - male
+            - female
+        sizeClass:
+          enum:
+            - toy
+            - small
+            - medium
+            - large
+            - giant
+        dateOfBirth:
+          type:
+            - string
+            - "null"
+          format: date
+        dobPrecision:
+          enum:
+            - exact
+            - month
+            - year
+            - estimate
+        neutered:
+          type:
+            - boolean
+            - "null"
+        neuteredAt:
+          type:
+            - string
+            - "null"
+          format: date
+        weightG:
+          type:
+            - integer
+            - "null"
+          minimum: 500
+          maximum: 120000
+        bio:
+          type:
+            - string
+            - "null"
+          maxLength: 300
+        status:
           enum:
             - active
             - rehomed
             - memorialised
             - removed
-        publicationState: &a27
+        publicationState:
           enum:
             - draft
             - published
             - paused
-        createdAt: *a12
-        updatedAt: *a12
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     Dogs:
       type: object
       additionalProperties: false
@@ -2024,7 +2439,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DogSummary"
-        nextCursor: *a13
+        nextCursor:
+          type:
+            - string
+            - "null"
     DogBreedsInput:
       type: object
       additionalProperties: false
@@ -2040,7 +2458,9 @@ components:
               - breedId
               - percentage
             properties:
-              breedId: *a3
+              breedId:
+                type: string
+                format: uuid
               percentage:
                 type: integer
                 minimum: 1
@@ -2060,16 +2480,16 @@ components:
         - recallReliability
         - sizeTolerance
         - needsToKnow
-      properties: &a23
+      properties:
         questionnaireVersion:
           const: 1
-        energy: &a22
+        energy:
           type: integer
           minimum: 1
           maximum: 5
         playStyle:
           type: array
-          items: &a24
+          items:
             enum:
               - wrestle
               - chase
@@ -2079,13 +2499,31 @@ components:
           minItems: 1
           maxItems: 5
           uniqueItems: true
-        dogReactivity: *a22
-        humanReactivity: *a22
-        resourceGuarding: *a22
-        recallReliability: *a22
+        dogReactivity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        humanReactivity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        resourceGuarding:
+          type: integer
+          minimum: 1
+          maximum: 5
+        recallReliability:
+          type: integer
+          minimum: 1
+          maximum: 5
         sizeTolerance:
           type: array
-          items: *a17
+          items:
+            enum:
+              - toy
+              - small
+              - medium
+              - large
+              - giant
           minItems: 1
           maxItems: 5
           uniqueItems: true
@@ -2105,7 +2543,57 @@ components:
         - resourceGuarding
         - recallReliability
         - sizeTolerance
-      properties: *a23
+      properties:
+        questionnaireVersion:
+          const: 1
+        energy:
+          type: integer
+          minimum: 1
+          maximum: 5
+        playStyle:
+          type: array
+          items:
+            enum:
+              - wrestle
+              - chase
+              - parallel
+              - fetch
+              - sniff
+          minItems: 1
+          maxItems: 5
+          uniqueItems: true
+        dogReactivity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        humanReactivity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        resourceGuarding:
+          type: integer
+          minimum: 1
+          maximum: 5
+        recallReliability:
+          type: integer
+          minimum: 1
+          maximum: 5
+        sizeTolerance:
+          type: array
+          items:
+            enum:
+              - toy
+              - small
+              - medium
+              - large
+              - giant
+          minItems: 1
+          maxItems: 5
+          uniqueItems: true
+        needsToKnow:
+          type: string
+          maxLength: 500
+          default: ""
     DogPreferences:
       type: object
       additionalProperties: false
@@ -2120,7 +2608,7 @@ components:
         - minVerificationTier
         - parallelWalkOnly
         - acceptsReactive
-      properties: &a25
+      properties:
         maxDistanceBucket:
           enum:
             - under_2_km
@@ -2131,7 +2619,13 @@ components:
           default: km_5_10
         sizeClasses:
           type: array
-          items: *a17
+          items:
+            enum:
+              - toy
+              - small
+              - medium
+              - large
+              - giant
           maxItems: 5
           uniqueItems: true
           default: []
@@ -2165,7 +2659,13 @@ components:
           default: null
         playStyles:
           type: array
-          items: *a24
+          items:
+            enum:
+              - wrestle
+              - chase
+              - parallel
+              - fetch
+              - sniff
           maxItems: 5
           uniqueItems: true
           default: []
@@ -2184,7 +2684,78 @@ components:
       type: object
       additionalProperties: false
       required: []
-      properties: *a25
+      properties:
+        maxDistanceBucket:
+          enum:
+            - under_2_km
+            - km_2_5
+            - km_5_10
+            - km_10_25
+            - over_25_km
+          default: km_5_10
+        sizeClasses:
+          type: array
+          items:
+            enum:
+              - toy
+              - small
+              - medium
+              - large
+              - giant
+          maxItems: 5
+          uniqueItems: true
+          default: []
+        ageMinMonths:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 360
+          default: null
+        ageMaxMonths:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 360
+          default: null
+        energyMin:
+          type:
+            - integer
+            - "null"
+          minimum: 1
+          maximum: 5
+          default: null
+        energyMax:
+          type:
+            - integer
+            - "null"
+          minimum: 1
+          maximum: 5
+          default: null
+        playStyles:
+          type: array
+          items:
+            enum:
+              - wrestle
+              - chase
+              - parallel
+              - fetch
+              - sniff
+          maxItems: 5
+          uniqueItems: true
+          default: []
+        minVerificationTier:
+          type: integer
+          minimum: 0
+          maximum: 4
+          default: 1
+        parallelWalkOnly:
+          type: boolean
+          default: false
+        acceptsReactive:
+          type: boolean
+          default: false
     Availability:
       type: object
       additionalProperties: false
@@ -2234,7 +2805,9 @@ components:
       required:
         - beaconUntil
       properties:
-        beaconUntil: *a12
+        beaconUntil:
+          type: string
+          format: date-time
     Dog:
       type: object
       additionalProperties: false
@@ -2259,21 +2832,75 @@ components:
         - preferences
         - availability
       properties:
-        id: *a3
-        householdId: *a3
-        name: *a15
-        sex: *a16
-        sizeClass: *a17
-        dateOfBirth: *a14
-        dobPrecision: *a18
-        neutered: *a19
-        neuteredAt: *a14
-        weightG: *a20
-        bio: *a21
-        status: *a26
-        publicationState: *a27
-        createdAt: *a12
-        updatedAt: *a12
+        id:
+          type: string
+          format: uuid
+        householdId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 40
+        sex:
+          enum:
+            - male
+            - female
+        sizeClass:
+          enum:
+            - toy
+            - small
+            - medium
+            - large
+            - giant
+        dateOfBirth:
+          type:
+            - string
+            - "null"
+          format: date
+        dobPrecision:
+          enum:
+            - exact
+            - month
+            - year
+            - estimate
+        neutered:
+          type:
+            - boolean
+            - "null"
+        neuteredAt:
+          type:
+            - string
+            - "null"
+          format: date
+        weightG:
+          type:
+            - integer
+            - "null"
+          minimum: 500
+          maximum: 120000
+        bio:
+          type:
+            - string
+            - "null"
+          maxLength: 300
+        status:
+          enum:
+            - active
+            - rehomed
+            - memorialised
+            - removed
+        publicationState:
+          enum:
+            - draft
+            - published
+            - paused
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
         breeds:
           type: array
           items:
@@ -2285,8 +2912,11 @@ components:
               - percentage
               - source
             properties:
-              breedId: *a3
-              name: *a28
+              breedId:
+                type: string
+                format: uuid
+              name:
+                type: string
               percentage:
                 type:
                   - integer
@@ -2328,9 +2958,13 @@ components:
     PhotoStatus:
       type: object
       additionalProperties: false
-      properties: &a29
-        id: *a5
-        dogId: *a5
+      properties:
+        id:
+          type: string
+          format: uuid
+        dogId:
+          type: string
+          format: uuid
         ordinal:
           type: integer
           minimum: 0
@@ -2367,7 +3001,7 @@ components:
         createdAt:
           type: string
           format: date-time
-      required: &a30
+      required:
         - id
         - dogId
         - ordinal
@@ -2381,8 +3015,59 @@ components:
       allOf:
         - type: object
           additionalProperties: true
-          properties: *a29
-          required: *a30
+          properties:
+            id:
+              type: string
+              format: uuid
+            dogId:
+              type: string
+              format: uuid
+            ordinal:
+              type: integer
+              minimum: 0
+              maximum: 29
+            width:
+              type:
+                - integer
+                - "null"
+            height:
+              type:
+                - integer
+                - "null"
+            moderationState:
+              enum:
+                - pending
+                - approved
+                - rejected
+                - quarantined
+            uploadState:
+              type:
+                - string
+                - "null"
+              enum:
+                - awaiting_upload
+                - uploaded
+                - completed
+                - deleted
+                - null
+            expiresAt:
+              type:
+                - string
+                - "null"
+              format: date-time
+            createdAt:
+              type: string
+              format: date-time
+          required:
+            - id
+            - dogId
+            - ordinal
+            - width
+            - height
+            - moderationState
+            - uploadState
+            - expiresAt
+            - createdAt
         - type: object
           properties:
             upload:
@@ -2420,7 +3105,9 @@ components:
           properties:
             kind:
               const: dog
-            dogId: *a6
+            dogId:
+              type: string
+              format: uuid
           required:
             - kind
             - dogId
@@ -2428,12 +3115,16 @@ components:
       type: object
       additionalProperties: false
       properties:
-        id: *a6
+        id:
+          type: string
+          format: uuid
         subjectType:
           enum:
             - user
             - dog
-        subjectId: *a6
+        subjectId:
+          type: string
+          format: uuid
         targetTier:
           type: integer
           enum:
@@ -2452,10 +3143,12 @@ components:
           type:
             - string
             - "null"
-        createdAt: &a31
+        createdAt:
           type: string
           format: date-time
-        updatedAt: *a31
+        updatedAt:
+          type: string
+          format: date-time
         nextAction:
           enum:
             - none
@@ -2476,7 +3169,7 @@ components:
       type: object
       additionalProperties: false
       properties:
-        recordType: &a32
+        recordType:
           enum:
             - vaccination
             - rabies
@@ -2487,15 +3180,15 @@ components:
             - cardiac_exam
             - dna_panel
             - vet_exam
-        testedAt: &a33
+        testedAt:
           type: string
           format: date
-        expiresAt: &a34
+        expiresAt:
           type:
             - string
             - "null"
           format: date
-        resultCode: &a35
+        resultCode:
           type:
             - string
             - "null"
@@ -2507,18 +3200,44 @@ components:
       type: object
       additionalProperties: false
       properties:
-        id: *a6
-        dogId: *a6
-        recordType: *a32
-        testedAt: *a33
-        expiresAt: *a34
-        resultCode: *a35
+        id:
+          type: string
+          format: uuid
+        dogId:
+          type: string
+          format: uuid
+        recordType:
+          enum:
+            - vaccination
+            - rabies
+            - deworming
+            - hip_score
+            - elbow_score
+            - eye_exam
+            - cardiac_exam
+            - dna_panel
+            - vet_exam
+        testedAt:
+          type: string
+          format: date
+        expiresAt:
+          type:
+            - string
+            - "null"
+          format: date
+        resultCode:
+          type:
+            - string
+            - "null"
+          pattern: ^[a-z0-9_]{1,40}$
         verifiedAt:
           type:
             - string
             - "null"
           format: date-time
-        createdAt: *a31
+        createdAt:
+          type: string
+          format: date-time
         provenance:
           enum:
             - self_reported
@@ -2536,6 +3255,76 @@ components:
         - createdAt
         - provenance
         - expired
+    Area:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        countryCode:
+          type: string
+        adminRegion:
+          type:
+            - string
+            - "null"
+        timezone:
+          type: string
+        rollout:
+          enum:
+            - development
+            - waitlist
+            - soft_launch
+            - gated
+            - open
+        selectable:
+          type: boolean
+      required:
+        - id
+        - name
+        - countryCode
+        - adminRegion
+        - timezone
+        - rollout
+        - selectable
+    HouseholdLocation:
+      type: object
+      additionalProperties: false
+      properties:
+        householdId:
+          type: string
+          format: uuid
+        source:
+          enum:
+            - manual_area
+            - null
+        precision:
+          enum:
+            - city
+            - null
+        area:
+          oneOf:
+            - $ref: "#/components/schemas/Area"
+            - type: "null"
+        updatedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        canChangeAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+      required:
+        - householdId
+        - source
+        - precision
+        - area
+        - updatedAt
+        - canChangeAt
   securitySchemes:
     bearerAuth:
       type: http

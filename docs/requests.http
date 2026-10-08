@@ -175,3 +175,21 @@ Content-Type: application/json
 ### Read private health records
 GET {{baseUrl}}/v1/dogs/{{dogId}}/health-records?limit=20
 Authorization: Bearer {{accessToken}}
+
+### Public coarse area lookup
+GET {{baseUrl}}/v1/app/areas?countryCode=IN&query=Bengaluru&limit=20
+
+### Save city selection after accepting the current location document
+PUT {{baseUrl}}/v1/households/{{householdId}}/location
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"source":"manual_area","areaId":"01920000-0000-7000-8000-0000000e0001"}
+
+### Read private city selection
+GET {{baseUrl}}/v1/households/{{householdId}}/location
+Authorization: Bearer {{accessToken}}
+
+### Clear shared household location (does not withdraw personal consent)
+DELETE {{baseUrl}}/v1/households/{{householdId}}/location
+Authorization: Bearer {{accessToken}}

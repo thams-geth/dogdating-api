@@ -22,6 +22,8 @@ import { mediaRoutes } from './modules/media/media.routes.js';
 import { LocalPhotoStorage, type PhotoStorage } from './modules/media/media.storage.js';
 import { VerificationService } from './modules/verification/verification.service.js';
 import { verificationRoutes } from './modules/verification/verification.routes.js';
+import { LocationService } from './modules/location/location.service.js';
+import { areaRoutes, locationRoutes } from './modules/location/location.routes.js';
 
 export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage } = {}) {
   const database = deps.database ?? pool;
@@ -41,7 +43,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0016']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0017']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -49,6 +51,8 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
     res.json({ status: 'ready' });
   }));
   app.use('/v1/app', appRoutes(policySchema.parse(deps.policy ?? defaultPolicy)));
+  const location = new LocationService(database);
+  app.use('/v1/app/areas', areaRoutes(location));
   app.use('/v1/dogs/breeds', breedRoutes(database));
   const auth = deps.auth ?? (config.OTP_MODE === 'development' && config.AUTH_SECRET
     ? new AuthService(database, config.AUTH_SECRET, new DevelopmentOtpSender(config.NODE_ENV)) : undefined);
@@ -61,6 +65,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
     return auth.phoneIndex(phone);
   });
   app.use('/v1/households',householdRoutes(households,auth));
+  app.use('/v1/households',locationRoutes(location,auth));
   app.use('/v1/household-invitations',invitationRoutes(households,auth));
   app.use('/v1/dogs',dogRoutes(new DogsService(database),auth));
   const photos = deps.photoStorage ?? (config.MEDIA_MODE === 'local' ? new LocalPhotoStorage(config.MEDIA_LOCAL_DIR, config.NODE_ENV) : undefined);

@@ -16,7 +16,9 @@
     "test:integration": "node --import tsx --test --test-concurrency=1 test/integration/*.test.ts",
     "setup:dev": "node scripts/setup-dev.mjs",
     "check:openapi": "node scripts/check-openapi.mjs",
-    "media:cleanup": "tsx src/modules/media/cleanup.ts"
+    "media:cleanup": "tsx src/modules/media/cleanup.ts",
+    "docs:handovers": "node scripts/generate-handovers.mjs",
+    "check:handovers": "node scripts/generate-handovers.mjs --check"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

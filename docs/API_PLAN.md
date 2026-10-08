@@ -97,6 +97,8 @@ States: `account_created → guardian_details → household → dog_details → 
 
 ### M04 — Households and dog profiles [L]
 
+Current location delivery: public area lookup plus GET/PUT/DELETE household location using consented `manual_area` city selection. This is the no-GPS onboarding path. It does not populate inherited displaced-anchor cells; future discovery must explicitly handle city-only precision. GPS/displaced-anchor capture and its encrypted storage remain planned.
+
 | Method + path | Access | Purpose |
 | --- | --- | --- |
 | POST/GET `/households`; GET/PATCH `/households/{id}` | U | Create/list own households; membership-scoped detail/edit |

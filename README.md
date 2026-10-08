@@ -9,6 +9,7 @@ India-first dog social/matching backend built with TypeScript, Express and Postg
 - [Implementation ledger](docs/IMPLEMENTATION.md): delivered modules, limitations and next work.
 - [Project memory](PROJECT_MEMORY.md): user decisions, environment and future-session handoff.
 - [OpenAPI](docs/openapi.yaml) and [HTTP examples](docs/requests.http): implemented endpoints only.
+- [Frontend handovers and wire diagrams](docs/handovers/README.md): module status, integration contracts, errors and screen flows.
 
 The provisional launch scope is dog playdates/walks. Breeding introductions and owner dating have separate rollout plans. The founder's launch-mode clarification is still pending; common platform work is underway.
 
@@ -57,6 +58,7 @@ npm run typecheck
 npm run build
 npm test
 npm run check:openapi
+npm run check:handovers
 
 # Create once; tests clear fixture data in this dedicated test database.
 docker exec dogdating-api-postgres createdb -U waggle waggle_api_test
@@ -67,9 +69,9 @@ Integration tests refuse databases whose names do not end in `_test`. They verif
 
 ## Database and module workflow
 
-Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata; 0013 adds consent/onboarding; 0014 adds invitations and dog drafts; 0015 adds photo uploads; 0016 adds verification intake and health-record deletion metadata. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
+Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata; 0013 adds consent/onboarding; 0014 adds invitations and dog drafts; 0015 adds photo uploads; 0016 adds verification intake and health-record deletion metadata; 0017 adds manual location state. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
 
-Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: private location capture, production media/moderation and verification integration, then home/discovery, likes/connections, chat and notifications.
+Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: home/discovery and its blocking/privacy prerequisites; production media/moderation and verification integration remain launch dependencies.
 
 ## Consent and onboarding
 
@@ -77,7 +79,7 @@ Each completed module gets relevant tests, contract/examples, updated docs/memor
 
 `GET/POST /v1/me/consents` reads/accepts document versions; `DELETE /v1/me/consents/{purpose}` records withdrawal. `GET /v1/legal/documents/{kind}` serves published, immutable text, optionally by version. **No legal text is seeded.** Until reviewed documents, approved photos, location and guardian verification exist, completion returns 409 and progress explains what is missing. Tests use labeled synthetic evidence in the test database only.
 
-`GET/PATCH /v1/me/preferences` controls discovery pause and read receipts. Discovery cannot be enabled with incomplete onboarding. Clients must use the current `ready`/`missing` fields: historical `completedAt` alone is insufficient after evidence expires or a policy changes. Photo uploads and verification intake are available below; moderation approval, verified grants and location capture remain prerequisites.
+`GET/PATCH /v1/me/preferences` controls discovery pause and read receipts. Discovery cannot be enabled with incomplete onboarding. Clients must use the current `ready`/`missing` fields: historical `completedAt` alone is insufficient after evidence expires or a policy changes. Photo uploads and verification intake are available below; moderation approval and verified grants remain external prerequisites; manual city selection is implemented.
 
 ## Households and dog profiles
 
@@ -89,7 +91,7 @@ Create/list dog drafts at `/v1/dogs`; household members can read `/v1/dogs/{id}`
 
 `POST /publish`, `/pause`, `/memorialise`, and `POST/DELETE /beacon` manage visibility and walking-now status. Publishing requires this dog to be selected and its guardian's live onboarding checks to pass. A beacon also requires discovery enabled and lasts at most 90 minutes. Memorialisation is owner-only and cannot be reversed with profile edits. Editing core profile details returns a published dog to draft; identity or breed changes revoke existing dog-verification grants so stale claims cannot survive edits.
 
-Household/dog lists use `limit` (default 20, maximum 50) and a user/list-scoped `nextCursor`, ordered by UUID. `GET /v1/dogs/{id}` is a private household view; public discovery profiles, dog transfers and household location capture are still pending. Publication is a stored lifecycle state, not proof that future discovery safety/consent checks may be skipped.
+Household/dog lists use `limit` (default 20, maximum 50) and a user/list-scoped `nextCursor`, ordered by UUID. `GET /v1/dogs/{id}` is a private household view; public discovery profiles, dog transfers and precise GPS capture are still pending. Publication is a stored lifecycle state, not proof that future discovery safety/consent checks may be skipped.
 
 ## Private photo uploads
 
@@ -114,3 +116,17 @@ Run `npm run media:cleanup` regularly while using local uploads. Each run handle
 `POST/GET /v1/dogs/{dogId}/health-records` stores/lists private health metadata. Create with `recordType`, `testedAt`, optional `expiresAt`, and optional `resultCode`. Dates must be real, tests cannot predate birth or lie in the future, and expiry cannot predate the test. New records always have `provenance: self_reported` and no verification date; they never grant health badges. Lists use the standard `limit`/`cursor` pagination and explicitly mark expired records. Limits: 100 live records per dog and 10 creations per dog/day.
 
 Owners/co-guardians can `DELETE /v1/dogs/{dogId}/health-records/{id}`. Removal is idempotent and hides the record from household lists; retained database evidence follows the future retention/deletion policy. Removing reviewed evidence revokes dog health tiers (3+) and resets publication. Actual reviewer/provider integrations and document handling are still pending.
+
+## Mobile/web handovers and wire diagrams
+
+Start at [docs/handovers/README.md](docs/handovers/README.md). All 16 modules have a handover with implemented/planned status, screen flow and wireframe. Implemented modules include endpoint/access/status tables, request/response shapes, examples, error codes and client recovery rules. [Shared client conventions](docs/handovers/COMMON.md) cover authentication, pagination, errors and development setup.
+
+Run `npm run docs:handovers` after changing OpenAPI or module guidance; `npm run check:handovers` detects stale handovers and runs in CI. Authored guidance lives in `scripts/handover-notes.mjs`.
+
+## Consented manual location
+
+`GET /v1/app/areas?countryCode=IN&query=Bengaluru` lists coarse selectable/development/waitlist areas with standard `limit`/`cursor` pagination. Bengaluru remains development seed data; the list is not a public-launch promise.
+
+After accepting the current location policy, an owner/co-guardian can `PUT /v1/households/{id}/location` with `{ "source": "manual_area", "areaId": "..." }`. Household members can GET that path. The response reports `precision: city`, area details, `updatedAt` and `canChangeAt`; it contains no coordinates or matching cells. Manual selection stores only the city identifier. GPS capture and displaced anchors remain planned.
+
+Identical saves are idempotent; a different selection is allowed once per 24 hours. `DELETE` clears location immediately while retaining the change deadline, so deleting/recreating cannot bypass the limit. Changing or clearing the area resets household dog publication and cancels beacons. Personal location-consent withdrawal and shared household location removal are separate actions. Onboarding checks live consent and area availability; a city-only location must never be presented as a precise distance in future discovery.

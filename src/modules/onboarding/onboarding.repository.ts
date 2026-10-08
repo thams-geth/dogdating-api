@@ -40,11 +40,13 @@ export class OnboardingRepository {
       (SELECT count(*)::int FROM graph.dog_breeds b WHERE b.dog_id=d.id) AS breed_count,
       (SELECT count(*)::int FROM graph.dog_media m WHERE m.dog_id=d.id AND m.kind='photo' AND m.moderation_state='approved' AND m.deleted_at IS NULL) AS photos,
       EXISTS(SELECT 1 FROM graph.dog_temperament t WHERE t.dog_id=d.id) AS temperament,
-      h.cell_coarse IS NOT NULL AS location_ready
+      (h.cell_coarse IS NOT NULL OR (h.location_source='manual_area' AND EXISTS(
+        SELECT 1 FROM ops.metros area WHERE area.id=h.metro_id AND area.country=$3
+        AND area.launch_state IN ('seeding','soft_launch','open')))) AS location_ready
       FROM graph.dogs d JOIN identity.households h ON h.id=d.household_id
       JOIN identity.household_members m ON m.household_id=h.id AND m.user_id=$1 AND m.accepted_at IS NOT NULL
       WHERE d.id=$2 AND d.deleted_at IS NULL AND d.status='active' AND h.deleted_at IS NULL`,
-    [userId,preference.active_dog_id])).rows[0];
+    [userId,preference.active_dog_id,user.country_code])).rows[0];
     const household = (await tx.query(`SELECT EXISTS(SELECT 1 FROM identity.household_members m
       JOIN identity.households h ON h.id=m.household_id WHERE m.user_id=$1 AND m.accepted_at IS NOT NULL AND h.deleted_at IS NULL) AS present`,[userId])).rows[0]!.present;
     const verified = (await tx.query(`SELECT EXISTS(SELECT 1 FROM verify.tiers_granted WHERE subject_type='user'
