@@ -17,16 +17,18 @@ Updated: 8 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 | M05 private photo foundation | Complete for local development | Real JPEG/PNG uploads, checksum/type/size checks, EXIF removal, status/order/deletion and retryable cleanup; pending moderation only |
 | M05 verification intake / health metadata | Complete as a foundation | Request/status/withdrawal, requester permissions, deduplication, limits and private self-reported health records; no badges granted |
 | M05 production integrations | Planned | Object storage, scan/moderation, approved-photo delivery, identity/document provider, signed webhooks and authorized reviewer grants |
-| M06–M12 launch modules | Planned | Home/feed, likes/connections, chat, notifications, meetups, privacy/support, staff operations |
+| M06 home/discovery | In progress | Live eligibility and household-wide block enforcement |
+| M11 blocking foundation | Complete | Private paginated block list, idempotent block/unblock; existing cross-household matches/conversations close |
+| M07–M12 remaining launch modules | Planned | Likes/connections, chat, notifications, meetups, reports/privacy/support, staff operations |
 | M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 52 PostgreSQL integration tests passed (60 total).
+- Typecheck/build passed; 8 unit/HTTP tests and 55 PostgreSQL integration tests passed (63 total).
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
 - Migrations through 0017. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 63 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- 66 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions
@@ -56,3 +58,5 @@ Verification intake: provider=NULL, pending/awaiting_provider_setup. No document
 All 16 modules have docs/handovers/Mxx.md, with current status, screen flow and wireframe. Implemented operations have request/response shapes, examples, permissions, success/error codes and client handling. Planned contracts are explicitly unavailable. npm run docs:handovers generates from OpenAPI, source errors and scripts/handover-notes.mjs; npm run check:handovers checks drift (also configured in CI).
 
 Location verification: five database tests cover public rollout/search/cursor semantics, current consent, country/role checks, concurrent throttling, deletion and live readiness. Manual location stores metro_id only; it never generates precise distance or GPS claims. Consent withdrawal remains per-user and does not delete shared location.
+
+Blocking tests cover private lists, cursor scope, validation, reciprocal concurrency, idempotency and persistent match/conversation closure after unblock. Discovery enforcement follows in M06; future relationship/message operations must check live blocks.

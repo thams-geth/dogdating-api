@@ -130,3 +130,7 @@ Run `npm run docs:handovers` after changing OpenAPI or module guidance; `npm run
 After accepting the current location policy, an owner/co-guardian can `PUT /v1/households/{id}/location` with `{ "source": "manual_area", "areaId": "..." }`. Household members can GET that path. The response reports `precision: city`, area details, `updatedAt` and `canChangeAt`; it contains no coordinates or matching cells. Manual selection stores only the city identifier. GPS capture and displaced anchors remain planned.
 
 Identical saves are idempotent; a different selection is allowed once per 24 hours. `DELETE` clears location immediately while retaining the change deadline, so deleting/recreating cannot bypass the limit. Changing or clearing the area resets household dog publication and cancels beacons. Personal location-consent withdrawal and shared household location removal are separate actions. Onboarding checks live consent and area availability; a city-only location must never be presented as a precise distance in future discovery.
+
+## Blocking
+
+`POST /v1/me/blocks` with `{ "userId": "..." }` blocks another user idempotently (204). `GET /v1/me/blocks` lists only your outgoing blocks with standard pagination; `DELETE /v1/me/blocks/{userId}` removes your block idempotently. The other direction remains effective. Existing active cross-household matches are blocked and conversations close; unblocking does not restore them. Shared household membership is not removed. Maximum 500 outgoing blocks. See the [safety handover](docs/handovers/M11.md).

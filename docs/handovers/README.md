@@ -14,7 +14,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 | M08 | [Messages and realtime](M08.md) | Not implemented | 0 |
 | M09 | [Notifications and devices](M09.md) | Not implemented | 0 |
 | M10 | [Meetups and places](M10.md) | Not implemented | 0 |
-| M11 | [Trust, safety, privacy and support](M11.md) | Not implemented | 0 |
+| M11 | [Trust, safety, privacy and support](M11.md) | Implemented foundation; see limitations | 3 |
 | M12 | [Operations and staff](M12.md) | Not implemented | 0 |
 | M13 | [Billing and growth](M13.md) | Not implemented | 0 |
 | M14 | [Country expansion](M14.md) | Not implemented | 0 |

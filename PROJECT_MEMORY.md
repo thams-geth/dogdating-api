@@ -40,7 +40,7 @@ Historical input lives in /Users/thamaraiselvan/Dog dating/waggle-plan and /User
 - Household/dog core follows 5da00c6; use git log for exact hash. Roles, manual phone-bound invitations, last-owner protection, private dog drafts, declared breed mix, structured temperament, filters/schedule, gated publication/pause/memorialisation/beacons.
 - Household writes lock the household before checking membership. Multi-resource operations lock user before household; avoid reversing this order. Profile edits reset publication; identity/breed changes revoke dog tiers.
 - Public discovery profiles, precise GPS capture, transfer and twelve-question temperament scoring are not implemented. Manual city selection is implemented.
-- Local checks: 8 unit/HTTP + 52 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
+- Local checks: 8 unit/HTTP + 55 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
 
 ## Next work
 
@@ -52,10 +52,14 @@ Home/discovery with blocking/privacy prerequisites and explicit city-only locati
 
 ## Verification handoff
 
-Guardian requests bind to caller; dog requests require editor membership. Active requests deduplicate, max 3 new requests/user/day. Health metadata is explicitly self_reported; dates validated, 100 live/dog and 10 new/dog/day. Removing reviewed evidence revokes health tiers and publication. Future health eligibility must check deleted_at, verified_at and live expiry; future callbacks must recheck membership, request state and current identity. No identity documents or numbers are accepted. Tests now total 60; OpenAPI has 63 operations. Next concrete shared-platform task: home/discovery with current prerequisites enforced and blocking/privacy foundations.
+Guardian requests bind to caller; dog requests require editor membership. Active requests deduplicate, max 3 new requests/user/day. Health metadata is explicitly self_reported; dates validated, 100 live/dog and 10 new/dog/day. Removing reviewed evidence revokes health tiers and publication. Future health eligibility must check deleted_at, verified_at and live expiry; future callbacks must recheck membership, request state and current identity. No identity documents or numbers are accepted. Tests now total 63; OpenAPI has 66 operations. Next concrete shared-platform task: home/discovery with current prerequisites enforced and blocking/privacy foundations.
 
 ## Location and developer handover
 
 GET /app/areas; GET/PUT/DELETE /households/{id}/location implemented. source=manual_area, precision=city, current location consent required. City selection is an explicit no-GPS path; metro_id only, inherited anchor cells/origins cleared. Do not derive precise distance buckets from city selection. Area changes serialized per household and limited to 24h; identical save is idempotent, clear retains deadline. Both change/clear reset publication and cancel beacons. Bengaluru remains development-only seed data.
 
 User requires handover per module from now on. All 16 have docs/handovers/Mxx.md, plus COMMON.md and index with end-to-end wire flow; planned modules clearly have no callable contracts. Keep OpenAPI, scripts/handover-notes.mjs and API_PLAN current; run docs:handovers and check:handovers before each module commit. CI includes drift check. This requirement is also in AGENTS.md.
+
+## Blocking foundation
+
+M11 POST/GET /me/blocks and DELETE /me/blocks/{userId} implemented. Max 500 outgoing, private list, idempotent, reciprocal blocks use sorted user locks. Existing cross-household matches/conversations close; unblock never restores. Shared household membership is not removed. Next work in progress: M06 enforcement and home/feed.

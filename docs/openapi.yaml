@@ -1686,6 +1686,96 @@ paths:
             retained
         default:
           $ref: "#/components/responses/Problem"
+  /v1/me/blocks:
+    get:
+      operationId: listBlocks
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  blocks:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        userId:
+                          type: string
+                          format: uuid
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - userId
+                        - createdAt
+                  nextCursor:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - blocks
+                  - nextCursor
+        default:
+          $ref: "#/components/responses/Problem"
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - in: query
+          name: cursor
+          schema:
+            type: string
+            maxLength: 400
+    post:
+      operationId: blockUser
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Success
+        default:
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                userId:
+                  type: string
+                  format: uuid
+              required:
+                - userId
+  /v1/me/blocks/{userId}:
+    delete:
+      operationId: unblockUser
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Success
+        default:
+          $ref: "#/components/responses/Problem"
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            format: uuid
 components:
   responses:
     Problem:

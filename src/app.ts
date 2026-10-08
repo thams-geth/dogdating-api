@@ -24,6 +24,8 @@ import { VerificationService } from './modules/verification/verification.service
 import { verificationRoutes } from './modules/verification/verification.routes.js';
 import { LocationService } from './modules/location/location.service.js';
 import { areaRoutes, locationRoutes } from './modules/location/location.routes.js';
+import { BlocksService } from './modules/safety/blocks.service.js';
+import { blockRoutes } from './modules/safety/blocks.routes.js';
 
 export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage } = {}) {
   const database = deps.database ?? pool;
@@ -60,6 +62,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   const onboarding=new OnboardingService(database);
   app.use('/v1/legal',legalRoutes(onboarding));
   app.use('/v1/me',onboardingRoutes(onboarding,auth));
+  app.use('/v1/me/blocks',blockRoutes(new BlocksService(database),auth));
   const households=new HouseholdsService(database,(phone)=> {
     if(!auth)throw new ApiError(503,'auth-unavailable','Authentication is not configured.');
     return auth.phoneIndex(phone);

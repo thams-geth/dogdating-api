@@ -193,3 +193,14 @@ Authorization: Bearer {{accessToken}}
 ### Clear shared household location (does not withdraw personal consent)
 DELETE {{baseUrl}}/v1/households/{{householdId}}/location
 Authorization: Bearer {{accessToken}}
+
+### Block a known guardian (replace targetUserId)
+POST {{baseUrl}}/v1/me/blocks
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"userId":"{{targetUserId}}"}
+
+### List own outgoing blocks
+GET {{baseUrl}}/v1/me/blocks?limit=20
+Authorization: Bearer {{accessToken}}
