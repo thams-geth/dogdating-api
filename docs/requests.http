@@ -65,3 +65,63 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {"readReceipts":false,"discoveryPaused":true}
+
+### Create your household (response supplies householdId)
+POST {{baseUrl}}/v1/households
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"name":"My pack"}
+
+@householdId = REPLACE_FROM_HOUSEHOLD_RESPONSE
+@dogId = REPLACE_FROM_DOG_RESPONSE
+@breedId = REPLACE_FROM_BREED_CATALOGUE
+
+### Create a private dog draft
+POST {{baseUrl}}/v1/dogs
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"householdId":"{{householdId}}","name":"Ruby","sex":"female","sizeClass":"medium","dateOfBirth":"2023-01-01","neutered":true}
+
+### Set declared breed mix
+PUT {{baseUrl}}/v1/dogs/{{dogId}}/breeds
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"breeds":[{"breedId":"{{breedId}}","percentage":100}]}
+
+### Save self-reported temperament, questionnaire version 1
+PUT {{baseUrl}}/v1/dogs/{{dogId}}/temperament
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"questionnaireVersion":1,"energy":3,"playStyle":["parallel"],"dogReactivity":2,"humanReactivity":2,"resourceGuarding":1,"recallReliability":3,"sizeTolerance":["medium"],"needsToKnow":"Prefers quiet walks."}
+
+### Weekly schedule; Sunday is 0, times are minutes since local midnight
+PUT {{baseUrl}}/v1/dogs/{{dogId}}/availability
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"timezone":"Asia/Kolkata","windows":[{"dayOfWeek":1,"startMin":1080,"endMin":1140}]}
+
+### Select the draft to see its remaining onboarding requirements
+PUT {{baseUrl}}/v1/me/active-dog
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"dogId":"{{dogId}}"}
+
+### Invite a co-guardian; caller shares the returned token manually, no SMS is sent
+POST {{baseUrl}}/v1/households/{{householdId}}/invitations
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{"phoneE164":"+919000100001","role":"co_guardian"}
+
+### Publish is blocked until current consent, media, location and verification prerequisites are met
+POST {{baseUrl}}/v1/dogs/{{dogId}}/publish
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{}

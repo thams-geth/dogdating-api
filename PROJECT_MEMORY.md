@@ -1,50 +1,47 @@
 # Project memory
 
-Last updated: 8 October 2026. Read this with docs/IMPLEMENTATION.md at the start of a session.
+Last updated: 8 October 2026. Read with docs/IMPLEMENTATION.md at the start of a session.
 
 ## Confirmed user decisions
 
-- Build a backend-only dog dating/social app. Launch in India, expand to other countries later.
-- Use TypeScript + Express (explicitly requested), PostgreSQL. Do not reintroduce NestJS.
-- Working repository: /Users/thamaraiselvan/ReactProject/dogdating-api.
-- Research and plan the full API journey before feature implementation. Start implementing when the plan is written.
-- Commit each completed module with a meaningful message. Maintain Markdown docs and this memory file.
+- Backend-only dog dating/social app. India first, then other countries.
+- TypeScript + Express + PostgreSQL; do not reintroduce NestJS.
+- Repository: /Users/thamaraiselvan/ReactProject/dogdating-api.
+- Research and plan the whole API journey, then implement modules. Commit each completed module with a meaningful message; maintain docs and this memory.
+- Latest user instruction: continue the next modules. No remote push/deployment requested.
 
-## Current product assumptions
+## Product assumptions and open inputs
 
-- Pack/playdates first is provisional. A question about breeding vs human dating was sent; no answer was present when these notes were written. Shared platform work may proceed.
-- One launch city at a time; Bengaluru is only existing seed data, not a founder-approved launch city.
-- Phone OTP, adult guardian accounts, households with multiple dogs/guardians. Like → mutual match → chat → meetup.
-- Android client exists externally; backend changes need an explicit contract and later client reconciliation.
+- Pack/playdates first remains provisional: the question about breeding/owner dating has no recorded answer. Shared platform work is authorized.
+- One metro at a time; Bengaluru is seed data, not a confirmed launch city.
+- Adult guardian accounts, phone OTP, multi-dog/multi-guardian households; likes → mutual connection → chat → meetup.
+- Production SMS/DLT, verification/media providers, legal text/translations, domains/store IDs and final launch city remain unresolved.
+- Never fabricate legal acceptance, age/identity verification or production readiness. New accounts remain pending; live onboarding readiness is distinct from identity account status.
 
 ## Sources of truth
 
-1. Latest user decisions override repository docs.
-2. docs/API_PLAN.md is the current Express API plan; docs/RESEARCH.md has dated primary sources.
-3. docs/IMPLEMENTATION.md records actual status; planned paths are not implemented endpoints.
-4. External reference: /Users/thamaraiselvan/Dog dating/waggle-plan and /Users/thamaraiselvan/Dog dating/waggle. These are historical input, not authoritative when conflicting with the current user/plan.
+Latest user decisions → docs/API_PLAN.md → docs/IMPLEMENTATION.md for actual state. docs/RESEARCH.md contains dated sources. docs/openapi.yaml and docs/requests.http describe implemented endpoints.
 
-## Local environment
+Historical input lives in /Users/thamaraiselvan/Dog dating/waggle-plan and /Users/thamaraiselvan/Dog dating/waggle. The old NestJS plan does not override the Express repository. Its Android client is a draft and needs contract reconciliation later.
 
-- Node, npm and Docker available. PostgreSQL container dogdating-api-postgres uses localhost:5433, database/user waggle. Redis configured on 6380 but not required by current routes.
-- Ports 5432 and 6379 belong to the user's campusone project; never stop or overwrite it.
-- Migrations 0001–0011 copied from old backend and applied to local Waggle DB. Preserve them; add forward migrations.
-- Baseline committed as d0b4746. No remote push/deployment requested.
+## Environment
+
+- PostgreSQL: dogdating-api-postgres, localhost:5433, database/user waggle. Redis configured on 6380, not used yet.
+- Ports 5432/6379 belong to campusone. Do not touch unrelated containers/databases.
+- Migrations 0001–0011 inherited; 0012 auth metadata, 0013 consent/onboarding, 0014 dog drafts/invitations. Add migrations; never rewrite applied SQL.
+- TEST_DATABASE_URL must name a dedicated DB ending in _test. Local test DB waggle_api_test uses port 5433. Tests clear its fixture identity/household data.
+- npm run setup:dev generates an ignored local secret and opts into terminal-only OTP for synthetic numbers. Do not print secrets or enable this in production.
+- A previous compiled server may still own port 3000. Do not assume it serves the latest code; use npm run dev or restart only the known Waggle process.
+
+## Delivered modules / commits
+
+- d0b4746 baseline; 898efff research/plan; f4236eb app lifecycle; 23e75eb auth/session core.
+- 5da00c6 consent and resumable onboarding. Published policy rows are immutable; no legal content is seeded. Adult declaration is not verification. Active dog selection always rechecks household membership. Live missing steps override historical completedAt.
+- Household/dog core follows 5da00c6; use git log for exact hash. Roles, manual phone-bound invitations, last-owner protection, private dog drafts, declared breed mix, structured temperament, filters/schedule, gated publication/pause/memorialisation/beacons.
+- Household writes lock the household before checking membership. Multi-resource operations lock user before household; avoid reversing this order. Profile edits reset publication; identity/breed changes revoke dog tiers.
+- Public discovery profiles, private location capture, transfer and twelve-question temperament scoring are not implemented.
+- Local checks: 8 unit/HTTP + 34 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
 
 ## Next work
 
-Consult docs/IMPLEMENTATION.md for the current completed modules and exact continuation point. Production SMS, verification, media storage, app store IDs, public domains, reviewed legal text and launch city are still open product/operations inputs. Do not invent credentials, verified claims or production readiness.
-
-App lifecycle core delivered: countries/bootstrap, numeric version guidance, HTTP errors/readiness and six tests. OpenAPI only lists implemented routes. India is development-only; all product flags remain off. M02 auth/session core is now delivered for local development.
-
-## Latest handoff
-
-- Research/plan commit: 898efff. App lifecycle core commit: f4236eb. Auth module commit is the next commit after those; use git log for its exact hash.
-- Auth delivered: OTP request/verify, refresh with reuse detection, logout/all, own-device session list/revoke, private GET/PATCH me. New accounts stay pending.
-- Eight unit/HTTP tests and 17 database integration tests passed; migration 0012 added. Never treat passing local tests as production readiness.
-- `npm run setup:dev` enables a local-only sender and generates `.env` secret. Do not print the secret. Real SMS adapter, DLT, shared rate limits and auth audit events are still needed.
-- Test database: waggle_api_test at localhost:5433; tests clear its identity data and refuse DB names without `_test`.
-- Next module: M03 consent/onboarding followed by M04 household and dog ownership. All plan endpoints beyond documented OpenAPI paths remain unimplemented.
-- Pending answer about launch mode remains an assumption, not approval for breeding or human dating.
-
-M03 delivered: immutable published policy documents (no legal text seeded), consent acceptance/withdrawal history, resumable live onboarding, active-dog selection and preferences. Migration 0013. Adult self-declaration never awards verification. Historical completion does not replace current eligibility. Next: M04 household/dog profile module.
+M05 media upload/moderation and verification, plus remaining private location prerequisite; then home/discovery. Read the implementation ledger first. New public discovery must enforce live consent, blocking, visibility and verification; a published row alone does not authorize disclosure. Keep module docs and commits current.

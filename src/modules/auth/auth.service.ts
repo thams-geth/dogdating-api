@@ -26,6 +26,7 @@ export class AuthService {
   private hash(purpose: string, value: string): string {
     return createHmac('sha256', this.secret).update(`${purpose}:${value}`).digest('hex');
   }
+  phoneIndex(phone: string): string { return this.hash('phone', phone); }
   private equal(left: string, right: string): boolean {
     const a = Buffer.from(left); const b = Buffer.from(right);
     return a.length === b.length && timingSafeEqual(a, b);

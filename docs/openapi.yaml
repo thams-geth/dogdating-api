@@ -322,7 +322,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: &a2
+          schema: &a5
             type: string
             format: uuid
       responses:
@@ -574,6 +574,488 @@ paths:
                 $ref: "#/components/schemas/UserPreferences"
         default:
           $ref: "#/components/responses/Problem"
+  /v1/households:
+    post:
+      operationId: createHousehold
+      description: Creates household and accepted owner atomically. Maximum ten
+        households per user.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HouseholdInput"
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Household"
+        default:
+          $ref: "#/components/responses/Problem"
+    get:
+      operationId: listHouseholds
+      security:
+        - bearerAuth: []
+      parameters: &a4
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 400
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Households"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/households/{id}:
+    get:
+      operationId: getHousehold
+      security:
+        - bearerAuth: []
+      parameters:
+        - &a2
+          name: id
+          in: path
+          required: true
+          schema: &a3
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Household"
+        default:
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: renameHousehold
+      description: Owner or co-guardian only.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HouseholdInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Household"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/households/{id}/members:
+    get:
+      operationId: listMembers
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Members"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/households/{id}/members/{userId}:
+    patch:
+      operationId: changeMemberRole
+      description: Owner only. Serializes membership changes; cannot remove or demote
+        the final accepted owner.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+        - name: userId
+          in: path
+          required: true
+          schema: *a3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberRole"
+      responses:
+        "204":
+          description: Success
+        default:
+          $ref: "#/components/responses/Problem"
+    delete:
+      operationId: removeMember
+      description: Owner only. Serializes membership changes; cannot remove or demote
+        the final accepted owner.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+        - name: userId
+          in: path
+          required: true
+          schema: *a3
+      responses:
+        "204":
+          description: Success
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/households/{id}/invitations:
+    post:
+      operationId: inviteMember
+      description: Owner only; 20 invites per household/day. Token expires in seven
+        days and must be shared manually. No SMS is sent.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvitationInput"
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/household-invitations/{token}/accept:
+    post:
+      operationId: acceptInvitation
+      description: Bound to the recipient verified phone. Consumed/expired tokens
+        return 409. Existing membership cannot be overwritten; inviter must
+        still be an owner.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[A-Za-z0-9_-]{43}$
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyBody"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Household"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs:
+    post:
+      operationId: createDog
+      description: Owner/co-guardian; draft by default, maximum 20 active dogs per
+        household.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDog"
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+    get:
+      operationId: listDogs
+      security:
+        - bearerAuth: []
+      parameters: *a4
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dogs"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}:
+    get:
+      operationId: getOwnDog
+      description: Accepted household members only. This is not a public discovery
+        projection.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: updateDog
+      description: Owner/co-guardian. Validates merged dates; profile edits reset
+        publication and identity changes revoke dog verification grants.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDog"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/breeds:
+    put:
+      operationId: replaceDogBreeds
+      description: Unique breed IDs; percentages sum to 100. Evidence is declared only.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DogBreedsInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/temperament:
+    put:
+      operationId: replaceTemperament
+      description: Version 1 self-reported dimensions. Not a medical compatibility
+        guarantee.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemperamentInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/preferences:
+    put:
+      operationId: replaceDogPreferences
+      description: PUT replaces all filters using documented defaults. Min/max ranges
+        must be ordered; acceptsReactive requires parallelWalkOnly.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DogPreferencesInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/availability:
+    put:
+      operationId: replaceAvailability
+      description: "Weekly local-time windows: Sunday=0, minute offsets, no overlaps
+        or overnight windows. Split overnight windows across days; PUT replaces
+        schedule and preserves active beacon."
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Availability"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/publish:
+    post:
+      operationId: publishDog
+      description: Requires current onboarding readiness and selection of this active dog.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyBody"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/pause:
+    post:
+      operationId: pauseDog
+      description: "Owner/co-guardian: hide dog and clear walking beacon."
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyBody"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/memorialise:
+    post:
+      operationId: memorialiseDog
+      description: Owner only; irreversible through profile editing. Clears beacon and
+        removes active-dog eligibility.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyBody"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+        default:
+          $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/beacon:
+    post:
+      operationId: startBeacon
+      description: Requires publication, current onboarding, active dog and discovery
+        enabled. Replaces prior beacon, capped at 90 minutes.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BeaconInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Beacon"
+        default:
+          $ref: "#/components/responses/Problem"
+    delete:
+      operationId: stopBeacon
+      description: Owner/co-guardian can cancel; weekly availability is retained.
+      security:
+        - bearerAuth: []
+      parameters:
+        - *a2
+      responses:
+        "204":
+          description: Success
+        default:
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
@@ -679,7 +1161,7 @@ components:
         code:
           type: string
           pattern: ^\d{6}$
-        deviceId: *a2
+        deviceId: *a5
         displayName:
           type: string
           minLength: 1
@@ -709,7 +1191,7 @@ components:
         expiresIn:
           type: integer
           const: 900
-        userId: *a2
+        userId: *a5
     ProfileUpdate:
       type: object
       additionalProperties: false
@@ -740,7 +1222,7 @@ components:
         - residencyRegion
         - createdAt
       properties:
-        id: *a2
+        id: *a5
         displayName:
           type: string
         phoneE164Masked:
@@ -776,8 +1258,8 @@ components:
               - expiresAt
               - current
             properties:
-              id: *a2
-              deviceId: *a2
+              id: *a5
+              deviceId: *a5
               createdAt:
                 type: string
                 format: date-time
@@ -801,7 +1283,7 @@ components:
           const: en-IN
         mode:
           const: pack
-        adultDeclared: &a3
+        adultDeclared: &a6
           type: boolean
     ConsentInput:
       type: object
@@ -809,7 +1291,7 @@ components:
       required:
         - documentId
       properties:
-        documentId: &a5
+        documentId: &a8
           type: string
           format: uuid
     ActiveDogInput:
@@ -830,15 +1312,15 @@ components:
         - discoveryPaused
         - readReceipts
       properties:
-        discoveryPaused: *a3
-        readReceipts: *a3
+        discoveryPaused: *a6
+        readReceipts: *a6
     UserPreferencesPatch:
       type: object
       additionalProperties: false
       required: []
       properties:
-        discoveryPaused: *a3
-        readReceipts: *a3
+        discoveryPaused: *a6
+        readReceipts: *a6
       minProperties: 1
     Onboarding:
       type: object
@@ -854,12 +1336,12 @@ components:
       properties:
         rulesVersion:
           const: 1
-        ready: *a3
+        ready: *a6
         missing:
           type: array
-          items: &a6
+          items: &a9
             type: string
-        nextAction: &a4
+        nextAction: &a7
           type:
             - string
             - "null"
@@ -898,16 +1380,16 @@ components:
             properties:
               purpose:
                 enum: *a1
-              required: *a3
-              currentDocumentId: *a4
-              currentVersion: *a4
+              required: *a6
+              currentDocumentId: *a7
+              currentVersion: *a7
               status:
                 enum:
                   - accepted
                   - withdrawn
                   - not-accepted
-              acceptedDocumentId: *a4
-              current: *a3
+              acceptedDocumentId: *a7
+              current: *a6
               recordedAt:
                 type:
                   - string
@@ -926,14 +1408,14 @@ components:
         - contentSha256
         - publishedAt
       properties:
-        id: *a5
+        id: *a8
         purpose:
           enum: *a1
-        version: *a6
-        countryCode: *a6
-        locale: *a6
-        body: *a6
-        contentSha256: *a6
+        version: *a9
+        countryCode: *a9
+        locale: *a9
+        body: *a9
+        contentSha256: *a9
         publishedAt:
           type: string
           format: date-time
@@ -942,6 +1424,527 @@ components:
       additionalProperties: false
       required: []
       properties: {}
+    HouseholdInput:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+    Household:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - role
+        - createdAt
+        - updatedAt
+      properties:
+        id: *a3
+        name: &a11
+          type:
+            - string
+            - "null"
+        role:
+          enum:
+            - owner
+            - co_guardian
+            - walker
+            - view_only
+        createdAt: &a10
+          type: string
+          format: date-time
+        updatedAt: *a10
+    Households:
+      type: object
+      additionalProperties: false
+      required:
+        - households
+        - nextCursor
+      properties:
+        households:
+          type: array
+          items:
+            $ref: "#/components/schemas/Household"
+        nextCursor: *a11
+    Members:
+      type: object
+      additionalProperties: false
+      required:
+        - members
+      properties:
+        members:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - userId
+              - displayName
+              - role
+              - acceptedAt
+            properties:
+              userId: *a3
+              displayName: &a26
+                type: string
+              role:
+                enum:
+                  - owner
+                  - co_guardian
+                  - walker
+                  - view_only
+              acceptedAt: *a10
+    MemberRole:
+      type: object
+      additionalProperties: false
+      required:
+        - role
+      properties:
+        role:
+          enum:
+            - owner
+            - co_guardian
+            - walker
+            - view_only
+    InvitationInput:
+      type: object
+      additionalProperties: false
+      required:
+        - phoneE164
+      properties:
+        phoneE164:
+          type: string
+          pattern: ^\+91[6-9]\d{9}$
+        role:
+          enum:
+            - co_guardian
+            - walker
+            - view_only
+          default: co_guardian
+    Invitation:
+      type: object
+      additionalProperties: false
+      required:
+        - invitationId
+        - inviteToken
+        - expiresAt
+        - delivery
+      properties:
+        invitationId: *a3
+        inviteToken:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{43}$
+        expiresAt: *a10
+        delivery:
+          const: manual-share
+    CreateDog:
+      type: object
+      additionalProperties: false
+      required:
+        - householdId
+        - name
+        - sex
+        - sizeClass
+      properties:
+        name: &a13
+          type: string
+          minLength: 1
+          maxLength: 40
+        sex: &a14
+          enum:
+            - male
+            - female
+        sizeClass: &a15
+          enum:
+            - toy
+            - small
+            - medium
+            - large
+            - giant
+        dateOfBirth: &a12
+          type:
+            - string
+            - "null"
+          format: date
+        dobPrecision: &a16
+          enum:
+            - exact
+            - month
+            - year
+            - estimate
+        neutered: &a17
+          type:
+            - boolean
+            - "null"
+        neuteredAt: *a12
+        weightG: &a18
+          type:
+            - integer
+            - "null"
+          minimum: 500
+          maximum: 120000
+        bio: &a19
+          type:
+            - string
+            - "null"
+          maxLength: 300
+        householdId: *a3
+    UpdateDog:
+      type: object
+      additionalProperties: false
+      required: []
+      properties:
+        name: *a13
+        sex: *a14
+        sizeClass: *a15
+        dateOfBirth: *a12
+        dobPrecision: *a16
+        neutered: *a17
+        neuteredAt: *a12
+        weightG: *a18
+        bio: *a19
+      minProperties: 1
+    DogSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - householdId
+        - name
+        - sex
+        - sizeClass
+        - dateOfBirth
+        - dobPrecision
+        - neutered
+        - neuteredAt
+        - weightG
+        - bio
+        - status
+        - publicationState
+        - createdAt
+        - updatedAt
+      properties:
+        id: *a3
+        householdId: *a3
+        name: *a13
+        sex: *a14
+        sizeClass: *a15
+        dateOfBirth: *a12
+        dobPrecision: *a16
+        neutered: *a17
+        neuteredAt: *a12
+        weightG: *a18
+        bio: *a19
+        status: &a24
+          enum:
+            - active
+            - rehomed
+            - memorialised
+            - removed
+        publicationState: &a25
+          enum:
+            - draft
+            - published
+            - paused
+        createdAt: *a10
+        updatedAt: *a10
+    Dogs:
+      type: object
+      additionalProperties: false
+      required:
+        - dogs
+        - nextCursor
+      properties:
+        dogs:
+          type: array
+          items:
+            $ref: "#/components/schemas/DogSummary"
+        nextCursor: *a11
+    DogBreedsInput:
+      type: object
+      additionalProperties: false
+      required:
+        - breeds
+      properties:
+        breeds:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - breedId
+              - percentage
+            properties:
+              breedId: *a3
+              percentage:
+                type: integer
+                minimum: 1
+                maximum: 100
+          minItems: 1
+          maxItems: 4
+    Temperament:
+      type: object
+      additionalProperties: false
+      required:
+        - questionnaireVersion
+        - energy
+        - playStyle
+        - dogReactivity
+        - humanReactivity
+        - resourceGuarding
+        - recallReliability
+        - sizeTolerance
+        - needsToKnow
+      properties: &a21
+        questionnaireVersion:
+          const: 1
+        energy: &a20
+          type: integer
+          minimum: 1
+          maximum: 5
+        playStyle:
+          type: array
+          items: &a22
+            enum:
+              - wrestle
+              - chase
+              - parallel
+              - fetch
+              - sniff
+          minItems: 1
+          maxItems: 5
+          uniqueItems: true
+        dogReactivity: *a20
+        humanReactivity: *a20
+        resourceGuarding: *a20
+        recallReliability: *a20
+        sizeTolerance:
+          type: array
+          items: *a15
+          minItems: 1
+          maxItems: 5
+          uniqueItems: true
+        needsToKnow:
+          type: string
+          maxLength: 500
+          default: ""
+    TemperamentInput:
+      type: object
+      additionalProperties: false
+      required:
+        - questionnaireVersion
+        - energy
+        - playStyle
+        - dogReactivity
+        - humanReactivity
+        - resourceGuarding
+        - recallReliability
+        - sizeTolerance
+      properties: *a21
+    DogPreferences:
+      type: object
+      additionalProperties: false
+      required:
+        - maxDistanceBucket
+        - sizeClasses
+        - ageMinMonths
+        - ageMaxMonths
+        - energyMin
+        - energyMax
+        - playStyles
+        - minVerificationTier
+        - parallelWalkOnly
+        - acceptsReactive
+      properties: &a23
+        maxDistanceBucket:
+          enum:
+            - under_2_km
+            - km_2_5
+            - km_5_10
+            - km_10_25
+            - over_25_km
+          default: km_5_10
+        sizeClasses:
+          type: array
+          items: *a15
+          maxItems: 5
+          uniqueItems: true
+          default: []
+        ageMinMonths:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 360
+          default: null
+        ageMaxMonths:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 360
+          default: null
+        energyMin:
+          type:
+            - integer
+            - "null"
+          minimum: 1
+          maximum: 5
+          default: null
+        energyMax:
+          type:
+            - integer
+            - "null"
+          minimum: 1
+          maximum: 5
+          default: null
+        playStyles:
+          type: array
+          items: *a22
+          maxItems: 5
+          uniqueItems: true
+          default: []
+        minVerificationTier:
+          type: integer
+          minimum: 0
+          maximum: 4
+          default: 1
+        parallelWalkOnly:
+          type: boolean
+          default: false
+        acceptsReactive:
+          type: boolean
+          default: false
+    DogPreferencesInput:
+      type: object
+      additionalProperties: false
+      required: []
+      properties: *a23
+    Availability:
+      type: object
+      additionalProperties: false
+      required:
+        - timezone
+        - windows
+      properties:
+        timezone:
+          type: string
+          maxLength: 64
+        windows:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - dayOfWeek
+              - startMin
+              - endMin
+            properties:
+              dayOfWeek:
+                type: integer
+                minimum: 0
+                maximum: 6
+              startMin:
+                type: integer
+                minimum: 0
+                maximum: 1439
+              endMin:
+                type: integer
+                minimum: 1
+                maximum: 1440
+          maxItems: 21
+    BeaconInput:
+      type: object
+      additionalProperties: false
+      required:
+        - durationMinutes
+      properties:
+        durationMinutes:
+          type: integer
+          minimum: 1
+          maximum: 90
+    Beacon:
+      type: object
+      additionalProperties: false
+      required:
+        - beaconUntil
+      properties:
+        beaconUntil: *a10
+    Dog:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - householdId
+        - name
+        - sex
+        - sizeClass
+        - dateOfBirth
+        - dobPrecision
+        - neutered
+        - neuteredAt
+        - weightG
+        - bio
+        - status
+        - publicationState
+        - createdAt
+        - updatedAt
+        - breeds
+        - temperament
+        - preferences
+        - availability
+      properties:
+        id: *a3
+        householdId: *a3
+        name: *a13
+        sex: *a14
+        sizeClass: *a15
+        dateOfBirth: *a12
+        dobPrecision: *a16
+        neutered: *a17
+        neuteredAt: *a12
+        weightG: *a18
+        bio: *a19
+        status: *a24
+        publicationState: *a25
+        createdAt: *a10
+        updatedAt: *a10
+        breeds:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - breedId
+              - name
+              - percentage
+              - source
+            properties:
+              breedId: *a3
+              name: *a26
+              percentage:
+                type:
+                  - integer
+                  - "null"
+              source:
+                enum:
+                  - declared
+                  - dna_test
+                  - registry
+        temperament:
+          oneOf:
+            - $ref: "#/components/schemas/Temperament"
+            - type: "null"
+        preferences:
+          oneOf:
+            - $ref: "#/components/schemas/DogPreferences"
+            - type: "null"
+        availability:
+          $ref: "#/components/schemas/Availability"
   securitySchemes:
     bearerAuth:
       type: http

@@ -1,37 +1,45 @@
 # Implementation ledger
 
-Updated: 8 October 2026. Endpoint inventory lives in API_PLAN.md; this file records delivered behavior.
+Updated: 8 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents delivered routes.
 
-| Module | State | Evidence / next work |
+| Module | State | Evidence / remaining work |
 | --- | --- | --- |
-| Baseline | Complete | Express/TypeScript scaffold, 11 applied SQL migrations, health/readiness/breeds; commit d0b4746 |
-| Research and API plan | Complete, launch mode provisional | RESEARCH.md and API_PLAN.md; country expansion and full journey covered |
-| M01 app lifecycle core | Complete | Bootstrap/countries, numeric update guidance, fail-closed readiness, request IDs and HTTP validation; 6 HTTP tests pass |
-| M01 remaining content/rollout | Planned | Areas/waitlist, published legal documents, staff release controls and enforced minimum-build gate |
-| M02 authentication/session core | Complete for local development | OTP signup/login, refresh rotation/reuse revocation, logout/all, own-session list/revoke, GET/PATCH me; 17 PostgreSQL integration tests |
-| M02 production/recovery extensions | Planned | Production SMS + DLT, shared IP/device rate limits, security audit events, phone-change/recovery, provider reconciliation |
-| M03 consent/onboarding core | Complete | Versioned immutable policy text, acceptance/withdrawal evidence, resumable prerequisites, active-dog ownership checks and private preferences; 6 new database tests |
-| M04–M12 launch modules | Planned | Implement in dependency order in API_PLAN.md |
-| M13–M16 growth/expansion | Planned | Feature/country gates apply |
+| Baseline | Complete | Express/TypeScript, PostgreSQL migrations; d0b4746 |
+| Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
+| M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
+| M01 rollout/content extensions | Planned | Areas/waitlist, staff release administration, enforced update gates; bootstrap legal-version hints remain unconfigured |
+| M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me; 23e75eb |
+| M02 production/recovery | Planned | SMS + DLT, shared throttling, security audit events, phone-change/recovery |
+| M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
+| M04 household/dog profile core | Complete | Ownership, roles/invites, drafts, breed mix, structured temperament, preferences/schedule, gated publishing, pause, memorialisation, beacons |
+| M04 location/discovery/transfer extensions | Planned | Reviewed private location capture/anchor, public profile with block/privacy/anti-scraping checks; two-party transfer |
+| M05 media/verification | Next | Actual upload pipeline and provider/manual-review grants needed to finish the app flow |
+| M06–M12 launch modules | Planned | Home/feed, likes/connections, chat, notifications, meetups, privacy/support, staff operations |
+| M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
+
+## Latest local verification
+
+- Typecheck/build passed; 8 unit/HTTP tests and 34 PostgreSQL integration tests passed (42 total).
+- New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
+- New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
+- Migrations through 0014. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- 46 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- CI is configured but has not run remotely. No push or deployment performed.
+
+## Explicit gaps and decisions
+
+No reviewed legal text is seeded; public policy reads return 404 until published documents exist. Test policy/media/verification records are labeled fixtures confined to the test database. Onboarding can persist drafts but cannot finish in an ordinary local account until required media, consent, location and verification records exist. Self-declared adulthood never grants a verified badge.
+
+OTP and invitations do not send real SMS. OTP needs explicit local terminal mode; household invitation tokens are shared manually. IP rate limits are per process; phone OTP limits are database-backed. Exact household location and secrets are absent from new household/dog responses.
+
+M04 is the household/profile core, not every endpoint in the full plan. Current temperament input is versioned dimensions; twelve-question scoring is not delivered. Profile changes reset publication, and identity/breed changes invalidate dog verification evidence. Future discovery must check current consent, pauses, membership, blocks and verification; `publication_state='published'` alone is insufficient.
+
+The launch-mode question remains unanswered. Playdates/walks are provisional; this does not authorize opening breeding or owner dating.
+
+## Next session
+
+Build M05 uploads/verification and the remaining private location prerequisite, then M06 discovery. Before enabling a provider, document credentials/configuration, callback verification, storage restrictions and production availability. Keep legal text, actual launch city and provider selection as explicit inputs rather than fabricated configuration.
 
 ## Definition of module completion
 
-Routes and contracts are documented; migrations reviewed/applied; input validation and authorization tested; relevant tests/typecheck/build pass; README and memory updated; focused commit created. A development provider must be labeled and must not silently operate in production. Mark a partially delivered module as partial and list missing endpoints.
-
-## Session handoff
-
-Next: implement M04 households/dog profiles. Keep consent text/version and launch city as explicit unresolved inputs; local development can use labeled drafts, public launch cannot. Research and product docs supersede the external NestJS plan for this Express repository. Pending founder answer: playdates only vs playdates+breeding vs human dating at launch.
-
-## Latest verification
-
-- Typecheck and build passed. Eight unit/HTTP tests and 17 PostgreSQL integration tests passed.
-- Fresh test database applied migrations 0001–0012; second migration run was a no-op.
-- Integration tests use waggle_api_test only. Development database retains its own data.
-- OpenAPI has 14 operations across 13 paths; YAML/local-reference validation is available. Full schema conformance remains a later gate.
-- CI configured, not remotely executed. No push/deployment performed.
-
-## Explicit gaps
-
-M01 does not yet deliver areas/waitlists, reviewed legal documents, staff release controls or request-level update enforcement. M02's default provider is disabled; local setup explicitly enables terminal codes for synthetic users. No live SMS, adult verification, social login, phone-change/recovery or product onboarding is claimed. IP throttling is per process; OTP phone cooldown and attempt limits persist in PostgreSQL. Existing raw phone columns require infrastructure encryption/access controls and an explicit retention policy before launch.
-
-M03 verification: build/typecheck and all 23 integration tests passed before commit. Migrations now include 0013. Published legal text is intentionally unseeded; completion requires evidence from future media, location and verification modules. No public launch eligibility is manufactured.
+Validate inputs and resource permissions, run relevant tests/typecheck/build, document implemented contracts and limits, update README/memory, and create a focused module commit. Mark submodules or external-provider dependencies explicitly rather than claiming the full product is complete.

@@ -12,6 +12,10 @@ import { AuthService } from './modules/auth/auth.service.js';
 import { DevelopmentOtpSender } from './modules/auth/otp-sender.js';
 import { OnboardingService } from './modules/onboarding/onboarding.service.js';
 import { legalRoutes,onboardingRoutes } from './modules/onboarding/onboarding.routes.js';
+import { HouseholdsService } from './modules/households/households.service.js';
+import { householdRoutes,invitationRoutes } from './modules/households/households.routes.js';
+import { DogsService } from './modules/dogs/dogs.service.js';
+import { dogRoutes } from './modules/dogs/dogs.routes.js';
 import { config } from './config.js';
 
 export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService } = {}) {
@@ -32,7 +36,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0013']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0014']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -47,6 +51,13 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   const onboarding=new OnboardingService(database);
   app.use('/v1/legal',legalRoutes(onboarding));
   app.use('/v1/me',onboardingRoutes(onboarding,auth));
+  const households=new HouseholdsService(database,(phone)=> {
+    if(!auth)throw new ApiError(503,'auth-unavailable','Authentication is not configured.');
+    return auth.phoneIndex(phone);
+  });
+  app.use('/v1/households',householdRoutes(households,auth));
+  app.use('/v1/household-invitations',invitationRoutes(households,auth));
+  app.use('/v1/dogs',dogRoutes(new DogsService(database),auth));
   app.use(notFound);
   app.use(errorHandler);
   return app;
