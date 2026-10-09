@@ -13,7 +13,7 @@ export function fixture(photoStorage?: PhotoStorage, discoverySecret?: string,me
   const codes=new Map<string,string>();
   const auth=new AuthService(database,randomBytes(48).toString('hex'),{async send(phone,code){codes.set(phone,code);}});
   let sequence=200000;
-  return { database,app:createApp({database,auth,photoStorage,discoverySecret,messageCipher}),
+  return { database,code:(phone:string)=>codes.get(phone),app:createApp({database,auth,photoStorage,discoverySecret,messageCipher}),
     async setup(){await migrate(database);await database.query('TRUNCATE identity.users,identity.otp_challenges,identity.households,identity.policy_documents CASCADE');},
     async close(){await database.end();},
     async user(){const phone=`+919000${sequence++}`;await auth.requestOtp(phone,'IN');const pair=await auth.verifyOtp({phoneE164:phone,code:codes.get(phone)!,deviceId:randomUUID(),displayName:'Test Guardian'});return {...pair,phone,header:`Bearer ${pair.accessToken}`};},

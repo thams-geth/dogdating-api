@@ -1,7 +1,7 @@
 import type { Pool, PoolClient } from 'pg';
 
 export interface UserRow {
-  id: string; phone_e164: string; display_name: string; locale: string;
+  deletion_requested_at?:Date|null; deleted_at?:Date|null; id: string; phone_e164: string; display_name: string; locale: string;
   timezone: string; status: string; country_code: string; residency_region: string; created_at: Date;
 }
 export interface SessionRow {
@@ -22,9 +22,9 @@ export class AuthRepository {
   async userByPhone(tx: PoolClient, index: string): Promise<UserRow | undefined> {
     return (await tx.query<UserRow>('SELECT * FROM identity.users WHERE phone_blind_index=$1 FOR UPDATE', [index])).rows[0];
   }
-  async latestChallenge(tx: PoolClient, index: string): Promise<ChallengeRow | undefined> {
+  async latestChallenge(tx: PoolClient, index: string, purpose='auth'): Promise<ChallengeRow | undefined> {
     return (await tx.query<ChallengeRow>(`SELECT * FROM identity.otp_challenges
-      WHERE phone_blind_index=$1 AND consumed_at IS NULL ORDER BY created_at DESC, id DESC LIMIT 1 FOR UPDATE`, [index])).rows[0];
+      WHERE phone_blind_index=$1 AND purpose=$2 AND consumed_at IS NULL ORDER BY created_at DESC, id DESC LIMIT 1 FOR UPDATE`, [index,purpose])).rows[0];
   }
   async session(tx: PoolClient, id: string): Promise<SessionRow | undefined> {
     return (await tx.query<SessionRow>('SELECT * FROM identity.sessions WHERE id=$1', [id])).rows[0];

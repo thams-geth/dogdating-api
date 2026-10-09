@@ -1,3 +1,6 @@
+import { SafetyService } from './modules/safety/safety.service.js';
+import { PrivacyService } from './modules/safety/privacy.service.js';
+import { safetyRoutes } from './modules/safety/safety.routes.js';
 import { MeetupsService } from './modules/meetups/meetups.service.js';
 import { meetupRoutes } from './modules/meetups/meetups.routes.js';
 import { NotificationsService } from './modules/notifications/notifications.service.js';
@@ -58,7 +61,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0022']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0023']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -71,6 +74,8 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1/dogs/breeds', breedRoutes(database));
   const auth = deps.auth ?? (config.OTP_MODE === 'development' && config.AUTH_SECRET
     ? new AuthService(database, config.AUTH_SECRET, new DevelopmentOtpSender(config.NODE_ENV)) : undefined);
+  const messageCipher=deps.messageCipher ?? (config.MESSAGE_KEY?new LocalMessageCipher(config.MESSAGE_KEY,config.NODE_ENV):undefined);
+  app.use('/v1',safetyRoutes(new SafetyService(database,messageCipher),new PrivacyService(database),auth));
   app.use('/v1', authRoutes(auth));
   const onboarding=new OnboardingService(database);
   app.use('/v1/legal',legalRoutes(onboarding));
@@ -89,7 +94,6 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1', verificationRoutes(new VerificationService(database), auth));
   app.use('/v1',discoveryRoutes(new DiscoveryService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
   app.use('/v1',connectionRoutes(new ConnectionsService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
-  const messageCipher=deps.messageCipher ?? (config.MESSAGE_KEY?new LocalMessageCipher(config.MESSAGE_KEY,config.NODE_ENV):undefined);
   const messages=new MessagesService(database,messageCipher);
   app.use('/v1',messageRoutes(messages,auth));
   const realtime=new RealtimeService(database,messages);

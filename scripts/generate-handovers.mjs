@@ -15,7 +15,7 @@ function moduleFor(path) {
   if (/^\/v1\/(conversations|realtime)(?:\/|$)/.test(path)) return 'M08';
   if (/^\/v1\/(decisions|likes(?:\/|$)|matches(?:\/|$)|me\/entitlements)/.test(path)) return 'M07';
   if (['/v1/home','/v1/feed','/v1/feed/empty-reason'].includes(path) || /\/dogs\/\{id\}\/(profile|discovery-preferences)$/.test(path)) return 'M06';
-  if (path.startsWith('/v1/me/blocks')) return 'M11';
+  if (/^\/v1\/(reports|support|privacy|me\/(blocks|safety-notices|appeals|data-exports|deletion-requests))(?:\/|$)/.test(path)) return 'M11';
   if (/^\/v1\/(health|ready|app\/.*|dogs\/breeds)$/.test(path)) return 'M01';
   if (path.startsWith('/v1/auth/')) return 'M02';
   if (/^\/v1\/(me(?:\/|$)|legal\/)/.test(path)) return 'M03';

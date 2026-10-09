@@ -169,3 +169,7 @@ Atomic match/message inbox events, private read markers, preferences and encrypt
 ## M10 meetup core delivered (9 October 2026)
 
 Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups, extensions or reminder scheduler are fabricated. See docs/handovers/M10.md. Next: M11 reports/support/privacy.
+
+## M11 safety and privacy foundation (9 October 2026)
+
+Private reports, encrypted support, notices/appeals, purpose-bound restricted privacy OTP, and export/deletion request tracking are implemented. Migration 0023. Deletion requests revoke normal access and close social relationships immediately; full erasure and export processing remain needs_review, never completed. Existing restricted accounts can use Privacy-Token only for safety/privacy routes. See docs/handovers/M11.md. Next: M12 staff operations.

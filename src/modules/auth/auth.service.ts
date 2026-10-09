@@ -37,7 +37,7 @@ export class AuthService {
     return result.value;
   }
 
-  async requestOtp(phone: string, countryCode: string): Promise<void> {
+  async requestOtp(phone: string, countryCode: string, purpose:'auth'|'privacy'='auth'): Promise<void> {
     const index = this.hash('phone', phone);
     const code = String(randomInt(0, 1_000_000)).padStart(6, '0');
     const id = await transaction(this.database, async (tx) => {
@@ -48,8 +48,8 @@ export class AuthService {
       if (recent.rows[0]!.count >= 3 || recent.rows[0]!.too_soon) return null;
       await tx.query('UPDATE identity.otp_challenges SET consumed_at=now() WHERE phone_blind_index=$1 AND consumed_at IS NULL', [index]);
       const challengeId = randomUUID();
-      await tx.query(`INSERT INTO identity.otp_challenges (id, phone_blind_index, code_hash, country_code, expires_at)
-        VALUES ($1,$2,$3,$4,now()+interval '10 minutes')`, [challengeId, index, this.hash('otp', `${index}:${code}`), countryCode]);
+      await tx.query(`INSERT INTO identity.otp_challenges (id, phone_blind_index, code_hash, country_code, expires_at,purpose)
+        VALUES ($1,$2,$3,$4,now()+interval '10 minutes',$5)`, [challengeId, index, this.hash('otp', `${index}:${code}`), countryCode,purpose]);
       return challengeId;
     });
     if (id === null) return;
@@ -85,10 +85,30 @@ export class AuthService {
           VALUES ($1,$2,$3,now(),$4,$5,'pending') RETURNING *`,
         [randomUUID(), input.phoneE164, index, input.displayName, challenge.country_code])).rows[0]!;
       }
-      if (!usable(user.status)) return { error: invalidSession() };
+      if (!usable(user.status)||user.deletion_requested_at||user.deleted_at) return { error: invalidSession() };
       return { value: await this.issue(tx, user.id, input.deviceId, randomUUID(), new Date(Date.now() + 30 * 86400_000)) };
     });
     return this.unwrap(result);
+  }
+
+  async verifyPrivacyOtp(phone:string,code:string){
+    const index=this.hash('phone',phone);
+    const result=await transaction<Result<{token:string;expiresIn:number}>>(this.database,async tx=>{
+      await lockScope(tx,`phone:${index}`);const challenge=await this.repo.latestChallenge(tx,index,'privacy');
+      if(!challenge||!challenge.delivered_at||challenge.expires_at<=new Date()||challenge.attempt_count>=challenge.max_attempts)return {error:invalidOtp()};
+      if(!this.equal(this.hash('otp',`${index}:${code}`),challenge.code_hash)){
+        await tx.query("UPDATE identity.otp_challenges SET attempt_count=attempt_count+1,consumed_at=CASE WHEN attempt_count+1>=max_attempts THEN now() ELSE NULL END WHERE id=$1",[challenge.id]);return {error:invalidOtp()};
+      }
+      await tx.query('UPDATE identity.otp_challenges SET consumed_at=now() WHERE id=$1',[challenge.id]);
+      const user=await this.repo.userByPhone(tx,index);if(!user||user.deleted_at)return {error:invalidOtp()};
+      const token=randomBytes(32).toString('base64url');await tx.query('INSERT INTO identity.privacy_tokens(token_hash,user_id) VALUES($1,$2)',[this.hash('privacy',token),user.id]);
+      return {value:{token,expiresIn:1800}};
+    });return this.unwrap(result);
+  }
+  async authenticatePrivacy(token:string){
+    if(!/^[A-Za-z0-9_-]{43}$/.test(token))throw invalidSession();
+    const row=(await this.database.query('SELECT user_id FROM identity.privacy_tokens WHERE token_hash=$1 AND expires_at>now()',[this.hash('privacy',token)])).rows[0];
+    if(!row)throw invalidSession();return {userId:row.user_id};
   }
 
   private async issue(tx: PoolClient, userId: string, deviceId: string, familyId: string, expiresAt: Date): Promise<TokenPair> {
@@ -116,7 +136,7 @@ export class AuthService {
       if (session.revoked_at || session.expires_at <= new Date()) return { error: invalidSession() };
       // Serialize account-wide logout with issuance; all paths lock family before user.
       const user = (await tx.query<UserRow>('SELECT * FROM identity.users WHERE id=$1 FOR UPDATE', [session.user_id])).rows[0];
-      if (!user || !usable(user.status)) return { error: invalidSession() };
+      if (!user || !usable(user.status)||user.deletion_requested_at||user.deleted_at) return { error: invalidSession() };
       // An account-wide logout may have committed while we waited for the user lock.
       const current = (await this.repo.session(tx, session.id))!;
       if (current.revoked_at) return { error: invalidSession() };
@@ -133,10 +153,10 @@ export class AuthService {
       const { payload } = await jwtVerify(token, this.signingKey, { algorithms: ['HS256'], issuer: 'waggle-api', audience: 'waggle-mobile', requiredClaims: ['exp', 'iat', 'sub', 'sid'] });
       userId = uuidSchema.parse(payload.sub); sessionId = uuidSchema.parse(payload.sid);
     } catch { throw invalidSession(); }
-    const result = await this.database.query<SessionRow & { status: string }>(`SELECT s.*,u.status FROM identity.sessions s
+    const result = await this.database.query<SessionRow & { status: string;deletion_requested_at:Date|null;deleted_at:Date|null }>(`SELECT s.*,u.status,u.deletion_requested_at,u.deleted_at FROM identity.sessions s
       JOIN identity.users u ON u.id=s.user_id WHERE s.id=$1 AND s.user_id=$2 AND s.revoked_at IS NULL AND s.expires_at>now()`, [sessionId,userId]);
     const session = result.rows[0];
-    if (!session || !usable(session.status)) throw invalidSession();
+    if (!session || !usable(session.status) || session.deletion_requested_at || session.deleted_at) throw invalidSession();
     return { userId, sessionId, familyId: session.family_id };
   }
   private async revokeFamily(tx: PoolClient, familyId: string, reason: string): Promise<void> {

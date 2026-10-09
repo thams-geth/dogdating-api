@@ -4620,6 +4620,1112 @@ paths:
           $ref: "#/components/responses/Problem"
         "503":
           $ref: "#/components/responses/Problem"
+  /v1/reports:
+    post:
+      operationId: createReport
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    enum:
+                      - queued
+                      - in_review
+                      - actioned
+                      - dismissed
+                      - escalated
+                  createdAt:
+                    type: string
+                    format: date-time
+                required:
+                  - id
+                  - state
+                  - createdAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                subjectType:
+                  enum:
+                    - user
+                    - dog
+                    - media
+                    - message
+                    - meetup
+                subjectId:
+                  type: string
+                  format: uuid
+                category:
+                  enum:
+                    - harassment
+                    - unsafe_behavior
+                    - fake_profile
+                    - animal_welfare
+                    - spam
+                    - other
+                details:
+                  type: string
+                  minLength: 5
+                  maxLength: 2000
+              required:
+                - subjectType
+                - subjectId
+                - category
+                - details
+  /v1/reports/{id}:
+    get:
+      operationId: reportStatus
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    enum:
+                      - queued
+                      - in_review
+                      - actioned
+                      - dismissed
+                      - escalated
+                  createdAt:
+                    type: string
+                    format: date-time
+                  resolvedAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                required:
+                  - id
+                  - state
+                  - createdAt
+                  - resolvedAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/support/tickets:
+    post:
+      operationId: createSupportTicket
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  category:
+                    enum:
+                      - account
+                      - technical
+                      - privacy
+                      - safety
+                      - other
+                  state:
+                    enum:
+                      - open
+                      - in_review
+                      - resolved
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+                required:
+                  - id
+                  - category
+                  - state
+                  - createdAt
+                  - updatedAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                category:
+                  enum:
+                    - account
+                    - technical
+                    - privacy
+                    - safety
+                    - other
+                message:
+                  type: string
+                  minLength: 5
+                  maxLength: 4000
+              required:
+                - category
+                - message
+    get:
+      operationId: listSupportTickets
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        category:
+                          enum:
+                            - account
+                            - technical
+                            - privacy
+                            - safety
+                            - other
+                        state:
+                          enum:
+                            - open
+                            - in_review
+                            - resolved
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - category
+                        - state
+                        - createdAt
+                        - updatedAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/support/tickets/{id}:
+    get:
+      operationId: supportTicket
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  ticket:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      category:
+                        enum:
+                          - account
+                          - technical
+                          - privacy
+                          - safety
+                          - other
+                      state:
+                        enum:
+                          - open
+                          - in_review
+                          - resolved
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+                    required:
+                      - id
+                      - category
+                      - state
+                      - createdAt
+                      - updatedAt
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        author:
+                          enum:
+                            - you
+                            - support
+                        body:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - author
+                        - body
+                        - createdAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - ticket
+                  - messages
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/support/tickets/{id}/messages:
+    post:
+      operationId: replySupportTicket
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    format: date-time
+                required:
+                  - id
+                  - createdAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 4000
+              required:
+                - message
+  /v1/me/safety-notices:
+    get:
+      operationId: safetyNotices
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        action:
+                          type: string
+                        reasonCode:
+                          type: string
+                        policyRef:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                        expiresAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                        reversedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                      required:
+                        - id
+                        - action
+                        - reasonCode
+                        - policyRef
+                        - createdAt
+                        - expiresAt
+                        - reversedAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/me/appeals:
+    post:
+      operationId: createAppeal
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                actionId:
+                  type: string
+                  format: uuid
+                statement:
+                  type: string
+                  minLength: 5
+                  maxLength: 4000
+              required:
+                - actionId
+                - statement
+    get:
+      operationId: listAppeals
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        actionId:
+                          type: string
+                          format: uuid
+                        state:
+                          type: string
+                        outcome:
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        createdAt:
+                          type: string
+                          format: date-time
+                        decidedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                      required:
+                        - id
+                        - actionId
+                        - state
+                        - outcome
+                        - createdAt
+                        - decidedAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/me/data-exports:
+    post:
+      operationId: requestDataExport
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters: []
+      responses:
+        "202":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  kind:
+                    const: export
+                  state:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  statusToken:
+                    type: string
+                  nextAction:
+                    const: awaiting_privacy_review
+                  completed:
+                    const: false
+                required:
+                  - id
+                  - kind
+                  - state
+                  - createdAt
+                  - statusToken
+                  - nextAction
+                  - completed
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
+  /v1/me/data-exports/{id}:
+    get:
+      operationId: dataExportStatus
+      security:
+        - privacyStatusToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Privacy-Status-Token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  kind:
+                    enum:
+                      - export
+                      - deletion
+                  state:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+                  errorCode:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  downloadAvailable:
+                    const: false
+                required:
+                  - id
+                  - kind
+                  - state
+                  - createdAt
+                  - updatedAt
+                  - errorCode
+                  - downloadAvailable
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/me/deletion-requests:
+    post:
+      operationId: requestDeletion
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters: []
+      responses:
+        "202":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  kind:
+                    const: deletion
+                  state:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  statusToken:
+                    type: string
+                  nextAction:
+                    const: awaiting_privacy_review
+                  completed:
+                    const: false
+                required:
+                  - id
+                  - kind
+                  - state
+                  - createdAt
+                  - statusToken
+                  - nextAction
+                  - completed
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
+  /v1/me/deletion-requests/{id}:
+    get:
+      operationId: deletionStatus
+      security:
+        - privacyStatusToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Privacy-Status-Token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  kind:
+                    enum:
+                      - export
+                      - deletion
+                  state:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+                  errorCode:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  downloadAvailable:
+                    const: false
+                required:
+                  - id
+                  - kind
+                  - state
+                  - createdAt
+                  - updatedAt
+                  - errorCode
+                  - downloadAvailable
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/privacy/deletion/otp/request:
+    post:
+      operationId: requestPrivacyOtp
+      security: []
+      parameters: []
+      responses:
+        "202":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  status:
+                    const: accepted
+                required:
+                  - status
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                phoneE164:
+                  type: string
+                countryCode:
+                  const: IN
+              required:
+                - phoneE164
+                - countryCode
+  /v1/privacy/deletion/otp/verify:
+    post:
+      operationId: verifyPrivacyOtp
+      security: []
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  token:
+                    type: string
+                  expiresIn:
+                    const: 1800
+                required:
+                  - token
+                  - expiresIn
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                phoneE164:
+                  type: string
+                code:
+                  type: string
+                  pattern: ^[0-9]{6}$
+              required:
+                - phoneE164
+                - code
 components:
   responses:
     Problem:
@@ -6702,3 +7808,11 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    privacyToken:
+      type: apiKey
+      in: header
+      name: Privacy-Token
+    privacyStatusToken:
+      type: apiKey
+      in: header
+      name: Privacy-Status-Token
