@@ -95,7 +95,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   const photos = deps.photoStorage ?? (config.MEDIA_MODE === 'local' ? new LocalPhotoStorage(config.MEDIA_LOCAL_DIR, config.NODE_ENV) : undefined);
   app.use('/v1', mediaRoutes(new MediaService(database, photos), auth));
   app.use('/v1', verificationRoutes(new VerificationService(database), auth));
-  app.use('/v1',discoveryRoutes(new DiscoveryService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
+  app.use('/v1',discoveryRoutes(new DiscoveryService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined),!!messageCipher),auth));
   app.use('/v1',connectionRoutes(new ConnectionsService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined)),auth));
   const messages=new MessagesService(database,messageCipher);
   app.use('/v1',messageRoutes(messages,auth));

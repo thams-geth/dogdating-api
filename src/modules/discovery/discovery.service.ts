@@ -1,3 +1,5 @@
+import { homeSummary } from './home-summary.js';
+import { socialLock } from '../../db/social-lock.js';
 import { createHash, randomUUID } from 'node:crypto';
 import type { Pool,PoolClient } from 'pg';
 import type { z } from 'zod';
@@ -12,7 +14,7 @@ import type { feedQuery } from './discovery.schemas.js';
 export class DiscoveryService {
   private readonly onboarding=new OnboardingRepository();private readonly dogs=new DogsRepository();private readonly repo=new DiscoveryRepository();
   private readonly tokens?:DiscoveryTokens;
-  constructor(private readonly db:Pool, secret?:string){if(secret)this.tokens=new DiscoveryTokens(secret);}
+  constructor(private readonly db:Pool, secret?:string,private readonly messagesAvailable=false){if(secret)this.tokens=new DiscoveryTokens(secret);}
   async actor(tx:PoolClient,userId:string,dogId?:string){
     await this.onboarding.lockUser(tx,userId);
     const preference=(await tx.query('SELECT active_dog_id,discovery_paused FROM identity.user_preferences WHERE user_id=$1',[userId])).rows[0]!;
@@ -32,10 +34,11 @@ export class DiscoveryService {
     return {id,dog,progress,reason,contextHash:createHash('sha256').update(JSON.stringify(context)).digest('hex')};
   }
   home(userId:string,dogId?:string){return transaction(this.db,async tx=>{
+    await socialLock(tx);
     const actor=await this.actor(tx,userId,dogId);
     return {dog:actor.dog?{id:actor.dog.id,name:actor.dog.name,publicationState:actor.dog.publicationState}:null,
       onboarding:actor.progress,discovery:{available:actor.reason===null,reason:actor.reason,scope:'city',distance:'unknown',mediaDelivery:'unavailable'},
-      sections:{connections:{status:'not_implemented',value:null},messages:{status:'not_implemented',value:null},meetup:{status:'not_implemented',value:null},notifications:{status:'not_implemented',value:null}}};
+      sections:await homeSummary(tx,userId,this.messagesAvailable)};
   });}
   private async budget(tx:PoolClient,userId:string,ids:string[]){
     const rows=(await tx.query("SELECT dog_id FROM graph.discovery_profile_reads WHERE user_id=$1 AND day=(now() AT TIME ZONE 'UTC')::date",[userId])).rows;

@@ -16,10 +16,10 @@ const ready=(name?:string,energy?:number)=>readyDog(f,documents,name,energy);
 async function feed(user:{header:string},query:Record<string,unknown>={}){return (await http.get('/v1/feed').set('Authorization',user.header).query(query).expect(200)).body;}
 async function profile(a:{header:string;dog:string},card:{id:string;impressionToken:string},status=200){return http.get(`/v1/dogs/${card.id}/profile`).set('Authorization',a.header).query({dogId:a.dog,impressionToken:card.impressionToken}).expect(status);}
 
-test('home reports real progress and unavailable counters; discovery is disabled without explicit configuration',async()=>{
+test('home reports real progress and live counters; discovery is disabled without explicit configuration',async()=>{
   const user=await f.user();const home=await http.get('/v1/home').set('Authorization',user.header).expect(200);
   assert.equal(home.body.dog,null);assert.equal(home.body.discovery.reason,'select_dog');assert.equal(home.body.onboarding.ready,false);
-  assert.deepEqual(home.body.sections.messages,{status:'not_implemented',value:null});
+  assert.deepEqual(home.body.sections.messages,{status:'unavailable',value:null});
   assert.equal((await new DiscoveryService(f.database).home(user.userId)).discovery.reason,'discovery_disabled');
   await http.get('/v1/feed?latitude=12').set('Authorization',user.header).expect(400);
   await http.get('/v1/feed?mode=lineage').set('Authorization',user.header).expect(400);

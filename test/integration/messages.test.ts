@@ -30,6 +30,7 @@ test('concurrent sends sequence, deduplicate, encrypt, paginate and monotonicall
  await http.post(path+'/read').set('Authorization',b.header).send({upToSeq:'3'}).expect(400);
  await http.post(path+'/read').set('Authorization',b.header).send({upToSeq:'2'}).expect(200);
  assert.equal((await http.post(path+'/read').set('Authorization',b.header).send({upToSeq:'1'})).body.lastReadSeq,'2');
+ const home=(await http.get('/v1/home').set('Authorization',a.header)).body;assert.deepEqual(home.sections.connections,{status:'available',value:1});assert.deepEqual(home.sections.messages,{status:'available',value:1});
  const list=await http.get('/v1/conversations').set('Authorization',b.header).expect(200);assert.equal(list.body.items[0].unreadCount,0);
  await http.patch(path+'/preferences').set('Authorization',a.header).send({archived:true,mutedUntil:null}).expect(200);
 });

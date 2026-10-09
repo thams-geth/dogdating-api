@@ -8812,7 +8812,9 @@ components:
               additionalProperties: false
               properties:
                 status:
-                  const: not_implemented
+                  enum:
+                    - available
+                    - unavailable
                 value:
                   type: "null"
               required:
@@ -8823,7 +8825,9 @@ components:
               additionalProperties: false
               properties:
                 status:
-                  const: not_implemented
+                  enum:
+                    - available
+                    - unavailable
                 value:
                   type: "null"
               required:
@@ -8834,7 +8838,9 @@ components:
               additionalProperties: false
               properties:
                 status:
-                  const: not_implemented
+                  enum:
+                    - available
+                    - unavailable
                 value:
                   type: "null"
               required:
@@ -8845,7 +8851,9 @@ components:
               additionalProperties: false
               properties:
                 status:
-                  const: not_implemented
+                  enum:
+                    - available
+                    - unavailable
                 value:
                   type: "null"
               required:
