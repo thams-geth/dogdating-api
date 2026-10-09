@@ -84,3 +84,14 @@ test('meetup safety incidents queue privately, require exclusive reviewer claim 
  await http.post(`/admin/v1/meetup-incidents/${id}/decide`).set('Authorization','Bearer one').send({decision:'dismissed',reasonCode:'reviewed'}).expect(409);
  assert.ok(!JSON.stringify((await f.database.query('SELECT action,before,after FROM ops.audit_log WHERE subject_id=$1',[id])).rows).includes(caseNote));
 });
+
+test('operations browse redacted audit metadata with bounded windows and scoped cursors',async()=>{
+ const subject=randomUUID();for(let i=0;i<3;i++)await f.database.query("INSERT INTO ops.audit_log(actor_kind,action,subject_type,subject_id,before) VALUES('system','test.audit','user',$1,$2)",[subject,{secret:'PRIVATE AUDIT CONTENT'}]);
+ await http.get('/admin/v1/audit-events').set('Authorization','Bearer support').expect(403);
+ const first=(await http.get('/admin/v1/audit-events?limit=2&action=test.audit').set('Authorization','Bearer one').expect(200)).body;
+ assert.equal(first.items.length,2);assert.ok(first.nextCursor);assert.ok(!JSON.stringify(first).includes('PRIVATE AUDIT CONTENT'));
+ const second=(await http.get('/admin/v1/audit-events').query({limit:'2',action:'test.audit',from:first.from,to:first.to,cursor:first.nextCursor}).set('Authorization','Bearer one').expect(200)).body;
+ assert.equal(second.items.length,1);assert.notEqual(second.items[0].id,first.items[0].id);
+ await http.get('/admin/v1/audit-events').query({action:'other',from:first.from,to:first.to,cursor:first.nextCursor}).set('Authorization','Bearer one').expect(400);
+ await http.get('/admin/v1/audit-events').query({from:'2025-01-01T00:00:00Z',to:'2025-03-01T00:00:00Z'}).set('Authorization','Bearer one').expect(400);
+});

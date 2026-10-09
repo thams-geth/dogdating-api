@@ -9379,6 +9379,143 @@ paths:
               required:
                 - decision
                 - reasonCode
+  /admin/v1/audit-events:
+    get:
+      operationId: adminAuditEvents
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: actorKind
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: action
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subjectType
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subjectId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          pattern: ^[0-9]+$
+                        actorKind:
+                          type: string
+                          enum:
+                            - user
+                            - staff
+                            - system
+                        actorUserId:
+                          anyOf:
+                            - type: string
+                              format: uuid
+                            - type: "null"
+                        action:
+                          type: string
+                        subjectType:
+                          type: string
+                        subjectId:
+                          anyOf:
+                            - type: string
+                              format: uuid
+                            - type: "null"
+                        requestId:
+                          anyOf:
+                            - type: string
+                              format: uuid
+                            - type: "null"
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - actorKind
+                        - actorUserId
+                        - action
+                        - subjectType
+                        - subjectId
+                        - requestId
+                        - createdAt
+                  from:
+                    type: string
+                    format: date-time
+                  to:
+                    type: string
+                    format: date-time
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - from
+                  - to
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:

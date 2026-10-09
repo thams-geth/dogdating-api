@@ -15,7 +15,7 @@ The provisional launch scope is dog playdates/walks. Breeding introductions and 
 
 ## Current status (9 October 2026)
 
-158 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
+159 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
 
 ## Local development
 
@@ -207,3 +207,5 @@ Provider-neutral push relay now has durable leases, per-installation receipts, t
 Meetup reminder/expiry pass: `npm run meetups:reminders` (requires external scheduling). See [M10 handover](docs/handovers/M10.md).
 
 Staff `reviewer` role now has an audited, exclusive meetup incident queue. See [M12 handover](docs/handovers/M12.md).
+
+Staff operations can browse bounded, redacted audit metadata through `GET /admin/v1/audit-events`.

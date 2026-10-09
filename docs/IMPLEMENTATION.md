@@ -123,3 +123,7 @@ Migration 0031 adds consented two-party extension requests and durable reminder 
 ### M12 meetup incident reviewer queue (9 October 2026)
 
 Migrations 0032–0033 create private case entries for incident reviews and backfill prior eligible records. Provisioned reviewer staff can list metadata, exclusively claim, read the assigned encrypted note and dismiss/escalate with a reason code. Every read/action is audited without copying private notes. This does not automatically enforce an account action or provide emergency response; real reviewer staffing remains a launch dependency.
+
+### M12 bounded audit browsing (9 October 2026)
+
+`GET /admin/v1/audit-events` lets provisioned operations staff browse seven days by default or a chosen past range up to 31 days, with exact filters and scoped descending ID pagination. It returns event metadata only; before/after JSON is withheld. Each browse creates its own audit entry. Partition/retention scheduling and monitoring remain operational work.

@@ -87,3 +87,7 @@ M10 adds two-party extension requests with revision and duration caps and a remi
 ## Meetup incident reviewer queue (9 October 2026)
 
 M12 reviewer role now has audited, exclusive claim/read/dismiss/escalate APIs for private meetup review incidents. Migrations 0032–0033 create new cases and backfill previous incident/private-note reviews. Decisions do not automatically suspend users or claim operational response. Readiness requires migration 0033.
+
+## Audit metadata browsing (9 October 2026)
+
+M12 operations role can browse redacted audit metadata in bounded past windows, exact filters and scoped cursors. Responses include normalized from/to for paging. No before/after JSON is returned. Every browse is audited. Audit retention/partition scheduler remains pending.

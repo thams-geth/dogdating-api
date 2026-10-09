@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 9 October 2026. The checked-in backend has 158 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
+Updated 9 October 2026. The checked-in backend has 159 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
 
 ## Required integration inputs
 
@@ -30,7 +30,7 @@ No credentials, provider selection, legal approval or operational response is in
 | M09 | Vendor adapter/credentials and operational scheduling; provider-neutral relay, receipts/backoff, invalid-token handling, quiet hours and dead-letter operations are implemented |
 | M10 | Reviewer response workflow and external scheduling for the implemented two-party extensions/reminders/expiry pass; optional groups/video |
 | M11 | Broader legal-response exports (photo files/shared/provider categories) and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help articles |
-| M12 | Verification review/provider evidence, complete audit browsing, broader privacy job execution and operational metrics; report and meetup incident decisions support dismiss/escalate, with suspension handled separately |
+| M12 | Verification review/provider evidence, audit retention scheduling and broader privacy job execution and operational metrics; report and meetup incident decisions support dismiss/escalate, with suspension handled separately |
 | M13 | Store offerings, verified receipt/restore, subscription/cancellation/refund/grace rules, signed billing webhooks and referral/growth behavior |
 | M14 | Additional market configuration, local content/providers, quota-zone rules and reviewed residency/rollout policy |
 | M15 | Optional breeding mode requires explicit product approval and reviewed jurisdiction/evidence rules before implementation/enablement |
