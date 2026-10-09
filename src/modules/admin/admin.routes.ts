@@ -23,6 +23,8 @@ export function adminRoutes(service:AdminService,auth:StaffAuth,releaseLegal:Rel
  router.get('/places',role('city_ops'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.places(staff(res),q.limit,q.cursor));}));
  router.get('/places/:id',role('city_ops'),asyncHandler(async(req,res)=>{res.json(await service.place(staff(res),id(req.params.id)));}));
  router.patch('/places/:id',role('city_ops'),asyncHandler(async(req,res)=>{const q=z.object({state:z.enum(['approved','rejected','closed'])}).strict().parse(req.body);res.json(await service.decidePlace(staff(res),id(req.params.id),q.state));}));
+ router.get('/notifications/jobs',role('operations'),asyncHandler(async(req,res)=>{const q=pageQuery.extend({state:z.enum(['awaiting_provider','pending','delivered','suppressed','dead_letter']).default('dead_letter')}).parse(req.query);res.json(await service.pushJobs(staff(res),q.state,q.limit,q.cursor));}));
+ router.post('/notifications/jobs/:id/retry',role('operations'),asyncHandler(async(req,res)=>{z.object({}).strict().parse(req.body);res.json(await service.retryPush(staff(res),id(req.params.id)));}));
  router.get('/jobs',role('operations'),asyncHandler(async(_req,res)=>{res.json(await service.jobs(staff(res)));}));
  router.get('/support/tickets',role('support'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.support(staff(res),q.limit,q.cursor));}));
  router.get('/support/tickets/:id',role('support'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.supportDetail(staff(res),id(req.params.id),q.limit,q.cursor));}));

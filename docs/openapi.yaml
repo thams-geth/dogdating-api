@@ -8727,6 +8727,160 @@ paths:
                   const: true
               required:
                 - reviewConfirmed
+  /admin/v1/notifications/jobs:
+    get:
+      operationId: staffPushJobs
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          schema:
+            enum:
+              - awaiting_provider
+              - pending
+              - delivered
+              - suppressed
+              - dead_letter
+            default: dead_letter
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        state:
+                          enum:
+                            - awaiting_provider
+                            - pending
+                            - delivered
+                            - suppressed
+                            - dead_letter
+                        attempts:
+                          type: integer
+                          minimum: 0
+                        availableAt:
+                          type: string
+                          format: date-time
+                        leaseUntil:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                        lastError:
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                      required:
+                        - id
+                        - state
+                        - attempts
+                        - availableAt
+                        - leaseUntil
+                        - lastError
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/notifications/jobs/{id}/retry:
+    post:
+      operationId: retryPushJob
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    const: awaiting_provider
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
 components:
   responses:
     Problem:

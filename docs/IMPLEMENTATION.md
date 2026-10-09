@@ -111,3 +111,7 @@ M04 now supports owner-requested, named-recipient/token-accepted same-country ho
 ## Release and legal operations (9 October 2026)
 
 M12 now has dedicated release_ops/legal_ops roles, optimistic audited release-policy edits and reviewed legal draft/publish endpoints. M01 bootstrap reads stored release guidance and current published legal-version hints, failing closed for an invalid/missing stored policy. Migration 0029. No actual legal content/store rollout was published. Hard API update enforcement and country expansion remain pending.
+
+## Push queue relay (9 October 2026)
+
+Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials/adapter wiring and scheduling are still absent; pushAvailable remains false.

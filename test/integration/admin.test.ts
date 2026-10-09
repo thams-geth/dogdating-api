@@ -57,3 +57,12 @@ test('legal drafts are private until explicit publication; published text stays 
  await assert.rejects(f.database.query('UPDATE identity.policy_documents SET body=$2 WHERE id=$1',[document.id,'changed']));
  await http.post('/admin/v1/legal/documents').set('Authorization','Bearer one').send(payload).expect(409);
 });
+test('operations can inspect and retry dead-letter pushes without gaining private payload access',async()=>{
+ const user=await f.user(),household=await f.household(user.userId),dogs=[await f.dog(household),await f.dog(household)].sort(),match=randomUUID(),conversation=randomUUID(),notification=randomUUID();
+ await f.database.query("INSERT INTO meetup.matches(id,pair_key,dog_a_id,dog_b_id,mode) VALUES($1,$2,$3,$4,'pack')",[match,dogs.join(':'),...dogs]);await f.database.query('INSERT INTO meetup.conversations(id,match_id) VALUES($1,$2)',[conversation,match]);
+ await f.database.query("INSERT INTO identity.notifications(id,user_id,event_id,category,conversation_id) VALUES($1,$2,$3,'messages',$4)",[notification,user.userId,randomUUID(),conversation]);await f.database.query("INSERT INTO ops.push_jobs(notification_id,state,attempts,last_error) VALUES($1,'dead_letter',5,'retries_exhausted')",[notification]);
+ await http.get('/admin/v1/notifications/jobs').set('Authorization','Bearer support').expect(403);
+ const jobs=(await http.get('/admin/v1/notifications/jobs').set('Authorization','Bearer one').expect(200)).body;assert.equal(jobs.items[0].id,notification);assert.equal(jobs.items[0].lastError,'retries_exhausted');assert.ok(!('userId' in jobs.items[0]));
+ await http.post(`/admin/v1/notifications/jobs/${notification}/retry`).set('Authorization','Bearer one').send({}).expect(200);
+ await http.post(`/admin/v1/notifications/jobs/${notification}/retry`).set('Authorization','Bearer one').send({}).expect(409);
+});
