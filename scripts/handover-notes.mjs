@@ -238,3 +238,8 @@ notes.M05.guidance.push('A bounded verification expiry pass revokes grants whose
 notes.M12.guidance.push('maintenance:run now includes up to 100 expired verification grants per pass. The separate verification:expire command runs that sweep alone. Neither command creates reviewer grants or replaces the required provider evidence workflow.');
 
 notes.M12.guidance.push('GET /admin/v1/jobs now includes maintenance: null before the first run, or the last runId, running/completed/failed state, start/finish times, aggregate counts and a generic maintenance_failed code. A stale running state indicates an interrupted worker; inspect the scheduler and rerun. This is a single last-status record, not job history or proof an external scheduler is configured.');
+
+notes.M11.guidance.push('GET /me/incident-reviews lists only the caller’s meetup incident cases; GET /me/incident-reviews/{id} reads one case by case ID. Both accept a normal bearer session or restricted Privacy-Token, so a reporter can check status after block, unmatch or suspension. Lists use caller-scoped UUID cursors. Responses contain reviewId, meetupId, queued/in_review/dismissed/escalated state and timestamps, without the private note, other participant identity, assigned staff or internal reason code. Unknown or another user’s case returns 404. Escalated means forwarded for further review, not an enforcement outcome or response-time promise.');
+notes.M11.steps.push('Track own meetup incident review');
+notes.M11.screen.push('My incident reviews [ queued | in review | escalated | closed ]');
+notes.M11.examples.push({title:'Track own meetup incident',request:'GET /v1/me/incident-reviews/77777777-7777-4777-8777-777777777777'});

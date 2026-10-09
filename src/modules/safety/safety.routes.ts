@@ -3,7 +3,7 @@ import { asyncHandler } from '../../http/async-handler.js';import { ApiError } f
 import type { AuthService } from '../auth/auth.service.js';import { requestOtpSchema } from '../auth/auth.schemas.js';
 import type { SafetyService } from './safety.service.js';import type { PrivacyService } from './privacy.service.js';import { reportInput,ticketInput,supportMessage,appealInput } from './safety.schemas.js';
 export function safetyRoutes(service:SafetyService,privacy:PrivacyService,auth?:AuthService){const router=Router(),id=(v:unknown)=>z.string().uuid().parse(v);
- router.use((req,_res,next)=>/^\/(reports(?:\/|$)|support\/tickets(?:\/|$)|me\/(safety-notices|appeals|data-exports|deletion-requests)(?:\/|$)|privacy\/deletion\/otp\/)/.test(req.path)?next():next('router'));
+ router.use((req,_res,next)=>/^\/(reports(?:\/|$)|support\/tickets(?:\/|$)|me\/(safety-notices|appeals|incident-reviews|data-exports|deletion-requests)(?:\/|$)|privacy\/deletion\/otp\/)/.test(req.path)?next():next('router'));
  const limiter=rateLimit({windowMs:15*60000,limit:30,standardHeaders:'draft-7',legacyHeaders:false});
  router.post('/privacy/deletion/otp/request',limiter,asyncHandler(async(req,res)=>{if(!auth)throw new ApiError(503,'auth-unavailable','Phone verification is unavailable.');const input=requestOtpSchema.parse(req.body);await auth.requestOtp(input.phoneE164,input.countryCode,'privacy');res.status(202).json({status:'accepted'});}));
  router.post('/privacy/deletion/otp/verify',limiter,asyncHandler(async(req,res)=>{if(!auth)throw new ApiError(503,'auth-unavailable','Phone verification is unavailable.');const input=z.object({phoneE164:requestOtpSchema.shape.phoneE164,code:z.string().regex(/^\d{6}$/)}).strict().parse(req.body);res.json(await auth.verifyPrivacyOtp(input.phoneE164,input.code));}));
@@ -19,6 +19,8 @@ export function safetyRoutes(service:SafetyService,privacy:PrivacyService,auth?:
  router.get('/support/tickets',asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.tickets(user(res).userId,q.limit,q.cursor));}));
  router.get('/support/tickets/:id',asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.ticketDetail(user(res).userId,id(req.params.id),q.limit,q.cursor));}));
  router.post('/support/tickets/:id/messages',asyncHandler(async(req,res)=>{res.status(201).json(await service.reply(user(res).userId,id(req.params.id),supportMessage.parse(req.body).message,id(req.get('Idempotency-Key'))));}));
+ router.get('/me/incident-reviews',asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.incidentReviews(user(res).userId,q.limit,q.cursor));}));
+ router.get('/me/incident-reviews/:id',asyncHandler(async(req,res)=>{res.json(await service.incidentReview(user(res).userId,id(req.params.id)));}));
  router.get('/me/safety-notices',asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.notices(user(res).userId,q.limit,q.cursor));}));
  router.get('/me/appeals',asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.appeals(user(res).userId,q.limit,q.cursor));}));
  router.post('/me/appeals',asyncHandler(async(req,res)=>{res.status(201).json(await service.appeal(user(res).userId,appealInput.parse(req.body)));}));

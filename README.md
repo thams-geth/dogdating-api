@@ -15,7 +15,7 @@ The provisional launch scope is dog playdates/walks. Breeding introductions and 
 
 ## Current status (9 October 2026)
 
-159 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
+161 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
 
 ## Local development
 
@@ -215,3 +215,5 @@ Run one bounded operations pass with `npm run maintenance:run`. Schedule it exte
 Run `npm run verification:expire` for a standalone bounded tier-expiry sweep; the maintenance pass includes it. No verification is granted without reviewed evidence.
 
 Operations staff can inspect the latest maintenance pass through `GET /admin/v1/jobs`; a stale `running` state needs an operator check.
+
+Guardians can track their own private meetup incident reviews through `/v1/me/incident-reviews`, including with a restricted safety token after a block or suspension.

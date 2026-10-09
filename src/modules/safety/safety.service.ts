@@ -39,6 +39,19 @@ export class SafetyService {
   if((await tx.query("SELECT count(*)::int n FROM safety.support_messages WHERE author_user_id=$1 AND created_at>now()-interval '1 day'",[userId])).rows[0].n>=20)throw new ApiError(429,'support-message-limit','Daily support message limit reached.');
   const messageId=randomUUID(),row=(await tx.query('INSERT INTO safety.support_messages(id,ticket_id,author_user_id,body_encrypted) VALUES($1,$2,$3,$4) RETURNING id,created_at AS "createdAt"',[messageId,id,userId,cipher.wrap(Buffer.from(message),`support:${messageId}`)])).rows[0];await tx.query('UPDATE safety.support_tickets SET updated_at=now() WHERE id=$1',[id]);await saveReceipt(tx,userId,'support-reply',key,hash,row);return row;
  });}
+ private incidentProjection=`c.id,c.review_id AS "reviewId",r.meetup_id AS "meetupId",c.state,
+   c.created_at AS "createdAt",c.first_action_at AS "firstActionAt",c.decided_at AS "decidedAt"`;
+ async incidentReviews(userId:string,limit:number,cursor?:string){
+  const scope=`incident-reviews:${userId}`,after=decodeCursor(cursor,scope);
+  return page((await this.db.query(`SELECT ${this.incidentProjection} FROM safety.meetup_incident_cases c
+   JOIN meetup.meetup_reviews r ON r.id=c.review_id WHERE r.reviewer_user_id=$1
+   AND ($2::uuid IS NULL OR c.id>$2) ORDER BY c.id LIMIT $3`,[userId,after,limit+1])).rows,limit,scope);
+ }
+ async incidentReview(userId:string,id:string){
+  const row=(await this.db.query(`SELECT ${this.incidentProjection} FROM safety.meetup_incident_cases c
+   JOIN meetup.meetup_reviews r ON r.id=c.review_id WHERE c.id=$1 AND r.reviewer_user_id=$2`,[id,userId])).rows[0];
+  if(!row)throw new ApiError(404,'not-found','Incident review is unavailable.');return row;
+ }
  async notices(userId:string,limit:number,cursor?:string){const scope=`notices:${userId}`,after=decodeCursor(cursor,scope);return page((await this.db.query(`SELECT id,action,reason_code AS "reasonCode",policy_ref AS "policyRef",created_at AS "createdAt",expires_at AS "expiresAt",reversed_at AS "reversedAt" FROM safety.enforcement_actions WHERE subject_type='user' AND subject_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT $3`,[userId,after,limit+1])).rows,limit,scope);}
  appeal(userId:string,input:z.infer<typeof appealInput>){return transaction(this.db,async tx=>{
   const cipher=this.encryption();await tx.query('SELECT id FROM identity.users WHERE id=$1 FOR UPDATE',[userId]);if(!(await tx.query("SELECT 1 FROM safety.enforcement_actions WHERE id=$1 AND subject_type='user' AND subject_id=$2",[input.actionId,userId])).rowCount)throw new ApiError(404,'not-found','Action is unavailable.');

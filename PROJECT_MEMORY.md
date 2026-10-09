@@ -1,6 +1,6 @@
 # Project memory
 
-Updated 9 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md.
+Updated 10 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md.
 
 ## User instructions
 
@@ -103,3 +103,7 @@ M05 has a bounded, audited expiry sweep for lapsed grants. With no other current
 ## Maintenance observability (9 October 2026)
 
 Migration 0034 persists only the latest maintenance run state/timestamps/aggregate counts or generic failure code. M12 GET /admin/v1/jobs exposes it to operations staff; null means never run, stale running suggests interruption. No scheduler has been deployed.
+
+## Own meetup incident status (10 October 2026)
+
+M11 now exposes reporter-only incident case list/detail under /v1/me/incident-reviews, including restricted Privacy-Token access after block, unmatch or suspension. It returns status/timestamps only, not notes, peer identity, staff assignment or internal reasons. OpenAPI now has 161 HTTP operations.

@@ -44,3 +44,19 @@ test('reports reject guessed subjects and remain available after connection bloc
  await report(randomUUID()).expect(404);const result=await report(message).expect(201);await http.get(`/v1/reports/${result.body.id}`).set('Authorization',b.header).expect(404);
  assert.equal((await http.get(`/v1/reports/${result.body.id}`).set('Authorization',a.header)).body.state,'queued');
 });
+test('incident-review status is own-only and survives block and restricted safety access',async()=>{
+ const a=await f.user(),b=await f.user(),da=await f.dog(await f.household(a.userId)),db=await f.dog(await f.household(b.userId));
+ const dogs=[da,db].sort(),match=randomUUID(),place=randomUUID(),meetup=randomUUID(),review=randomUUID();
+ await f.database.query("INSERT INTO meetup.matches(id,pair_key,dog_a_id,dog_b_id,mode) VALUES($1,$2,$3,$4,'pack')",[match,dogs.join(':'),...dogs]);
+ await f.database.query("INSERT INTO meetup.places(id,name,kind,latitude,longitude,address,metro_id,state,verified_at) VALUES($1,'TEST PARK','offleash_park',12.9,77.5,'TEST ADDRESS','01920000-0000-7000-8000-0000000e0001','approved',now())",[place]);
+ await f.database.query("INSERT INTO meetup.meetups(id,match_id,place_id,kind,window_start,window_end,proposed_by) VALUES($1,$2,$3,'parallel_walk',now()-interval '2 hours',now()-interval '1 hour',$4)",[meetup,match,place,a.userId]);
+ await f.database.query("INSERT INTO meetup.meetup_reviews(id,meetup_id,reviewer_user_id,subject_dog_id,showed_up,would_repeat,incident_occurred,incident_type) VALUES($1,$2,$3,$4,true,false,true,'other')",[review,meetup,a.userId,db]);
+ const first=(await http.get('/v1/me/incident-reviews').set('Authorization',a.header).expect(200)).body;
+ assert.equal(first.items.length,1);assert.equal(first.items[0].reviewId,review);assert.equal(first.items[0].state,'queued');
+ assert.ok(!JSON.stringify(first).includes(b.userId));const caseId=first.items[0].id;
+ await http.get(`/v1/me/incident-reviews/${caseId}`).set('Authorization',b.header).expect(404);
+ await http.post('/v1/me/blocks').set('Authorization',a.header).send({userId:b.userId}).expect(204);
+ assert.equal((await http.get(`/v1/me/incident-reviews/${caseId}`).set('Authorization',a.header).expect(200)).body.state,'queued');
+ await f.database.query("UPDATE identity.users SET status='suspended' WHERE id=$1",[a.userId]);const token=await privacy(a);
+ assert.equal((await http.get(`/v1/me/incident-reviews/${caseId}`).set('Privacy-Token',token).expect(200)).body.reviewId,review);
+});

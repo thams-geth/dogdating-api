@@ -2,7 +2,7 @@
 
 Plan version: 1.1 • status reconciled 9 October 2026 • Backend: TypeScript + Express + PostgreSQL.
 
-This is the complete design inventory, not a claim that every listed API exists. Current implementation: 159 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
+This is the complete design inventory, not a claim that every listed API exists. Current implementation: 161 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
 
 ## 1. Product and release boundaries
 
@@ -207,7 +207,7 @@ States: proposed → accepted/countered/declined → completed/cancelled/expired
 | --- | --- | --- |
 | POST/GET `/me/blocks`; DELETE `/me/blocks/{userId}` | U | Immediate cross-household discovery/contact suppression; unblock does not restore a match |
 | POST `/reports`; GET `/reports/{id}` | U | Dog/user/media/message/meetup report; reporter identity private |
-| GET `/me/safety-notices`; POST/GET `/me/appeals` | U | Enforcement explanations and review workflow |
+| GET `/me/safety-notices`; POST/GET `/me/appeals`; GET `/me/incident-reviews` and `/{id}` | U | Enforcement explanations, appeals and private incident status |
 | POST/GET `/support/tickets`; GET `/support/tickets/{id}`; POST `/support/tickets/{id}/messages` | U | Support and privacy grievances |
 | POST `/me/data-exports`; GET `/me/data-exports/{id}` | U | Async export, short-lived download, recent reauthentication |
 | POST `/me/deletion-requests`; GET `/me/deletion-requests/{id}` | U | Recent reauthentication, revoke discovery/sessions, tracked erasure |

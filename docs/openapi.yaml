@@ -9614,6 +9614,176 @@ paths:
           $ref: "#/components/responses/Problem"
         "503":
           $ref: "#/components/responses/Problem"
+  /v1/me/incident-reviews:
+    get:
+      operationId: myIncidentReviews
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        reviewId:
+                          type: string
+                          format: uuid
+                        meetupId:
+                          type: string
+                          format: uuid
+                        state:
+                          type: string
+                          enum:
+                            - queued
+                            - in_review
+                            - dismissed
+                            - escalated
+                        createdAt:
+                          type: string
+                          format: date-time
+                        firstActionAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                        decidedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                      required:
+                        - id
+                        - reviewId
+                        - meetupId
+                        - state
+                        - createdAt
+                        - firstActionAt
+                        - decidedAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/me/incident-reviews/{id}:
+    get:
+      operationId: myIncidentReview
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  reviewId:
+                    type: string
+                    format: uuid
+                  meetupId:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                    enum:
+                      - queued
+                      - in_review
+                      - dismissed
+                      - escalated
+                  createdAt:
+                    type: string
+                    format: date-time
+                  firstActionAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  decidedAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                required:
+                  - id
+                  - reviewId
+                  - meetupId
+                  - state
+                  - createdAt
+                  - firstActionAt
+                  - decidedAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
