@@ -67,3 +67,7 @@ Continue authorized independent backend work without repeated permission request
 ## Scoped account exports (9 October 2026)
 
 M11 now queues account_data_v1 exports, processes encrypted snapshots with npm run privacy:exports, and serves owner-only/recent-auth JSON downloads for 24 hours. Migration 0027. Explicit exclusions include photo file bytes, others’ content, shared documents, provider records and internal notes; this is not a full legal-response archive. Size failures go to review without truncation. Deletion remains unprocessed/needs_review.
+
+## Two-party dog transfers (9 October 2026)
+
+M04 now supports owner-requested, named-recipient/token-accepted same-country household transfers. Migration 0028. Transfers reset publication, selection, matching opt-in and dog verification, close old social relationships and cancel incomplete uploads; completed dog profile/photos/health metadata move with explicit sharing acknowledgement. Dog access rechecks the locked household after transfer, and active-dog selection serializes with social writes.

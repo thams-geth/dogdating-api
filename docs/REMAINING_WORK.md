@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 9 October 2026. The checked-in backend has 140 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
+Updated 9 October 2026. The checked-in backend has 144 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
 
 ## Required integration inputs
 
@@ -23,7 +23,7 @@ No credentials, provider selection, legal approval or operational response is in
 | --- | --- |
 | M01 | Audited release/country administration, enforced update policy and live legal-version hints; waitlist outbound delivery |
 | M02 | Production SMS/DLT, distributed abuse controls and broader security audit/monitoring; optional OAuth/passkeys/recovery factors |
-| M04 | GPS/displaced anchors, two-party dog transfer and twelve-question scoring; structured temperament and city-only location already work |
+| M04 | GPS/displaced anchors and twelve-question scoring; structured temperament, city-only location and two-party dog transfers already work |
 | M05 | Production uploads/delivery, scan/moderation, document uploads, signed replay-safe provider webhooks, reviewer evidence/grants and account activation |
 | M06 | Production discovery rollout, precise-distance matching and scheduled snapshot cleanup; account-wide home counters are implemented |
 | M08 | Production key wrapping/rotation, moderated attachments, typing/presence/shared read receipts, scalable event delivery and ticket retention; current sockets use bounded DB polling |

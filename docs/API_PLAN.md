@@ -2,7 +2,7 @@
 
 Plan version: 1.1 • status reconciled 9 October 2026 • Backend: TypeScript + Express + PostgreSQL.
 
-This is the complete design inventory, not a claim that every listed API exists. Current implementation: 140 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
+This is the complete design inventory, not a claim that every listed API exists. Current implementation: 144 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
 
 ## 1. Product and release boundaries
 

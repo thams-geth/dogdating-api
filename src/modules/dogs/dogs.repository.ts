@@ -11,7 +11,7 @@ export class DogsRepository {
   if(!row)throw new ApiError(404,'not-found','Dog not found.');
   await requireHousehold(tx,row.household_id,userId,roles);
   const dog=(await tx.query(`SELECT ${dogProjection} FROM graph.dogs d WHERE d.id=$1 AND d.deleted_at IS NULL`,[id])).rows[0];
-  if(!dog)throw new ApiError(404,'not-found','Dog not found.');
+  if(!dog||dog.householdId!==row.household_id)throw new ApiError(404,'not-found','Dog not found.');
   return dog;
  }
  async detail(tx:PoolClient,id:string){

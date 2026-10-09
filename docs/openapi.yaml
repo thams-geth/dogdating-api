@@ -7870,6 +7870,319 @@ paths:
           $ref: "#/components/responses/Problem"
         "503":
           $ref: "#/components/responses/Problem"
+  /v1/dogs/{id}/transfer:
+    post:
+      operationId: requestDogTransfer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  dogId:
+                    type: string
+                    format: uuid
+                  sourceHouseholdId:
+                    type: string
+                    format: uuid
+                  targetHouseholdId:
+                    type: string
+                    format: uuid
+                  requestedBy:
+                    type: string
+                    format: uuid
+                  recipientUserId:
+                    type: string
+                    format: uuid
+                  state:
+                    enum:
+                      - pending
+                      - accepted
+                      - cancelled
+                      - expired
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  createdAt:
+                    type: string
+                    format: date-time
+                  acceptedAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  token:
+                    type: string
+                  recordSharing:
+                    type: array
+                    items:
+                      enum:
+                        - profile
+                        - completed_photos
+                        - health_metadata
+                required:
+                  - id
+                  - dogId
+                  - sourceHouseholdId
+                  - targetHouseholdId
+                  - requestedBy
+                  - recipientUserId
+                  - state
+                  - expiresAt
+                  - createdAt
+                  - acceptedAt
+                  - token
+                  - recordSharing
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                targetHouseholdId:
+                  type: string
+                  format: uuid
+                recipientUserId:
+                  type: string
+                  format: uuid
+                shareRecords:
+                  const: true
+              required:
+                - targetHouseholdId
+                - recipientUserId
+                - shareRecords
+  /v1/dog-transfers:
+    get:
+      operationId: listDogTransfers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        dogId:
+                          type: string
+                          format: uuid
+                        sourceHouseholdId:
+                          type: string
+                          format: uuid
+                        targetHouseholdId:
+                          type: string
+                          format: uuid
+                        requestedBy:
+                          type: string
+                          format: uuid
+                        recipientUserId:
+                          type: string
+                          format: uuid
+                        state:
+                          enum:
+                            - pending
+                            - accepted
+                            - cancelled
+                            - expired
+                        expiresAt:
+                          type: string
+                          format: date-time
+                        createdAt:
+                          type: string
+                          format: date-time
+                        acceptedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                      required:
+                        - id
+                        - dogId
+                        - sourceHouseholdId
+                        - targetHouseholdId
+                        - requestedBy
+                        - recipientUserId
+                        - state
+                        - expiresAt
+                        - createdAt
+                        - acceptedAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/dog-transfers/{id}/accept:
+    post:
+      operationId: acceptDogTransfer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  dogId:
+                    type: string
+                    format: uuid
+                  state:
+                    const: accepted
+                required:
+                  - id
+                  - dogId
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                token:
+                  type: string
+                  pattern: ^[A-Za-z0-9_-]{43}$
+                acceptRecords:
+                  const: true
+              required:
+                - token
+                - acceptRecords
+  /v1/dog-transfers/{id}:
+    delete:
+      operationId: cancelDogTransfer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Completed; no body
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:

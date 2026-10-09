@@ -1,3 +1,4 @@
+import { socialLock } from '../../db/social-lock.js';
 import { requireHousehold } from '../households/access.js';
 import type { Pool } from 'pg';
 import type { z } from 'zod';
@@ -68,6 +69,7 @@ export class OnboardingService {
   }
   async selectDog(userId: string, dogId: string | null) {
     return transaction(this.database,async (tx)=> {
+      await socialLock(tx);
       await this.repo.lockUser(tx,userId);
       if (dogId) {
         const selected=(await tx.query<{household_id:string}>('SELECT household_id FROM graph.dogs WHERE id=$1',[dogId])).rows[0];

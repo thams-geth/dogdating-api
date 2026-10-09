@@ -10,6 +10,7 @@ const sections = [...plan.matchAll(/^### (M\d+) — (.+)\n([\s\S]*?)(?=^### M|^#
 const ids = Object.keys(notes).sort();
 const operations = Object.fromEntries(ids.map(id => [id, []]));
 function moduleFor(path) {
+  if(path.startsWith('/v1/dog-transfers'))return 'M04';
   if(path.startsWith('/v1/waitlist'))return 'M01';
   if (path.startsWith('/admin/v1/')) return 'M12';
   if (/^\/v1\/(places|meetups)(?:\/|$)/.test(path)) return 'M10';
@@ -57,6 +58,8 @@ function access({path,method,op}) {
   if(op.security.some(s=>s.staffBearer))return 'Provisioned staff SSO + recent MFA; endpoint role required';
   if(op.security.some(s=>s.privacyStatusToken))return 'Request-specific Privacy-Status-Token';
   if(op.security.some(s=>s.privacyToken))return 'Own account: bearer session or restricted Privacy-Token';
+  if(path.endsWith('/transfer'))return 'Current source owner; destination owner must separately accept';
+  if(path.startsWith('/v1/dog-transfers'))return method==='GET'?'Original sender or recipient':path.endsWith('/accept')?'Named recipient + token + current destination ownership':'Original sender or recipient';
   if (path.endsWith('/profile')) return 'Eligible selected-dog editor; matching impression token required';
   if (path.endsWith('/discovery-preferences')) return 'Owner/co-guardian';
   if (path.startsWith('/v1/feed')) return 'Signed-in caller; eligible selected-dog editor to receive cards';

@@ -1,3 +1,5 @@
+import { TransfersService } from './modules/dogs/transfers.service.js';
+import { transferRoutes } from './modules/dogs/transfers.routes.js';
 import { waitlistRoutes } from './modules/app/waitlist.js';
 import { StaffAuth,OidcStaffVerifier,type StaffVerifier } from './modules/admin/staff-auth.js';
 import { AdminService } from './modules/admin/admin.service.js';
@@ -65,7 +67,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0027']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0028']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -93,6 +95,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1/households',householdRoutes(households,auth));
   app.use('/v1/households',locationRoutes(location,auth));
   app.use('/v1/household-invitations',invitationRoutes(households,auth));
+  app.use('/v1',transferRoutes(new TransfersService(database),auth));
   app.use('/v1/dogs',dogRoutes(new DogsService(database),auth));
   const photos = deps.photoStorage ?? (config.MEDIA_MODE === 'local' ? new LocalPhotoStorage(config.MEDIA_LOCAL_DIR, config.NODE_ENV) : undefined);
   app.use('/v1', mediaRoutes(new MediaService(database, photos), auth));
