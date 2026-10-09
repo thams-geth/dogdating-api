@@ -29,11 +29,11 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 115 PostgreSQL integration tests at the latest full run.
+- Typecheck/build passed; 8 unit/HTTP tests and 116 PostgreSQL integration tests at the latest full run.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
 - Migrations through 0034. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 161 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- 168 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions
@@ -143,3 +143,7 @@ Migration 0034 keeps one latest maintenance status record. The operations-only j
 ### M11 own meetup incident status (10 October 2026)
 
 `GET /v1/me/incident-reviews` and `/{id}` expose a reporter’s own case state and timestamps through normal or restricted safety authentication. The response omits private notes, peer identities, staff assignments and internal reason codes. Historical status remains accessible after block/unmatch; unknown or another user’s case returns 404. This does not create an emergency or response-time promise.
+
+### M11/M12 reviewed help publishing (10 October 2026)
+
+Migration 0035 adds immutable, versioned en-IN help articles. Legal operations staff can create drafts with a review reference, publish after explicit confirmation, read audited details and retire articles. Publishing a new version atomically retires the old public version for its slug. Public list/detail return published content only. No guidance text or external deletion page is seeded; actual editorial review remains required before publication.

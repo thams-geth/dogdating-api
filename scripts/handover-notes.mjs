@@ -243,3 +243,15 @@ notes.M11.guidance.push('GET /me/incident-reviews lists only the caller’s meet
 notes.M11.steps.push('Track own meetup incident review');
 notes.M11.screen.push('My incident reviews [ queued | in review | escalated | closed ]');
 notes.M11.examples.push({title:'Track own meetup incident',request:'GET /v1/me/incident-reviews/77777777-7777-4777-8777-777777777777'});
+
+notes.M11.guidance.push('GET /help/articles?locale=en-IN lists only published reviewed guidance and GET /help/articles/{slug}?locale=en-IN reads one public article. No articles are seeded; empty list and 404 detail are normal before staff publication. Unsupported locales fail validation. Show the article version and publishedAt to readers; retired guidance disappears immediately.');
+notes.M11.steps.push('Read reviewed help article when available');
+notes.M11.screen.push('[ Help articles ] [ Read article ]');
+notes.M11.examples.push({title:'List reviewed help',request:'GET /v1/help/articles?locale=en-IN'});
+notes.M12.guidance.push('legal_ops can GET/POST /admin/v1/help/articles, GET /{id}, POST /{id}/publish with reviewConfirmed=true, and POST /{id}/retire with {}. A draft needs en-IN, slug, version, title, body and reviewReference. The server stores no default content. Only published articles are public; published body/title/version are immutable. Publishing a new version atomically retires the old public version for that slug. Duplicate locale/slug/version returns 409 help-version-exists. Retiring is idempotent; a retired version cannot be republished. Every staff read/write is audited without body copies. The review reference and confirmation are staff attestation, not independent external verification.');
+notes.M12.steps.push('Review and publish help guidance');
+notes.M12.screen.push('Help draft [ review reference ] [ Publish | Retire ]');
+notes.M12.examples.push({title:'Publish reviewed help draft',request:'POST /admin/v1/help/articles/77777777-7777-4777-8777-777777777777/publish',status:200,body:{reviewConfirmed:true}});
+
+notes.M11.sources.push('help');
+notes.M12.sources.push('help');

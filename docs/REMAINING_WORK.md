@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 10 October 2026. The checked-in backend has 161 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
+Updated 10 October 2026. The checked-in backend has 168 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
 
 ## Required integration inputs
 
@@ -29,7 +29,7 @@ No credentials, provider selection, legal approval or operational response is in
 | M08 | Production key wrapping/rotation, moderated attachments, typing/presence/shared read receipts, scalable event delivery; expired tickets are cleaned after one day, and current sockets use bounded DB polling |
 | M09 | Vendor adapter/credentials and operational scheduling; provider-neutral relay, receipts/backoff, invalid-token handling, quiet hours and dead-letter operations are implemented |
 | M10 | Reviewer response workflow and external scheduling for the implemented two-party extensions/reminders/expiry pass; optional groups/video |
-| M11 | Broader legal-response exports (photo files/shared/provider categories) and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help articles; own meetup incident tracking is implemented |
+| M11 | Broader legal-response exports (photo files/shared/provider categories) and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help article content and external deletion page; own meetup incident tracking and publishing workflow are implemented |
 | M12 | Verification review/provider evidence, reviewed audit retention, external maintenance scheduling, broader privacy job execution and operational metrics; report and meetup incident decisions support dismiss/escalate, with suspension handled separately |
 | M13 | Store offerings, verified receipt/restore, subscription/cancellation/refund/grace rules, signed billing webhooks and referral/growth behavior |
 | M14 | Additional market configuration, local content/providers, quota-zone rules and reviewed residency/rollout policy |

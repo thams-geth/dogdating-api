@@ -104,3 +104,22 @@ test('operations jobs view exposes only maintenance status and aggregate counts'
  assert.ok(!('privateNote' in jobs.maintenance));
  await http.get('/admin/v1/jobs').set('Authorization','Bearer support').expect(403);
 });
+test('reviewed help articles remain private as drafts, publish immutably and can be retired',async()=>{
+ const input={locale:'en-IN',slug:'meeting-safely',version:'v1',title:'Safe meeting guidance',body:'TEST FIXTURE GUIDANCE ONLY. Meet in a reviewed public place and keep control of your dog.',reviewReference:'TEST EDITORIAL REVIEW'};
+ await http.post('/admin/v1/help/articles').set('Authorization','Bearer support').send(input).expect(403);
+ const draft=(await http.post('/admin/v1/help/articles').set('Authorization','Bearer one').send(input).expect(201)).body;
+ await http.get('/v1/help/articles?locale=en-IN').expect(200).then(r=>assert.equal(r.body.items.length,0));
+ await http.get('/v1/help/articles/meeting-safely?locale=en-IN').expect(404);
+ await http.post(`/admin/v1/help/articles/${draft.id}/publish`).set('Authorization','Bearer one').send({reviewConfirmed:false}).expect(400);
+ await http.post(`/admin/v1/help/articles/${draft.id}/publish`).set('Authorization','Bearer one').send({reviewConfirmed:true}).expect(200);
+ const publicArticle=(await http.get('/v1/help/articles/meeting-safely?locale=en-IN').expect(200)).body;assert.equal(publicArticle.body,input.body);assert.ok(!('reviewReference' in publicArticle));
+ await assert.rejects(f.database.query('UPDATE ops.help_articles SET body=$2 WHERE id=$1',[draft.id,'Changed body']));
+ await http.post('/admin/v1/help/articles').set('Authorization','Bearer one').send(input).expect(409);
+ const replacement=(await http.post('/admin/v1/help/articles').set('Authorization','Bearer one').send({...input,version:'v2',body:'TEST UPDATED GUIDANCE ONLY. Meet in a public place and check current consent.'}).expect(201)).body;
+ await http.post(`/admin/v1/help/articles/${replacement.id}/publish`).set('Authorization','Bearer one').send({reviewConfirmed:true}).expect(200);
+ assert.equal((await http.get('/v1/help/articles?locale=en-IN').expect(200)).body.items.length,1);
+ assert.equal((await http.get('/v1/help/articles/meeting-safely?locale=en-IN').expect(200)).body.version,'v2');
+ await http.post(`/admin/v1/help/articles/${replacement.id}/retire`).set('Authorization','Bearer one').send({}).expect(200);
+ await http.get('/v1/help/articles/meeting-safely?locale=en-IN').expect(404);
+ assert.ok((await f.database.query("SELECT count(*)::int n FROM ops.audit_log WHERE subject_type='help_article'")).rows[0].n>=4);
+});

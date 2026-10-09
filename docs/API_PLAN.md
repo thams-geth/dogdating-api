@@ -2,7 +2,7 @@
 
 Plan version: 1.1 • status reconciled 9 October 2026 • Backend: TypeScript + Express + PostgreSQL.
 
-This is the complete design inventory, not a claim that every listed API exists. Current implementation: 161 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
+This is the complete design inventory, not a claim that every listed API exists. Current implementation: 168 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
 
 ## 1. Product and release boundaries
 
@@ -212,7 +212,7 @@ States: proposed → accepted/countered/declined → completed/cancelled/expired
 | POST `/me/data-exports`; GET `/me/data-exports/{id}` | U | Async export, short-lived download, recent reauthentication |
 | POST `/me/deletion-requests`; GET `/me/deletion-requests/{id}` | U | Recent reauthentication, revoke discovery/sessions, tracked erasure |
 | POST `/privacy/deletion/otp/request`, `/verify` | P | External deletion-page identity proof; restricted token, no account creation |
-| GET `/help/articles?locale=` | P | Reviewed safety/support guidance and external deletion URL |
+| GET `/help/articles?locale=`; GET `/help/articles/{slug}` | P | Reviewed safety/support guidance; no content seeded |
 
 Deletion includes user rows, private media, messages as required by policy, vendor records, search/caches and backup expiry. Shared household dogs require transfer/remaining-owner rules. Legal holds are scoped, documented and excluded from normal access; communicate retained categories. Proposed operational target is completion within 30 days, subject to verified legal obligations; not a blanket statutory claim. Keep only necessary security/audit records under an explicit retention policy.
 
@@ -228,6 +228,7 @@ Use `/admin/v1` (not `/v1/admin`) with staff SSO/MFA and role checks. Every sens
 | GET `/appeals`; POST `/appeals/{id}/decide` | Appeals | Different reviewer from original enforcement |
 | GET/POST/PATCH `/places` and `/{id}` | City ops | Safe public-place registry |
 | GET/PATCH `/countries/{code}`, `/app-releases/{platform}` | Release ops | Audit rollout/version changes; staged validation |
+| GET/POST `/help/articles`; GET `/{id}`; POST `/{id}/publish`, `/{id}/retire` | Legal ops | Reviewed help draft, publication and retirement |
 | GET `/jobs`, `/metrics`, `/audit-events` | Operations | Failed delivery/deletion, queue health, launch funnel |
 
 Staff cannot retrieve raw household location or casually read private messages. Evidence access is case-scoped. Analytics initially covers onboarding funnel, eligible dogs by sufficiently large area, time to first match/conversation, meetup acceptance/completion, report resolution and crash/error rates. Never fabricate local supply counts.

@@ -9784,6 +9784,559 @@ paths:
           $ref: "#/components/responses/Problem"
         "503":
           $ref: "#/components/responses/Problem"
+  /v1/help/articles:
+    get:
+      operationId: helpArticles
+      security: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: locale
+          in: query
+          required: false
+          schema:
+            type: string
+            const: en-IN
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        locale:
+                          type: string
+                          const: en-IN
+                        slug:
+                          type: string
+                        version:
+                          type: string
+                        title:
+                          type: string
+                        publishedAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - locale
+                        - slug
+                        - version
+                        - title
+                        - publishedAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/help/articles/{slug}:
+    get:
+      operationId: helpArticle
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+        - name: locale
+          in: query
+          required: false
+          schema:
+            type: string
+            const: en-IN
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  locale:
+                    type: string
+                    const: en-IN
+                  slug:
+                    type: string
+                  version:
+                    type: string
+                  title:
+                    type: string
+                  body:
+                    type: string
+                  state:
+                    type: string
+                    const: published
+                  createdAt:
+                    type: string
+                    format: date-time
+                  publishedAt:
+                    type: string
+                    format: date-time
+                  retiredAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                required:
+                  - id
+                  - locale
+                  - slug
+                  - version
+                  - title
+                  - body
+                  - state
+                  - createdAt
+                  - publishedAt
+                  - retiredAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/help/articles:
+    get:
+      operationId: adminHelpArticles
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        locale:
+                          type: string
+                          const: en-IN
+                        slug:
+                          type: string
+                        version:
+                          type: string
+                        title:
+                          type: string
+                        state:
+                          type: string
+                          enum:
+                            - draft
+                            - published
+                            - retired
+                        createdAt:
+                          type: string
+                          format: date-time
+                        publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                      required:
+                        - id
+                        - locale
+                        - slug
+                        - version
+                        - title
+                        - state
+                        - createdAt
+                        - publishedAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+    post:
+      operationId: adminCreateHelpArticle
+      security:
+        - staffBearer: []
+      parameters: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  locale:
+                    type: string
+                    const: en-IN
+                  slug:
+                    type: string
+                  version:
+                    type: string
+                  title:
+                    type: string
+                  state:
+                    type: string
+                    const: draft
+                  createdAt:
+                    type: string
+                    format: date-time
+                required:
+                  - id
+                  - locale
+                  - slug
+                  - version
+                  - title
+                  - state
+                  - createdAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                locale:
+                  type: string
+                  const: en-IN
+                slug:
+                  type: string
+                  pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+                  maxLength: 80
+                version:
+                  type: string
+                  minLength: 1
+                  maxLength: 60
+                title:
+                  type: string
+                  minLength: 3
+                  maxLength: 120
+                body:
+                  type: string
+                  minLength: 30
+                  maxLength: 10000
+                reviewReference:
+                  type: string
+                  minLength: 5
+                  maxLength: 200
+              required:
+                - locale
+                - slug
+                - version
+                - title
+                - body
+                - reviewReference
+  /admin/v1/help/articles/{id}:
+    get:
+      operationId: adminHelpArticle
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  locale:
+                    type: string
+                    const: en-IN
+                  slug:
+                    type: string
+                  version:
+                    type: string
+                  title:
+                    type: string
+                  body:
+                    type: string
+                  state:
+                    type: string
+                    enum:
+                      - draft
+                      - published
+                      - retired
+                  createdAt:
+                    type: string
+                    format: date-time
+                  publishedAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  retiredAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  reviewReference:
+                    type: string
+                  createdByStaff:
+                    type: string
+                    format: uuid
+                required:
+                  - id
+                  - locale
+                  - slug
+                  - version
+                  - title
+                  - body
+                  - state
+                  - createdAt
+                  - publishedAt
+                  - retiredAt
+                  - reviewReference
+                  - createdByStaff
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/help/articles/{id}/publish:
+    post:
+      operationId: adminPublishHelpArticle
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                    const: published
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                reviewConfirmed:
+                  type: boolean
+                  const: true
+              required:
+                - reviewConfirmed
+  /admin/v1/help/articles/{id}/retire:
+    post:
+      operationId: adminRetireHelpArticle
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                    const: retired
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
 components:
   responses:
     Problem:
