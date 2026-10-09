@@ -72,3 +72,7 @@ Impression-bound pack interests/passes, sent/received likes, withdrawal, atomic 
 ## M08 text messaging delivered (8 October 2026)
 
 Encrypted text messages, deduplicated sends, bigint sequence history, private read markers, mute/archive and development WebSockets with single-use tickets are implemented. Migration 0020. MESSAGE_KEY is separate, opt-in and forbidden in production; KMS and attachments remain unavailable. Socket history polls PostgreSQL every two seconds; REST is authoritative. See docs/handovers/M08.md. Next: M09 notifications.
+
+## M09 notification foundation delivered (8 October 2026)
+
+Atomic match/message inbox events, private read markers, preferences and encrypted session-bound device registration are implemented. Migration 0021. Push jobs remain awaiting_provider; external push delivery/retry/dead-letter worker is still pending. Logout revokes registrations. See docs/handovers/M09.md. Next: M10 meetups.

@@ -1,3 +1,4 @@
+import { notifyConversation } from '../notifications/notifications.events.js';
 import { randomBytes,randomUUID } from 'node:crypto';
 import type { Pool,PoolClient } from 'pg';
 import type { z } from 'zod';
@@ -32,6 +33,7 @@ export class MessagesService {
   if(count>=30)throw new ApiError(429,'message-limit','Wait before sending more messages.');
   const seq=(await tx.query('UPDATE meetup.conversations SET last_seq=last_seq+1,last_message_at=now() WHERE id=$1 RETURNING last_seq',[id])).rows[0].last_seq;
   const messageId=randomUUID(),row=(await tx.query(`INSERT INTO meetup.messages(conversation_id,seq,message_id,sender_user_id,kind,body_encrypted,client_message_id) VALUES($1,$2,$3,$4,'text',$5,$6) RETURNING *`,[id,seq,messageId,userId,seal(key,Buffer.from(input.body),`${id}:${messageId}`),input.clientMessageId])).rows[0];
+  await notifyConversation(tx,id,messageId,'messages',userId);
   await tx.query('UPDATE meetup.conversation_members SET archived=false WHERE conversation_id=$1',[id]);return this.decode(row,key);
  });}
  history(userId:string,id:string,input:z.infer<typeof historyQuery>){return transaction(this.db,async tx=>{

@@ -142,6 +142,7 @@ export class AuthService {
   private async revokeFamily(tx: PoolClient, familyId: string, reason: string): Promise<void> {
     await tx.query(`UPDATE identity.sessions SET revoked_at=coalesce(revoked_at,now()), revoked_reason=$2
       WHERE family_id=$1`, [familyId, reason]);
+    await tx.query('DELETE FROM identity.devices WHERE family_id=$1',[familyId]);
   }
   async logout(principal: Principal): Promise<void> {
     await transaction(this.database, async (tx) => {
@@ -153,6 +154,7 @@ export class AuthService {
     await transaction(this.database, async (tx) => {
       await tx.query('SELECT id FROM identity.users WHERE id=$1 FOR UPDATE', [principal.userId]);
       await tx.query(`UPDATE identity.sessions SET revoked_at=coalesce(revoked_at,now()), revoked_reason='logout_all' WHERE user_id=$1`, [principal.userId]);
+      await tx.query('DELETE FROM identity.devices WHERE user_id=$1',[principal.userId]);
     });
   }
   async sessions(principal: Principal) {

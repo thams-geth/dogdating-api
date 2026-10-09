@@ -1,3 +1,4 @@
+import { notifyConversation } from '../notifications/notifications.events.js';
 import type { Pool, PoolClient } from 'pg';
 import type { z } from 'zod';
 import { transaction } from '../../db/transaction.js';
@@ -54,6 +55,7 @@ export class ConnectionsService {
    matchId=(await tx.query(`INSERT INTO meetup.matches(id,pair_key,dog_a_id,dog_b_id,mode) VALUES(gen_random_uuid(),$1,$2,$3,'pack') RETURNING id`,[pair.join(':'),...pair])).rows[0].id;
    const conversation=(await tx.query('INSERT INTO meetup.conversations(id,match_id) VALUES(gen_random_uuid(),$1) RETURNING id',[matchId])).rows[0].id;
    await tx.query(`INSERT INTO meetup.conversation_members(conversation_id,user_id) SELECT DISTINCT $1::uuid,m.user_id FROM identity.household_members m JOIN graph.dogs d ON d.household_id=m.household_id WHERE d.id=ANY($2::uuid[]) AND m.accepted_at IS NOT NULL AND m.role IN ('owner','co_guardian')`,[conversation,pair]);
+   await notifyConversation(tx,conversation,matchId,'connections');
   }
   const result={id:decision.id,verdict:decision.verdict,matchId};
   await saveReceipt(tx,userId,'decision',key,hash,result);return result;

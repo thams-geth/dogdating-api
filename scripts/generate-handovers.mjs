@@ -10,6 +10,7 @@ const sections = [...plan.matchAll(/^### (M\d+) — (.+)\n([\s\S]*?)(?=^### M|^#
 const ids = Object.keys(notes).sort();
 const operations = Object.fromEntries(ids.map(id => [id, []]));
 function moduleFor(path) {
+  if (/^\/v1\/(notifications|me\/devices|me\/notification-preferences)(?:\/|$)/.test(path)) return 'M09';
   if (/^\/v1\/(conversations|realtime)(?:\/|$)/.test(path)) return 'M08';
   if (/^\/v1\/(decisions|likes(?:\/|$)|matches(?:\/|$)|me\/entitlements)/.test(path)) return 'M07';
   if (['/v1/home','/v1/feed','/v1/feed/empty-reason'].includes(path) || /\/dogs\/\{id\}\/(profile|discovery-preferences)$/.test(path)) return 'M06';

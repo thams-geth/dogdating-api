@@ -2914,6 +2914,414 @@ paths:
           $ref: "#/components/responses/Problem"
         "503":
           $ref: "#/components/responses/Problem"
+  /v1/me/notification-preferences:
+    get:
+      operationId: notificationPreferences
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  messages:
+                    type: boolean
+                  connections:
+                    type: boolean
+                  meetups:
+                    type: boolean
+                  pushEnabled:
+                    type: boolean
+                  timezone:
+                    type: string
+                  quietStart:
+                    anyOf:
+                      - type: integer
+                        minimum: 0
+                        maximum: 1439
+                      - type: "null"
+                  quietEnd:
+                    anyOf:
+                      - type: integer
+                        minimum: 0
+                        maximum: 1439
+                      - type: "null"
+                  pushAvailable:
+                    const: false
+                required:
+                  - messages
+                  - connections
+                  - meetups
+                  - pushEnabled
+                  - timezone
+                  - quietStart
+                  - quietEnd
+                  - pushAvailable
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+    put:
+      operationId: saveNotificationPreferences
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  messages:
+                    type: boolean
+                  connections:
+                    type: boolean
+                  meetups:
+                    type: boolean
+                  pushEnabled:
+                    type: boolean
+                  timezone:
+                    type: string
+                  quietStart:
+                    anyOf:
+                      - type: integer
+                        minimum: 0
+                        maximum: 1439
+                      - type: "null"
+                  quietEnd:
+                    anyOf:
+                      - type: integer
+                        minimum: 0
+                        maximum: 1439
+                      - type: "null"
+                  pushAvailable:
+                    const: false
+                required:
+                  - messages
+                  - connections
+                  - meetups
+                  - pushEnabled
+                  - timezone
+                  - quietStart
+                  - quietEnd
+                  - pushAvailable
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                messages:
+                  type: boolean
+                connections:
+                  type: boolean
+                meetups:
+                  type: boolean
+                pushEnabled:
+                  type: boolean
+                timezone:
+                  type: string
+                quietStart:
+                  anyOf:
+                    - type: integer
+                      minimum: 0
+                      maximum: 1439
+                    - type: "null"
+                quietEnd:
+                  anyOf:
+                    - type: integer
+                      minimum: 0
+                      maximum: 1439
+                    - type: "null"
+              required:
+                - messages
+                - connections
+                - meetups
+                - pushEnabled
+                - timezone
+                - quietStart
+                - quietEnd
+  /v1/me/devices/{id}:
+    put:
+      operationId: registerDevice
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  installationId:
+                    type: string
+                    format: uuid
+                  registered:
+                    const: true
+                  pushAvailable:
+                    const: false
+                required:
+                  - installationId
+                  - registered
+                  - pushAvailable
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                platform:
+                  enum:
+                    - android
+                    - ios
+                    - web
+                provider:
+                  enum:
+                    - fcm
+                    - apns
+                    - webpush
+                token:
+                  type: string
+                  minLength: 16
+                  maxLength: 4096
+                locale:
+                  enum:
+                    - en-IN
+                    - hi-IN
+                appBuild:
+                  type: integer
+                  minimum: 1
+                  maximum: 2147483647
+              required:
+                - platform
+                - provider
+                - token
+                - locale
+                - appBuild
+    delete:
+      operationId: removeDevice
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Completed; no body
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/notifications:
+    get:
+      operationId: notificationInbox
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        category:
+                          enum:
+                            - messages
+                            - connections
+                            - meetups
+                        conversationId:
+                          type: string
+                          format: uuid
+                        matchId:
+                          type: string
+                          format: uuid
+                        createdAt:
+                          type: string
+                          format: date-time
+                        readAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                      required:
+                        - id
+                        - category
+                        - conversationId
+                        - matchId
+                        - createdAt
+                        - readAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/notifications/read:
+    post:
+      operationId: readNotifications
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        "204":
+          description: Completed; no body
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  minItems: 1
+                  maxItems: 100
+                  uniqueItems: true
+              required:
+                - ids
 components:
   responses:
     Problem:
