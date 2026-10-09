@@ -355,8 +355,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
     patch:
       operationId: updateMe
       description: Allowlisted name, locale and timezone edits. No verification, role
@@ -376,8 +396,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
   /v1/legal/documents/{kind}:
     get:
       operationId: legalDocument
@@ -433,8 +473,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Onboarding"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
   /v1/me/onboarding/preferences:
     put:
       operationId: saveOnboardingPreferences
@@ -454,8 +514,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Onboarding"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
   /v1/me/onboarding/complete:
     post:
       operationId: completeOnboarding
@@ -475,8 +555,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Onboarding"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
   /v1/me/consents:
     get:
       operationId: consents
@@ -489,8 +589,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConsentState"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
     post:
       operationId: acceptConsent
       description: Accept current published document once. Repeated acceptance does
@@ -510,8 +630,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConsentState"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
   /v1/me/consents/{purpose}:
     delete:
       operationId: withdrawConsent
@@ -530,9 +670,28 @@ paths:
               - community
               - location
               - marketing
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Success
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/me/active-dog:
@@ -555,8 +714,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Onboarding"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
   /v1/me/preferences:
     get:
       operationId: userPreferences
@@ -569,8 +748,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserPreferences"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
     patch:
       operationId: saveUserPreferences
       description: Enabling discovery requires current complete onboarding.
@@ -589,8 +788,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserPreferences"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
   /v1/households:
     post:
       operationId: createHousehold
@@ -611,8 +830,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Household"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
     get:
       operationId: listHouseholds
       security:
@@ -630,6 +869,23 @@ paths:
           schema:
             type: string
             maxLength: 400
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -637,6 +893,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Households"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/households/{id}:
@@ -651,6 +909,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -658,6 +933,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Household"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
     patch:
@@ -672,6 +949,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -685,6 +979,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Household"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/households/{id}/members:
@@ -699,6 +995,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -706,6 +1019,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Members"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/households/{id}/members/{userId}:
@@ -728,6 +1043,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -737,6 +1069,8 @@ paths:
       responses:
         "204":
           description: Success
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
     delete:
@@ -758,9 +1092,28 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Success
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/households/{id}/invitations:
@@ -777,6 +1130,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -790,6 +1160,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Invitation"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/household-invitations/{token}/accept:
@@ -807,6 +1179,23 @@ paths:
           schema:
             type: string
             pattern: ^[A-Za-z0-9_-]{43}$
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -820,6 +1209,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Household"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs:
@@ -842,8 +1233,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
     get:
       operationId: listDogs
       security:
@@ -861,6 +1272,23 @@ paths:
           schema:
             type: string
             maxLength: 400
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -868,6 +1296,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dogs"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}:
@@ -884,6 +1314,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -891,6 +1338,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
     patch:
@@ -906,6 +1355,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -919,6 +1385,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/breeds:
@@ -934,6 +1402,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -947,6 +1432,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/temperament:
@@ -963,6 +1450,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -976,6 +1480,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/preferences:
@@ -992,6 +1498,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -1005,6 +1528,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/availability:
@@ -1022,6 +1547,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -1035,6 +1577,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/publish:
@@ -1050,6 +1594,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -1063,6 +1624,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/pause:
@@ -1078,6 +1641,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -1091,6 +1671,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/memorialise:
@@ -1107,6 +1689,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -1120,6 +1719,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/beacon:
@@ -1136,6 +1737,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       requestBody:
         required: true
         content:
@@ -1149,6 +1767,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Beacon"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
     delete:
@@ -1163,9 +1783,28 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Success
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{dogId}/media/uploads:
@@ -1181,6 +1820,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Reserve a private photo upload; local bearer PUT expires after 15
@@ -1189,6 +1845,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PhotoUploadCreated"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1210,6 +1868,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: List household photo metadata; no storage keys or image URLs
@@ -1225,6 +1900,8 @@ paths:
                       $ref: "#/components/schemas/PhotoStatus"
                 required:
                   - media
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{dogId}/media/order:
@@ -1240,9 +1917,28 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Replace the complete live photo order
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1282,9 +1978,28 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Delete photo, invalidate publication and schedule physical cleanup
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/media/{id}/content:
@@ -1301,6 +2016,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20
@@ -1309,6 +2041,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PhotoStatus"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1335,6 +2069,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Idempotently complete an uploaded photo; moderation remains pending
@@ -1342,6 +2093,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PhotoStatus"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1366,6 +2119,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Read household-scoped photo processing status
@@ -1373,6 +2143,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PhotoStatus"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/verifications:
@@ -1382,7 +2154,24 @@ paths:
         no provider or badge is created
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Record verification intent; same active request is returned on
@@ -1391,6 +2180,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VerificationStatus"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1412,6 +2203,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Read requester-only status; dog membership is also required
@@ -1419,6 +2227,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VerificationStatus"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/verifications/{id}/withdraw:
@@ -1434,6 +2244,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Idempotently withdraw an open request
@@ -1441,6 +2268,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VerificationStatus"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1466,6 +2295,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Save a self-reported health record; no identity documents or
@@ -1474,6 +2320,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthRecord"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1506,6 +2354,23 @@ paths:
           schema:
             type: string
             maxLength: 400
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: List private household health records; expired evidence remains
@@ -1527,6 +2392,8 @@ paths:
                 required:
                   - records
                   - nextCursor
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{dogId}/health-records/{id}:
@@ -1549,10 +2416,29 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Idempotently remove a record; reviewed evidence removal revokes dog
             health tiers and resets publication
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/app/areas:
@@ -1622,6 +2508,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Read private city-level household selection
@@ -1629,6 +2532,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HouseholdLocation"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
     put:
@@ -1644,6 +2549,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Select a city with current location consent; changes limited to
@@ -1652,6 +2574,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HouseholdLocation"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
       requestBody:
@@ -1682,10 +2606,29 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Clear household location and reset dog publication; cooldown is
             retained
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/me/blocks:
@@ -1790,6 +2733,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -1797,6 +2757,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Home"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/feed:
@@ -1829,6 +2791,23 @@ paths:
           schema:
             type: string
             maxLength: 2048
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -1836,6 +2815,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscoveryFeed"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/feed/empty-reason:
@@ -1850,6 +2831,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -1882,6 +2880,8 @@ paths:
                   - reason
                   - missing
                   - scope
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/profile:
@@ -1909,6 +2909,23 @@ paths:
           schema:
             type: string
             maxLength: 2048
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -1916,6 +2933,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscoveryCard"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/dogs/{id}/discovery-preferences:
@@ -1931,6 +2950,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -1938,6 +2974,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscoveryPreferences"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         default:
           $ref: "#/components/responses/Problem"
   /v1/decisions:
@@ -1952,6 +2990,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -1989,6 +3044,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2047,6 +3104,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2110,6 +3184,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2139,6 +3215,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2202,6 +3295,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2218,6 +3313,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Completed; no body
@@ -2233,6 +3345,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2256,6 +3370,23 @@ paths:
           required: false
           schema:
             type: string
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2319,6 +3450,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2335,6 +3468,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2385,6 +3535,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2400,6 +3552,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Completed; no body
@@ -2415,6 +3584,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2424,7 +3595,24 @@ paths:
       operationId: getEntitlements
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2468,6 +3656,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2491,6 +3681,23 @@ paths:
           required: false
           schema:
             type: string
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2561,6 +3768,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2597,6 +3806,23 @@ paths:
             minimum: 1
             maximum: 50
             default: 30
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2662,6 +3888,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2677,6 +3905,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2727,6 +3972,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2764,6 +4011,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2790,6 +4054,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2819,6 +4085,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2850,6 +4133,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2876,7 +4161,24 @@ paths:
       operationId: realtimeTicket
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Success
@@ -2912,6 +4214,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2921,7 +4225,24 @@ paths:
       operationId: notificationPreferences
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -2976,6 +4297,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -2984,7 +4307,24 @@ paths:
       operationId: saveNotificationPreferences
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -3039,6 +4379,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3093,6 +4435,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -3125,6 +4484,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3176,6 +4537,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Completed; no body
@@ -3191,6 +4569,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3214,6 +4594,23 @@ paths:
           required: false
           schema:
             type: string
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -3277,6 +4674,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3286,7 +4685,24 @@ paths:
       operationId: readNotifications
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Completed; no body
@@ -3302,6 +4718,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3349,6 +4767,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -3425,6 +4860,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3441,6 +4878,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -3504,6 +4958,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3513,7 +4969,24 @@ paths:
       operationId: suggestPlace
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Success
@@ -3543,6 +5016,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3607,6 +5082,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Success
@@ -3680,6 +5172,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3742,6 +5236,23 @@ paths:
           required: false
           schema:
             type: string
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -3828,6 +5339,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -3844,6 +5357,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -3984,6 +5514,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -4000,6 +5532,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -4073,6 +5622,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -4140,6 +5691,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -4213,6 +5781,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -4248,6 +5818,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -4321,6 +5908,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -4350,6 +5939,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -4423,6 +6029,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -4452,6 +6060,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Success
@@ -4483,6 +6108,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -4563,6 +6190,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -4650,6 +6294,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -7000,7 +8646,24 @@ paths:
       operationId: joinWaitlist
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Success
@@ -7038,6 +8701,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -7059,7 +8724,24 @@ paths:
       operationId: ownWaitlist
       security:
         - bearerAuth: []
-      parameters: []
+      parameters:
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -7102,6 +8784,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -7118,6 +8802,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Completed; no body
@@ -7133,6 +8834,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -8014,6 +9717,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Success
@@ -8092,6 +9812,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -8135,6 +9857,23 @@ paths:
           required: false
           schema:
             type: string
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -8215,6 +9954,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -8231,6 +9972,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -8264,6 +10022,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -8296,6 +10056,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
           description: Completed; no body
@@ -8311,6 +10088,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -9023,6 +10802,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
           description: Success
@@ -9069,6 +10865,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -9111,6 +10909,23 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-App-Platform
+          in: header
+          required: false
+          description: Required when either platform minimum build exceeds 1.
+          schema:
+            type: string
+            enum:
+              - android
+              - ios
+        - name: X-App-Build
+          in: header
+          required: false
+          description: Positive integer app build; required with platform once a forced
+            update is active.
+          schema:
+            type: string
+            pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
           description: Success
@@ -9172,6 +10987,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "410":
           $ref: "#/components/responses/Problem"
+        "426":
+          $ref: "#/components/responses/UpgradeRequired"
         "429":
           $ref: "#/components/responses/Problem"
         "503":
@@ -10341,6 +12158,13 @@ components:
   responses:
     Problem:
       description: Structured API error; status/code/detail depend on the failure
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    UpgradeRequired:
+      description: A confirmed minimum app build is required. Fetch bootstrap for the
+        current store URL.
       content:
         application/problem+json:
           schema:

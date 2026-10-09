@@ -111,3 +111,7 @@ M11 now exposes reporter-only incident case list/detail under /v1/me/incident-re
 ## Reviewed help workflow (10 October 2026)
 
 M11 public en-IN help list/detail now reads published articles only. M12 legal_ops can create reviewed-reference drafts, publish a version (retiring prior public slug version), and retire it. Published content is immutable, all staff access audited, no content seeded. Migration 0035; OpenAPI 168 HTTP operations.
+
+## Conditional app update gate (10 October 2026)
+
+M01 now checks X-App-Platform/X-App-Build on product routes against live persisted release policy. Once staff raise either minimum above 1, both headers are required; old builds get 426 update-required. Bootstrap, help/legal, auth, reports/support, blocks, privacy/deletion, appeals and incident review status remain reachable. Both minimums still default to 1. Missing/invalid policy fails 503. No store rollout was performed.

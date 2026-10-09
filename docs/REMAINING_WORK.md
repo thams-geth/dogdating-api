@@ -21,7 +21,7 @@ No credentials, provider selection, legal approval or operational response is in
 
 | Module | Remaining scope |
 | --- | --- |
-| M01 | Country administration and enforced API update policy; waitlist outbound delivery. Audited release edits and legal-version hints are implemented |
+| M01 | Country administration and waitlist outbound delivery. Audited release edits, legal-version hints and conditional API update enforcement are implemented |
 | M02 | Production SMS/DLT, distributed abuse controls and broader security audit/monitoring; optional OAuth/passkeys/recovery factors |
 | M04 | GPS/displaced anchors and twelve-question scoring; structured temperament, city-only location and two-party dog transfers already work |
 | M05 | Production uploads/delivery, scan/moderation, document uploads, signed replay-safe provider webhooks, reviewer evidence/grants and account activation; expired grants are now swept |

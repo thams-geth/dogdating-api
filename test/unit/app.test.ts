@@ -52,3 +52,11 @@ test('readiness fails closed when database/schema is unavailable; liveness remai
 test('invalid release policy fails before serving traffic', () => {
   assert.throws(() => createApp({ policy: { ...defaultPolicy, ios: { minimumBuild: 10, latestBuild: 2, storeUrl: null } } }));
 });
+
+test('update gate enforces confirmed minimum builds while leaving recovery routes reachable',async()=>{
+ const missing=await request(app).get('/v1/dogs').expect(400);assert.equal(missing.body.code,'app-build-required');
+ const old=await request(app).get('/v1/dogs').set('X-App-Platform','android').set('X-App-Build','11').expect(426);assert.equal(old.body.code,'update-required');
+ const current=await request(app).get('/v1/dogs').set('X-App-Platform','android').set('X-App-Build','12');assert.notEqual(current.status,426);
+ await request(app).get('/v1/app/bootstrap?platform=android&buildNumber=11').expect(200);
+ const safety=await request(app).get('/v1/reports/77777777-7777-4777-8777-777777777777').expect(503);assert.notEqual(safety.body.code,'update-required');
+});

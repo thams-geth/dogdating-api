@@ -7,7 +7,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | Baseline | Complete | Express/TypeScript, PostgreSQL migrations; d0b4746 |
 | Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
 | M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
-| M01 rollout/content extensions | Waitlist and release/legal operations implemented | Private waitlist; staff release policy and legal publishing; enforced update gates remain pending |
+| M01 rollout/content extensions | Waitlist and release/legal operations implemented | Private waitlist; staff release policy and legal publishing; conditional product update gate implemented |
 | M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me; 23e75eb |
 | M02 phone changes / production | Phone changes implemented; integrations pending | Recent-auth destination proof and revocation; SMS/DLT, distributed limits and optional recovery remain pending |
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
@@ -29,7 +29,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 116 PostgreSQL integration tests at the latest full run.
+- Typecheck/build passed; 9 unit/HTTP tests and 116 PostgreSQL integration tests at the latest full run.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
 - Migrations through 0034. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
@@ -147,3 +147,7 @@ Migration 0034 keeps one latest maintenance status record. The operations-only j
 ### M11/M12 reviewed help publishing (10 October 2026)
 
 Migration 0035 adds immutable, versioned en-IN help articles. Legal operations staff can create drafts with a review reference, publish after explicit confirmation, read audited details and retire articles. Publishing a new version atomically retires the old public version for its slug. Public list/detail return published content only. No guidance text or external deletion page is seeded; actual editorial review remains required before publication.
+
+### M01 conditional app build gate (10 October 2026)
+
+Product routes now use `X-App-Platform` and `X-App-Build` against the persisted release policy when staff raise either minimum above 1. Obsolete builds receive 426 `update-required`; missing/malformed headers receive 400 once enforcement is active. Bootstrap, public help/legal, auth and safety/privacy/recovery routes remain available. With both minimums at 1, existing development requests without headers still work. A missing/invalid policy fails closed. Staff store-availability confirmation is an attestation, not automated verification or deployment.

@@ -219,3 +219,5 @@ Operations staff can inspect the latest maintenance pass through `GET /admin/v1/
 Guardians can track their own private meetup incident reviews through `/v1/me/incident-reviews`, including with a restricted safety token after a block or suspension.
 
 Reviewed support guidance can be drafted and published by provisioned legal operations staff, then read from `/v1/help/articles`. No article text is seeded.
+
+When staff raise a confirmed minimum app build above 1, product calls require `X-App-Platform` and `X-App-Build`; obsolete builds receive `426 update-required`. Bootstrap and safety/account recovery routes stay reachable.

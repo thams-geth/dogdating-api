@@ -255,3 +255,5 @@ notes.M12.examples.push({title:'Publish reviewed help draft',request:'POST /admi
 
 notes.M11.sources.push('help');
 notes.M12.sources.push('help');
+
+notes.M01.guidance.push('Product routes now check X-App-Platform (android or ios) and X-App-Build against the current persisted release policy. While both minimum builds are 1, absent headers remain accepted for existing development clients. Once staff confirm a store URL and raise either minimum above 1, both headers are required on product routes; malformed/missing headers return 400 invalid-app-build/app-build-required, and an obsolete build returns 426 update-required. On 426, call bootstrap with the same platform/build to show the store URL and stop product requests. Bootstrap, public help/legal, auth, reports/support, account safety/privacy and deletion routes remain reachable. The gate reads current policy for each product request; invalid/missing policy returns 503 release-policy-unavailable. This does not itself publish an app or verify store availability.');

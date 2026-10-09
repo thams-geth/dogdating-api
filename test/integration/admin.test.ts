@@ -45,6 +45,9 @@ test('release changes require role, trusted store URL and optimistic version, an
  await http.patch('/admin/v1/app-releases').set('Authorization','Bearer support').send({expectedVersion:1,policy,storeAvailabilityConfirmed:true}).expect(403);
  await http.patch('/admin/v1/app-releases').set('Authorization','Bearer one').send({expectedVersion:1,policy:{...policy,android:{...policy.android,storeUrl:'https://not-a-store.invalid/app'}},storeAvailabilityConfirmed:true}).expect(400);
  const changes=await Promise.all([1,2].map(()=>http.patch('/admin/v1/app-releases').set('Authorization','Bearer one').send({expectedVersion:1,policy,storeAvailabilityConfirmed:true})));assert.deepEqual(changes.map(r=>r.status).sort(),[200,409]);
+ const obsolete=await http.get('/v1/dogs').set('X-App-Platform','android').set('X-App-Build','1').expect(426);assert.equal(obsolete.body.code,'update-required');
+ const current=await http.get('/v1/dogs').set('X-App-Platform','android').set('X-App-Build','2');assert.notEqual(current.status,426);
+ await http.get('/v1/reports/77777777-7777-4777-8777-777777777777').expect(401);
  const bootstrap=(await http.get('/v1/app/bootstrap?platform=android&buildNumber=1').expect(200)).body;assert.equal(bootstrap.update.action,'required');assert.equal(bootstrap.policyRevision,'fixture-release');assert.equal(bootstrap.features.pack,false);
 });
 test('legal drafts are private until explicit publication; published text stays immutable',async()=>{
