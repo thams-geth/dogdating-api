@@ -6,7 +6,7 @@ import { ApiError } from '../../middleware/error.js';
 import { transaction } from '../../db/transaction.js';
 import { AuthRepository, lockScope, type SessionRow, type UserRow } from './auth.repository.js';
 import { uuidSchema, type verifyOtpSchema, type profileSchema } from './auth.schemas.js';
-import type { OtpSender } from './otp-sender.js';
+import { DevelopmentOtpSender, type OtpSender } from './otp-sender.js';
 
 export interface Principal { userId: string; sessionId: string; familyId: string }
 export interface TokenPair { accessToken: string; refreshToken: string; expiresIn: number; userId: string }
@@ -39,7 +39,8 @@ export class AuthService {
 
   async requestOtp(phone: string, countryCode: string, purpose:'auth'|'privacy'|'phone_change'='auth',requestedBy?:string): Promise<void> {
     const index = this.hash('phone', phone);
-    const code = String(randomInt(0, 1_000_000)).padStart(6, '0');
+    const code = (this.sender instanceof DevelopmentOtpSender ? this.sender.fixedCodeFor(phone, purpose) : undefined)
+      ?? String(randomInt(0, 1_000_000)).padStart(6, '0');
     const id = await transaction(this.database, async (tx) => {
       await lockScope(tx, `phone:${index}`);
       const recent = await tx.query<{ count: number; too_soon: boolean }>(`SELECT count(*)::int AS count,

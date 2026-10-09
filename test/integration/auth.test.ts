@@ -5,6 +5,7 @@ import pg from 'pg';
 import request from 'supertest';
 import { createApp } from '../../src/app.js';
 import { AuthService } from '../../src/modules/auth/auth.service.js';
+import { DevelopmentOtpSender, LOCAL_TEST_PHONE_E164, LOCAL_TEST_OTP_CODE } from '../../src/modules/auth/otp-sender.js';
 import { migrate } from '../../src/db/migrate.js';
 
 const connectionString = process.env.TEST_DATABASE_URL;
@@ -48,6 +49,22 @@ test('signup returns usable credentials and only a safe private profile projecti
   assert.equal(response.body.phoneE164Masked.startsWith('******'), true);
   assert.equal('phone_e164' in response.body, false);
   assert.equal('phone_blind_index' in response.body, false);
+});
+
+test('fixed development sign-in code still requires an issued, single-use challenge', async () => {
+  class QuietDevelopmentSender extends DevelopmentOtpSender { override async send() {} }
+  const localAuth = new AuthService(database, randomBytes(48).toString('hex'), new QuietDevelopmentSender('development'));
+  const http = request(createApp({ database, auth: localAuth }));
+  const body = { phoneE164: LOCAL_TEST_PHONE_E164, code: LOCAL_TEST_OTP_CODE, deviceId: randomUUID(), displayName: 'Local Test Guardian' };
+  await http.post('/v1/auth/otp/verify').send(body).expect(401);
+  await http.post('/v1/auth/otp/request').send({ phoneE164: LOCAL_TEST_PHONE_E164, countryCode: 'IN' }).expect(202);
+  await http.post('/v1/auth/otp/verify').send({ ...body, code: '111111' }).expect(401);
+  const response = await http.post('/v1/auth/otp/verify').send(body).expect(200);
+  assert.ok(response.body.accessToken);
+  await http.post('/v1/auth/otp/verify').send(body).expect(401);
+  const row = (await database.query('SELECT attempt_count,consumed_at FROM identity.otp_challenges WHERE phone_blind_index=$1 ORDER BY created_at DESC LIMIT 1', [localAuth.phoneIndex(LOCAL_TEST_PHONE_E164)])).rows[0];
+  assert.equal(row.attempt_count, 1);
+  assert.ok(row.consumed_at);
 });
 
 test('failed guesses remain committed; correct code cannot bypass five-attempt lockout', async () => {

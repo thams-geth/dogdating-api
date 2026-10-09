@@ -8,7 +8,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
 | M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
 | M01 rollout/content extensions | Waitlist and release/legal operations implemented | Private waitlist; staff release policy and legal publishing; conditional product update gate implemented |
-| M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me; 23e75eb |
+| M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me and one fixed local-only sign-in fixture; production SMS remains unavailable |
 | M02 phone changes / production | Phone changes implemented; integrations pending | Recent-auth destination proof and revocation; SMS/DLT, distributed limits and optional recovery remain pending |
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
 | M04 household/dog profile core | Complete | Ownership, roles/invites, drafts, breed mix, structured temperament, preferences/schedule, gated publishing, pause, memorialisation, beacons |
@@ -29,7 +29,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 
 ## Latest local verification
 
-- Typecheck/build passed; 9 unit/HTTP tests and 122 PostgreSQL integration tests at the latest full run.
+- Typecheck/build passed; 10 unit/HTTP tests and 123 PostgreSQL integration tests at the latest full run.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
 - Migrations through 0036. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
@@ -41,6 +41,8 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 No reviewed legal text is seeded; public policy reads return 404 until published documents exist. Test policy/media/verification records are labeled fixtures confined to the test database. Onboarding can persist drafts but cannot finish in an ordinary local account until required media, consent, location and verification records exist. Self-declared adulthood never grants a verified badge.
 
 OTP and invitations do not send real SMS. OTP needs explicit local terminal mode; household invitation tokens are shared manually. IP rate limits are per process; phone OTP limits are database-backed. Exact household location and secrets are absent from new household/dog responses.
+
+Current development sign-in fixture: request OTP for +919000000001, then verify with 000000. Only the development sender issues this code, and only for ordinary sign-in. It does not bypass challenge creation, expiry, one-use or attempt limits. Other phones and privacy/phone-change purposes use random codes. Production cannot use the development sender. Photo and real SMS integrations are deferred for development at the user's request; both remain public-launch dependencies.
 
 M04 is the household/profile core, not every endpoint in the full plan. Current temperament input is versioned dimensions; twelve-question scoring is not delivered. Profile changes reset publication, and identity/breed changes invalidate dog verification evidence. Future discovery must check current consent, pauses, membership, blocks and verification; `publication_state='published'` alone is insufficient.
 

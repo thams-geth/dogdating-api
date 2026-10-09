@@ -13,4 +13,4 @@ for (const [key, value] of Object.entries(values)) {
   contents = pattern.test(contents) ? contents.replace(pattern, `${key}=${value}`) : `${contents}\n${key}=${value}\n`;
 }
 await writeFile('.env', contents, { mode: 0o600 });
-console.log('Local OTP delivery enabled in .env. Codes appear only in the development terminal; use synthetic test numbers.');
+console.log('Local OTP enabled. For sign-in, request +919000000001 and use 000000; other local codes appear in the development terminal. No SMS is sent.');

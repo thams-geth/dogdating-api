@@ -17,6 +17,8 @@ Updated 10 October 2026. The checked-in backend has 169 documented HTTP operatio
 
 No credentials, provider selection, legal approval or operational response is inferred from a request to implement backend features.
 
+For the current development phase, photo integration and real SMS delivery are deferred at the user's request. Local sign-in can use the single test phone `+919000000001` with code `000000` after requesting a challenge. The shortcut is unavailable in production, and neither deferred integration is considered complete for public launch.
+
 ## Remaining backend work
 
 | Module | Remaining scope |
@@ -38,10 +40,11 @@ No credentials, provider selection, legal approval or operational response is in
 
 ## Suggested next implementation sequence
 
-1. Choose SMS, storage/KMS, moderation and verification providers; implement their authenticated adapters and callbacks with provider test environments.
-2. Complete broader export/erasure processing against the reviewed retention policy and shared-household rules; requests must never be marked completed while data remains unprocessed.
-3. Wire the push provider and schedule the existing maintenance/media/export/push workers. Incident-review tooling is implemented, but requires real staffing.
-4. Finish legal/release administration, rollout checks and production verification.
-5. Implement approved growth/expansion modes only after their product and provider contracts are decided.
+1. Continue independent backend work using disposable fixtures while photo and real SMS integration are deferred. Do not bypass onboarding's approved-photo or verified-guardian requirements for public discovery.
+2. Before public launch, choose SMS, storage/KMS, moderation and verification providers; implement their authenticated adapters and callbacks with provider test environments.
+3. Complete broader export/erasure processing against the reviewed retention policy and shared-household rules; requests must never be marked completed while data remains unprocessed.
+4. Wire the push provider and schedule the existing maintenance/media/export/push workers. Incident-review tooling is implemented, but requires real staffing.
+5. Finish legal/release administration, rollout checks and production verification.
+6. Implement approved growth/expansion modes only after their product and provider contracts are decided.
 
 No provider integration, public rollout, remote push or deployment was performed in the implementation session.

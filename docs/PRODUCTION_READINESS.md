@@ -6,6 +6,8 @@ Updated 10 October 2026. The backend has working development APIs, but no public
 
 Synthetic guardians, dogs, photos, verification events, legal text, store receipts and push responses may be used only in disposable integration tests or an explicitly isolated demo environment. They must be labeled as fixtures. The production server does not seed them or interpret them as evidence. A successful dummy flow proves our API state transitions, not a provider's identity check, image review, SMS delivery, purchase, or legal approval.
 
+The local sign-in shortcut `+919000000001` / `000000` is available only through the development OTP sender after a fresh request. It never sends SMS or proves ownership of that phone number. Production startup rejects that sender; keep this test pair out of released clients and production account data. Photo integration and real SMS delivery are deferred for development at the user's request, but both remain public-launch blockers.
+
 ## Integration order
 
 | Boundary | Safe backend work now | Production input still required |

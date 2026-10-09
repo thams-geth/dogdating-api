@@ -29,7 +29,7 @@ npm run migrate
 npm run dev
 ```
 
-`setup:dev` creates/updates the ignored `.env`, generates a local authentication secret if absent and explicitly enables development OTP delivery. Use synthetic phone numbers: OTPs are printed to the local server terminal, and **no SMS is sent**. Authentication is disabled by default without this opt-in. The development sender cannot run in production. A production SMS adapter and DLT registration are still required.
+`setup:dev` creates/updates the ignored `.env`, generates a local authentication secret if absent and explicitly enables development OTP delivery. For local sign-in, request OTP for `+919000000001` and enter `000000`; the normal request, expiry, attempt and single-use rules still apply. Other numbers and privacy/phone-change purposes receive random codes printed to the local server terminal. **No SMS is sent, and this fixed test pair proves no phone ownership.** Authentication is disabled by default without the opt-in. The development sender cannot run in production. A production SMS adapter and DLT registration are still required.
 
 If port 3000 is already occupied, stop your previous Waggle process or set `PORT` in `.env`. Redis is available in Compose on 6380 but is not yet used by these modules.
 

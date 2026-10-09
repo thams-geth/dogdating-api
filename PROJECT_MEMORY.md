@@ -8,6 +8,7 @@ Updated 10 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WOR
 - Continue modules automatically; commit each completed module with a meaningful message.
 - Maintain the API plan, implementation ledger, this memory and per-module mobile/web handovers with methods, statuses, errors, request/response contracts, examples, Mermaid flows and wireframes.
 - No remote push/deployment requested. Do not fabricate provider success, verified evidence, legal content or completion of privacy processing.
+- For the present development phase, skip photo integration and real SMS. Use one local-only sign-in fixture number/code, then continue independent modules. Photo/SMS remain production launch blockers.
 - Pack/playdates remains the provisional shared-platform scope. Breeding, owner dating and live safety have no explicit product approval.
 
 ## Source of truth
@@ -25,6 +26,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 - Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
 - Migrations through 0036; applied SQL is immutable. Forward migrations only.
 - .env is ignored. setup:dev generates the local auth secret and enables terminal-only OTP for synthetic numbers. No real SMS.
+- With NODE_ENV=development and OTP_MODE=development, sign-in on +919000000001 uses fixed code 000000 only after a fresh request. Other numbers and privacy/phone-change codes remain random. Production cannot instantiate the development sender.
 - An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
 
 ## Delivered development modules

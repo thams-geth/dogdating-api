@@ -273,7 +273,9 @@ paths:
     post:
       operationId: requestOtp
       description: Generic acceptance; per-phone cooldown/limit suppression and
-        provider failure have the same response. Development sender only.
+        provider failure have the same response. Development sender only. A
+        local-only sign-in fixture uses +919000000001 with code 000000 after a
+        fresh request; all normal expiry and attempt rules still apply.
       requestBody:
         required: true
         content:
