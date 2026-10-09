@@ -5,7 +5,7 @@ const issuer='https://staff.test.invalid',identities=new Map<string,StaffIdentit
 const f=fixture(undefined,undefined,cipher,{async verify(token){const identity=identities.get(token);if(!identity)throw new Error('untrusted');return identity;}}),http=request(f.app);
 let one:string,two:string;
 beforeEach(async()=>{await f.setup();await f.database.query('TRUNCATE ops.staff_accounts CASCADE');identities.clear();for(const subject of ['one','two','support'])identities.set(subject,{issuer,subject,mfa:true,authenticatedAt:Date.now()/1000});
- one=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'one',['moderator','appeals','support','city_ops','operations','release_ops','legal_ops']])).rows[0].id;
+ one=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'one',['moderator','appeals','support','city_ops','operations','release_ops','legal_ops','reviewer']])).rows[0].id;
  two=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'two',['moderator','appeals']])).rows[0].id;
  await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3)',[issuer,'support',['support']]);await f.database.query('INSERT INTO ops.app_release_policy(singleton,policy) VALUES(true,$1)',[defaultPolicy]);});after(()=>f.close());
 test('staff identity requires MFA, recent authentication, live provisioning and database role',async()=>{
@@ -65,4 +65,22 @@ test('operations can inspect and retry dead-letter pushes without gaining privat
  const jobs=(await http.get('/admin/v1/notifications/jobs').set('Authorization','Bearer one').expect(200)).body;assert.equal(jobs.items[0].id,notification);assert.equal(jobs.items[0].lastError,'retries_exhausted');assert.ok(!('userId' in jobs.items[0]));
  await http.post(`/admin/v1/notifications/jobs/${notification}/retry`).set('Authorization','Bearer one').send({}).expect(200);
  await http.post(`/admin/v1/notifications/jobs/${notification}/retry`).set('Authorization','Bearer one').send({}).expect(409);
+});
+
+test('meetup safety incidents queue privately, require exclusive reviewer claim and audit decisions',async()=>{
+ const user=await f.user(),reviewId=randomUUID(),caseNote='PRIVATE INCIDENT TEST',dog=await f.dog(await f.household(user.userId));
+ const other=await f.dog(await f.household((await f.user()).userId));
+ const dogs=[dog,other].sort(),match=randomUUID(),meetup=randomUUID(),metro='01920000-0000-7000-8000-0000000e0001',place=randomUUID();
+ await f.database.query("INSERT INTO meetup.matches(id,pair_key,dog_a_id,dog_b_id,mode) VALUES($1,$2,$3,$4,'pack')",[match,dogs.join(':'),...dogs]);
+ await f.database.query("INSERT INTO meetup.places(id,name,kind,latitude,longitude,address,metro_id,state,verified_at) VALUES($1,'TEST PARK','offleash_park',12.9,77.5,'TEST ADDRESS',$2,'approved',now())",[place,metro]);
+ await f.database.query("INSERT INTO meetup.meetups(id,match_id,place_id,kind,window_start,window_end,proposed_by) VALUES($1,$2,$3,'parallel_walk',now()-interval '2 hours',now()-interval '1 hour',$4)",[meetup,match,place,user.userId]);
+ await f.database.query("INSERT INTO meetup.meetup_reviews(id,meetup_id,reviewer_user_id,subject_dog_id,showed_up,would_repeat,incident_occurred,incident_type,private_note_encrypted) VALUES($1,$2,$3,$4,true,false,true,'other',$5)",[reviewId,meetup,user.userId,other,cipher.wrap(Buffer.from(caseNote),`review:${reviewId}`)]);
+ const list=(await http.get('/admin/v1/meetup-incidents').set('Authorization','Bearer one').expect(200)).body;const id=list.items[0].id;assert.ok(!JSON.stringify(list).includes(caseNote));
+ await http.get(`/admin/v1/meetup-incidents/${id}`).set('Authorization','Bearer one').expect(404);
+ await http.get('/admin/v1/meetup-incidents').set('Authorization','Bearer support').expect(403);
+ await http.post(`/admin/v1/meetup-incidents/${id}/claim`).set('Authorization','Bearer one').send({}).expect(200);
+ assert.equal((await http.get(`/admin/v1/meetup-incidents/${id}`).set('Authorization','Bearer one').expect(200)).body.privateNote,caseNote);
+ await http.post(`/admin/v1/meetup-incidents/${id}/decide`).set('Authorization','Bearer one').send({decision:'escalated',reasonCode:'needs_review'}).expect(200);
+ await http.post(`/admin/v1/meetup-incidents/${id}/decide`).set('Authorization','Bearer one').send({decision:'dismissed',reasonCode:'reviewed'}).expect(409);
+ assert.ok(!JSON.stringify((await f.database.query('SELECT action,before,after FROM ops.audit_log WHERE subject_id=$1',[id])).rows).includes(caseNote));
 });

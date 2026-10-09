@@ -19,6 +19,33 @@ export class AdminService {
   const row=(await tx.query('SELECT state FROM safety.reports WHERE id=$1 AND assigned_staff_id=$2 FOR UPDATE',[id,staff.id])).rows[0];if(!row)throw new ApiError(404,'not-found','Assigned case is unavailable.');if(row.state!=='in_review')throw new ApiError(409,'case-final','Case is not in review.');
   await tx.query("UPDATE safety.reports SET state=$2::safety.report_state,resolved_at=CASE WHEN $2='dismissed' THEN now() ELSE NULL END,evidence=jsonb_build_object('decisionReason',$3::text) WHERE id=$1",[id,decision,reason]);await this.audit(tx,staff,`report.${decision}`,'report',id);return {id,state:decision};
  });}
+ incidents(staff:StaffPrincipal,limit:number,cursor?:string){return transaction(this.db,async tx=>{
+  const scope='admin:meetup-incidents',after=decodeCursor(cursor,scope);
+  await this.audit(tx,staff,'meetup_incidents.list','meetup_incident');
+  return page((await tx.query(`SELECT c.id,c.state,c.assigned_staff_id AS "assignedStaffId",r.incident_occurred AS "incidentOccurred",r.incident_type AS "incidentType",c.created_at AS "createdAt" FROM safety.meetup_incident_cases c JOIN meetup.meetup_reviews r ON r.id=c.review_id WHERE ($1::uuid IS NULL OR c.id>$1) ORDER BY c.id LIMIT $2`,[after,limit+1])).rows,limit,scope);
+ });}
+ claimIncident(staff:StaffPrincipal,id:string){return transaction(this.db,async tx=>{
+  const row=(await tx.query('SELECT state,assigned_staff_id FROM safety.meetup_incident_cases WHERE id=$1 FOR UPDATE',[id])).rows[0];
+  if(!row)throw new ApiError(404,'not-found','Incident case is unavailable.');
+  if(!['queued','in_review'].includes(row.state)||(row.assigned_staff_id&&row.assigned_staff_id!==staff.id))throw new ApiError(409,'case-unavailable','Incident case is closed or claimed by another reviewer.');
+  await tx.query("UPDATE safety.meetup_incident_cases SET state='in_review',assigned_staff_id=$2,first_action_at=coalesce(first_action_at,now()) WHERE id=$1",[id,staff.id]);
+  await this.audit(tx,staff,'meetup_incident.claim','meetup_incident',id);return {id,state:'in_review'};
+ });}
+ incident(staff:StaffPrincipal,id:string){return transaction(this.db,async tx=>{
+  const row=(await tx.query(`SELECT c.id,c.state,c.review_id,r.meetup_id,r.reviewer_user_id,r.incident_occurred,r.incident_type,r.private_note_encrypted
+   FROM safety.meetup_incident_cases c JOIN meetup.meetup_reviews r ON r.id=c.review_id WHERE c.id=$1 AND c.assigned_staff_id=$2`,[id,staff.id])).rows[0];
+  if(!row)throw new ApiError(404,'not-found','Claim the incident before viewing private details.');
+  const privateNote=row.private_note_encrypted?this.cipherRequired().unwrap(row.private_note_encrypted,`review:${row.review_id}`).toString('utf8'):null;
+  await this.audit(tx,staff,'meetup_incident.read','meetup_incident',id);
+  return {id,state:row.state,reviewId:row.review_id,meetupId:row.meetup_id,reporterUserId:row.reviewer_user_id,incidentOccurred:row.incident_occurred,incidentType:row.incident_type,privateNote};
+ });}
+ decideIncident(staff:StaffPrincipal,id:string,decision:'dismissed'|'escalated',reasonCode:string){return transaction(this.db,async tx=>{
+  const row=(await tx.query('SELECT state FROM safety.meetup_incident_cases WHERE id=$1 AND assigned_staff_id=$2 FOR UPDATE',[id,staff.id])).rows[0];
+  if(!row)throw new ApiError(404,'not-found','Assigned incident is unavailable.');
+  if(row.state!=='in_review')throw new ApiError(409,'case-final','Incident case is already decided.');
+  await tx.query('UPDATE safety.meetup_incident_cases SET state=$2,reason_code=$3,decided_at=now() WHERE id=$1',[id,decision,reasonCode]);
+  await this.audit(tx,staff,`meetup_incident.${decision}`,'meetup_incident',id);return {id,state:decision};
+ });}
  user(staff:StaffPrincipal,id:string){return transaction(this.db,async tx=>{const row=(await tx.query('SELECT id,status,country_code AS "countryCode",deletion_requested_at AS "deletionRequestedAt",created_at AS "createdAt" FROM identity.users WHERE id=$1',[id])).rows[0];if(!row)throw new ApiError(404,'not-found','User is unavailable.');await this.audit(tx,staff,'user.read','user',id);return row;});}
  userAction(staff:StaffPrincipal,id:string,input:{action:'suspend'|'reinstate';reasonCode:string;policyRef:string}){return transaction(this.db,async tx=>{
   await socialLock(tx);const user=(await tx.query('SELECT status,deletion_requested_at FROM identity.users WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!user)throw new ApiError(404,'not-found','User is unavailable.');if(user.deletion_requested_at||user.status==='deleted')throw new ApiError(409,'privacy-request-active','Account is in privacy processing.');

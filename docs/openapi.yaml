@@ -9094,6 +9094,291 @@ paths:
               required:
                 - revision
                 - accept
+  /admin/v1/meetup-incidents:
+    get:
+      operationId: adminMeetupIncidents
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        state:
+                          type: string
+                          enum:
+                            - queued
+                            - in_review
+                            - dismissed
+                            - escalated
+                        assignedStaffId:
+                          anyOf:
+                            - type: string
+                              format: uuid
+                            - type: "null"
+                        incidentOccurred:
+                          type: boolean
+                        incidentType:
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - state
+                        - assignedStaffId
+                        - incidentOccurred
+                        - incidentType
+                        - createdAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/meetup-incidents/{id}:
+    get:
+      operationId: adminMeetupIncident
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                    enum:
+                      - queued
+                      - in_review
+                      - dismissed
+                      - escalated
+                  reviewId:
+                    type: string
+                    format: uuid
+                  meetupId:
+                    type: string
+                    format: uuid
+                  reporterUserId:
+                    type: string
+                    format: uuid
+                  incidentOccurred:
+                    type: boolean
+                  incidentType:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  privateNote:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - id
+                  - state
+                  - reviewId
+                  - meetupId
+                  - reporterUserId
+                  - incidentOccurred
+                  - incidentType
+                  - privateNote
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/meetup-incidents/{id}/claim:
+    post:
+      operationId: adminClaimMeetupIncident
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                    const: in_review
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
+  /admin/v1/meetup-incidents/{id}/decide:
+    post:
+      operationId: adminDecideMeetupIncident
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                    enum:
+                      - dismissed
+                      - escalated
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                decision:
+                  type: string
+                  enum:
+                    - dismissed
+                    - escalated
+                reasonCode:
+                  type: string
+                  pattern: ^[a-z0-9_-]{3,60}$
+              required:
+                - decision
+                - reasonCode
 components:
   responses:
     Problem:

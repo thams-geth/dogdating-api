@@ -83,3 +83,7 @@ Provider-neutral push relay now has durable leases, per-installation receipts, t
 ## Meetup extensions and reminders (9 October 2026)
 
 M10 adds two-party extension requests with revision and duration caps and a reminder/expiry pass. Migration 0031. Only recorded participants receive meetup events. Worker must be externally scheduled; it writes generic inbox reminders once, not proof of attendance or emergency response. No real scheduler was installed.
+
+## Meetup incident reviewer queue (9 October 2026)
+
+M12 reviewer role now has audited, exclusive claim/read/dismiss/escalate APIs for private meetup review incidents. Migrations 0032–0033 create new cases and backfill previous incident/private-note reviews. Decisions do not automatically suspend users or claim operational response. Readiness requires migration 0033.

@@ -119,3 +119,7 @@ Provider-neutral push relay now has durable leases, per-installation receipts, t
 ### M10 extension and reminder update (9 October 2026)
 
 Migration 0031 adds consented two-party extension requests and durable reminder receipts. POST /v1/meetups/{id}/extend and /extensions/{extensionId}/respond use current revisions; requests expire and cannot exceed four total hours or ten requests per meetup. The meetup detail includes pendingExtension. Only recorded participants receive meetup notifications. The optional `npm run meetups:reminders` pass expires unaccepted proposals and creates one generic inbox reminder for accepted meetups near start; external scheduling is not installed. Meetups whose windows ended no longer occupy the three-future-meetup limit. Reviewer response workflow, groups/video and operational safety response remain pending.
+
+### M12 meetup incident reviewer queue (9 October 2026)
+
+Migrations 0032–0033 create private case entries for incident reviews and backfill prior eligible records. Provisioned reviewer staff can list metadata, exclusively claim, read the assigned encrypted note and dismiss/escalate with a reason code. Every read/action is audited without copying private notes. This does not automatically enforce an account action or provide emergency response; real reviewer staffing remains a launch dependency.

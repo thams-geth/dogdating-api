@@ -216,3 +216,12 @@ notes.M10.guidance.push(
 notes.M10.steps.push('Request or respond to extension','Receive scheduled inbox reminder');
 notes.M10.screen.push('[ Extend 15 | 30 | 60 minutes ]','Pending extension [ Accept | Decline ]');
 notes.M10.examples.push({title:'Request a two-party extension',request:'POST /v1/meetups/77777777-7777-4777-8777-777777777777/extend',status:201,body:{revision:2,additionalMinutes:30}});
+
+notes.M12.guidance.push(
+ 'reviewer can GET /admin/v1/meetup-incidents for metadata, POST /{id}/claim with {}, GET /{id} for the assigned private incident note, then POST /{id}/decide with dismissed/escalated and reasonCode. A competing reviewer gets 409 case-unavailable; unassigned detail returns 404. Decisions are terminal. Reads and actions are audited without copying the note. This queue does not automatically suspend an account or promise emergency response.',
+ 'Meetup incident queue entries are created transactionally for reviews with incidentOccurred=true or a privateNote. Existing eligible reviews are backfilled once. Provision reviewer only to approved trust staff; support and city_ops roles cannot read it.'
+);
+notes.M12.steps.push('Reviewer claims and decides meetup incident');
+notes.M12.screen.push('Incident queue [ claim ]','Assigned incident [ private note ] [ escalate | dismiss ]');
+notes.M12.examples.push({title:'Decide assigned meetup incident',request:'POST /admin/v1/meetup-incidents/77777777-7777-4777-8777-777777777777/decide',status:200,body:{decision:'escalated',reasonCode:'needs_review'}});
+notes.M12.status='SSO/MFA-gated staff cases, exclusive meetup incident reviews, support, account actions/appeals, place reviews, release policy and reviewed legal publishing implemented. Real SSO provisioning and broader provider/privacy tooling remain pending.';
