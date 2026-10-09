@@ -174,6 +174,8 @@ paths:
                           - "null"
         "400":
           $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
   /v1/dogs/breeds:
     get:
       operationId: breeds
@@ -8183,6 +8185,548 @@ paths:
           $ref: "#/components/responses/Problem"
         "503":
           $ref: "#/components/responses/Problem"
+  /admin/v1/app-releases:
+    get:
+      operationId: staffReleasePolicy
+      security:
+        - staffBearer: []
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  version:
+                    type: integer
+                    minimum: 1
+                  policy:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      revision:
+                        type: string
+                      maintenance:
+                        type: boolean
+                      android:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          minimumBuild:
+                            type: integer
+                            minimum: 1
+                          latestBuild:
+                            type: integer
+                            minimum: 1
+                          storeUrl:
+                            anyOf:
+                              - type: string
+                                format: uri
+                              - type: "null"
+                        required:
+                          - minimumBuild
+                          - latestBuild
+                          - storeUrl
+                      ios:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          minimumBuild:
+                            type: integer
+                            minimum: 1
+                          latestBuild:
+                            type: integer
+                            minimum: 1
+                          storeUrl:
+                            anyOf:
+                              - type: string
+                                format: uri
+                              - type: "null"
+                        required:
+                          - minimumBuild
+                          - latestBuild
+                          - storeUrl
+                    required:
+                      - revision
+                      - maintenance
+                      - android
+                      - ios
+                  updatedAt:
+                    type: string
+                    format: date-time
+                required:
+                  - version
+                  - policy
+                  - updatedAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: updateReleasePolicy
+      security:
+        - staffBearer: []
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  version:
+                    type: integer
+                    minimum: 1
+                  policy:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      revision:
+                        type: string
+                      maintenance:
+                        type: boolean
+                      android:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          minimumBuild:
+                            type: integer
+                            minimum: 1
+                          latestBuild:
+                            type: integer
+                            minimum: 1
+                          storeUrl:
+                            anyOf:
+                              - type: string
+                                format: uri
+                              - type: "null"
+                        required:
+                          - minimumBuild
+                          - latestBuild
+                          - storeUrl
+                      ios:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          minimumBuild:
+                            type: integer
+                            minimum: 1
+                          latestBuild:
+                            type: integer
+                            minimum: 1
+                          storeUrl:
+                            anyOf:
+                              - type: string
+                                format: uri
+                              - type: "null"
+                        required:
+                          - minimumBuild
+                          - latestBuild
+                          - storeUrl
+                    required:
+                      - revision
+                      - maintenance
+                      - android
+                      - ios
+                  updatedAt:
+                    type: string
+                    format: date-time
+                required:
+                  - version
+                  - policy
+                  - updatedAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                expectedVersion:
+                  type: integer
+                  minimum: 1
+                policy:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    revision:
+                      type: string
+                    maintenance:
+                      type: boolean
+                    android:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        minimumBuild:
+                          type: integer
+                          minimum: 1
+                        latestBuild:
+                          type: integer
+                          minimum: 1
+                        storeUrl:
+                          anyOf:
+                            - type: string
+                              format: uri
+                            - type: "null"
+                      required:
+                        - minimumBuild
+                        - latestBuild
+                        - storeUrl
+                    ios:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        minimumBuild:
+                          type: integer
+                          minimum: 1
+                        latestBuild:
+                          type: integer
+                          minimum: 1
+                        storeUrl:
+                          anyOf:
+                            - type: string
+                              format: uri
+                            - type: "null"
+                      required:
+                        - minimumBuild
+                        - latestBuild
+                        - storeUrl
+                  required:
+                    - revision
+                    - maintenance
+                    - android
+                    - ios
+                storeAvailabilityConfirmed:
+                  const: true
+              required:
+                - expectedVersion
+                - policy
+                - storeAvailabilityConfirmed
+  /admin/v1/legal/documents:
+    get:
+      operationId: staffLegalDocuments
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        purpose:
+                          type: string
+                        version:
+                          type: string
+                        countryCode:
+                          type: string
+                        locale:
+                          type: string
+                        publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                            - type: "null"
+                        contentHash:
+                          type: string
+                      required:
+                        - id
+                        - purpose
+                        - version
+                        - countryCode
+                        - locale
+                        - publishedAt
+                        - contentHash
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+    post:
+      operationId: createLegalDraft
+      security:
+        - staffBearer: []
+      parameters: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  publishedAt:
+                    type: "null"
+                  contentHash:
+                    type: string
+                required:
+                  - id
+                  - publishedAt
+                  - contentHash
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                purpose:
+                  enum:
+                    - terms
+                    - privacy
+                    - community
+                    - location
+                    - marketing
+                version:
+                  type: string
+                  minLength: 1
+                  maxLength: 60
+                countryCode:
+                  const: IN
+                locale:
+                  const: en-IN
+                body:
+                  type: string
+                  minLength: 30
+                  maxLength: 40000
+                reviewReference:
+                  type: string
+                  minLength: 5
+                  maxLength: 200
+              required:
+                - purpose
+                - version
+                - countryCode
+                - locale
+                - body
+                - reviewReference
+  /admin/v1/legal/documents/{id}:
+    get:
+      operationId: staffLegalDocument
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  purpose:
+                    type: string
+                  version:
+                    type: string
+                  countryCode:
+                    type: string
+                  locale:
+                    type: string
+                  publishedAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  contentHash:
+                    type: string
+                  body:
+                    type: string
+                  reviewReference:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - id
+                  - purpose
+                  - version
+                  - countryCode
+                  - locale
+                  - publishedAt
+                  - contentHash
+                  - body
+                  - reviewReference
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/legal/documents/{id}/publish:
+    post:
+      operationId: publishLegalDocument
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  publishedAt:
+                    type: string
+                    format: date-time
+                required:
+                  - id
+                  - publishedAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                reviewConfirmed:
+                  const: true
+              required:
+                - reviewConfirmed
 components:
   responses:
     Problem:

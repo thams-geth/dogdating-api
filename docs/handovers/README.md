@@ -15,7 +15,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 | M09 | [Notifications and devices](M09.md) | Implemented foundation; see limitations | 6 |
 | M10 | [Meetups and places](M10.md) | Implemented foundation; see limitations | 12 |
 | M11 | [Trust, safety, privacy and support](M11.md) | Implemented foundation; see limitations | 19 |
-| M12 | [Operations and staff](M12.md) | Implemented foundation; see limitations | 16 |
+| M12 | [Operations and staff](M12.md) | Implemented foundation; see limitations | 22 |
 | M13 | [Billing and growth](M13.md) | Not implemented | 0 |
 | M14 | [Country expansion](M14.md) | Not implemented | 0 |
 | M15 | [Breeding introductions](M15.md) | Not implemented | 0 |

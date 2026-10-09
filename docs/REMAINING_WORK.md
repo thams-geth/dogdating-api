@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 9 October 2026. The checked-in backend has 144 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
+Updated 9 October 2026. The checked-in backend has 150 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
 
 ## Required integration inputs
 
@@ -21,7 +21,7 @@ No credentials, provider selection, legal approval or operational response is in
 
 | Module | Remaining scope |
 | --- | --- |
-| M01 | Audited release/country administration, enforced update policy and live legal-version hints; waitlist outbound delivery |
+| M01 | Country administration and enforced API update policy; waitlist outbound delivery. Audited release edits and legal-version hints are implemented |
 | M02 | Production SMS/DLT, distributed abuse controls and broader security audit/monitoring; optional OAuth/passkeys/recovery factors |
 | M04 | GPS/displaced anchors and twelve-question scoring; structured temperament, city-only location and two-party dog transfers already work |
 | M05 | Production uploads/delivery, scan/moderation, document uploads, signed replay-safe provider webhooks, reviewer evidence/grants and account activation |
@@ -30,7 +30,7 @@ No credentials, provider selection, legal approval or operational response is in
 | M09 | Push relay with backoff/deduplication/invalid-token handling/dead-letter operations, quiet-hour enforcement at delivery and operational scheduling |
 | M10 | Extensions with agreement, reminders/expiry cleanup, reviewer response workflow; optional groups/video |
 | M11 | Broader legal-response exports (photo files/shared/provider categories) and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help articles |
-| M12 | Verification review/provider evidence, incident-review queue, complete audit browsing, legal/release tooling, privacy job execution and operational metrics; current report decisions support dismiss/escalate, with suspension handled separately |
+| M12 | Verification review/provider evidence, incident-review queue, complete audit browsing, broader privacy job execution and operational metrics; current report decisions support dismiss/escalate, with suspension handled separately |
 | M13 | Store offerings, verified receipt/restore, subscription/cancellation/refund/grace rules, signed billing webhooks and referral/growth behavior |
 | M14 | Additional market configuration, local content/providers, quota-zone rules and reviewed residency/rollout policy |
 | M15 | Optional breeding mode requires explicit product approval and reviewed jurisdiction/evidence rules before implementation/enablement |

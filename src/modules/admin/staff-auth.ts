@@ -1,6 +1,6 @@
 import { createRemoteJWKSet,jwtVerify } from 'jose';import type { Pool } from 'pg';
 import { ApiError } from '../../middleware/error.js';
-export type StaffRole='moderator'|'support'|'appeals'|'city_ops'|'operations'|'reviewer';
+export type StaffRole='moderator'|'support'|'appeals'|'city_ops'|'operations'|'reviewer'|'release_ops'|'legal_ops';
 export interface StaffIdentity {issuer:string;subject:string;mfa:boolean;authenticatedAt:number;}
 export interface StaffVerifier {verify(token:string):Promise<StaffIdentity>;}
 export interface StaffPrincipal {id:string;roles:StaffRole[];}

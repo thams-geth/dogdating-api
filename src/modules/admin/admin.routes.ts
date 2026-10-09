@@ -1,9 +1,16 @@
+import { ReleaseLegalService,releaseInput,legalInput } from './release-legal.service.js';
 import { Router } from 'express';import { z } from 'zod';import { asyncHandler } from '../../http/async-handler.js';import { ApiError } from '../../middleware/error.js';import { pageQuery } from '../../http/pagination.js';
 import type { StaffAuth,StaffPrincipal,StaffRole } from './staff-auth.js';import type { AdminService } from './admin.service.js';
-export function adminRoutes(service:AdminService,auth:StaffAuth){const router=Router(),id=(v:unknown)=>z.string().uuid().parse(v);
+export function adminRoutes(service:AdminService,auth:StaffAuth,releaseLegal:ReleaseLegalService){const router=Router(),id=(v:unknown)=>z.string().uuid().parse(v);
  router.use(asyncHandler(async(req,res,next)=>{const header=req.get('Authorization');if(!header?.startsWith('Bearer ')||header.length>16000)throw new ApiError(401,'staff-unauthenticated','Staff bearer token required.');res.locals.staff=await auth.authenticate(header.slice(7));next();}));
  const staff=(res:{locals:Record<string,any>})=>res.locals.staff as StaffPrincipal;
  const role=(required:StaffRole)=>asyncHandler(async(_req,res,next)=>{if(!staff(res).roles.includes(required))throw new ApiError(403,'staff-forbidden','This staff role is required.');next();});
+ router.get('/app-releases',role('release_ops'),asyncHandler(async(_req,res)=>{res.json(await releaseLegal.release(staff(res)));}));
+ router.patch('/app-releases',role('release_ops'),asyncHandler(async(req,res)=>{res.json(await releaseLegal.saveRelease(staff(res),releaseInput.parse(req.body)));}));
+ router.get('/legal/documents',role('legal_ops'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await releaseLegal.legalList(staff(res),q.limit,q.cursor));}));
+ router.post('/legal/documents',role('legal_ops'),asyncHandler(async(req,res)=>{res.status(201).json(await releaseLegal.createLegal(staff(res),legalInput.parse(req.body)));}));
+ router.get('/legal/documents/:id',role('legal_ops'),asyncHandler(async(req,res)=>{res.json(await releaseLegal.legal(staff(res),id(req.params.id)));}));
+ router.post('/legal/documents/:id/publish',role('legal_ops'),asyncHandler(async(req,res)=>{z.object({reviewConfirmed:z.literal(true)}).strict().parse(req.body);res.json(await releaseLegal.publishLegal(staff(res),id(req.params.id)));}));
  router.get('/reports',role('moderator'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.reports(staff(res),q.limit,q.cursor));}));
  router.get('/reports/:id',role('moderator'),asyncHandler(async(req,res)=>{res.json(await service.report(staff(res),id(req.params.id)));}));
  router.post('/reports/:id/claim',role('moderator'),asyncHandler(async(req,res)=>{z.object({}).strict().parse(req.body);res.json(await service.claim(staff(res),id(req.params.id)));}));

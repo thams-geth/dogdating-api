@@ -1,3 +1,4 @@
+import { ReleaseLegalService } from './modules/admin/release-legal.service.js';
 import { TransfersService } from './modules/dogs/transfers.service.js';
 import { transferRoutes } from './modules/dogs/transfers.routes.js';
 import { waitlistRoutes } from './modules/app/waitlist.js';
@@ -67,14 +68,14 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0028']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0029']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
     }
     res.json({ status: 'ready' });
   }));
-  app.use('/v1/app', appRoutes(policySchema.parse(deps.policy ?? defaultPolicy)));
+  app.use('/v1/app', appRoutes(policySchema.parse(deps.policy ?? defaultPolicy),deps.policy?undefined:database));
   const location = new LocationService(database);
   app.use('/v1/app/areas', areaRoutes(location));
   app.use('/v1/dogs/breeds', breedRoutes(database));
@@ -113,7 +114,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1',notificationRoutes(new NotificationsService(database,messageCipher),auth));
   app.use('/v1',meetupRoutes(new MeetupsService(database,messageCipher),auth));
   const staffVerifier=deps.staffVerifier ?? (config.STAFF_ISSUER&&config.STAFF_JWKS_URL&&config.STAFF_AUDIENCE?new OidcStaffVerifier(config.STAFF_ISSUER,config.STAFF_JWKS_URL,config.STAFF_AUDIENCE):undefined);
-  app.use('/admin/v1',adminRoutes(new AdminService(database,messageCipher),new StaffAuth(database,staffVerifier)));
+  app.use('/admin/v1',adminRoutes(new AdminService(database,messageCipher),new StaffAuth(database,staffVerifier),new ReleaseLegalService(database)));
   app.use(notFound);
   app.use(errorHandler);
   return app;

@@ -1,5 +1,5 @@
 import { z } from 'zod';import { pool } from '../../db/pool.js';import { transaction } from '../../db/transaction.js';
-const input=z.tuple([z.string().url().startsWith('https://'),z.string().min(1).max(255),z.string().transform(s=>s.split(',')).pipe(z.array(z.enum(['moderator','support','appeals','city_ops','operations','reviewer'])).min(1))]);
+const input=z.tuple([z.string().url().startsWith('https://'),z.string().min(1).max(255),z.string().transform(s=>s.split(',')).pipe(z.array(z.enum(['moderator','support','appeals','city_ops','operations','reviewer','release_ops','legal_ops'])).min(1))]);
 try{
  const [issuer,subject,roles]=input.parse(process.argv.slice(2));
  const result=await transaction(pool,async tx=>{

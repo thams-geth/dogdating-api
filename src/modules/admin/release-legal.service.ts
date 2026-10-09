@@ -1,0 +1,23 @@
+import type { Pool,PoolClient } from 'pg';import { z } from 'zod';import type { StaffPrincipal } from './staff-auth.js';
+import { transaction } from '../../db/transaction.js';import { ApiError } from '../../middleware/error.js';import { policySchema } from '../app/policy.js';import { page,decodeCursor } from '../../http/pagination.js';
+export const releaseInput=z.object({expectedVersion:z.number().int().positive(),policy:policySchema,storeAvailabilityConfirmed:z.literal(true)}).strict();
+export const legalInput=z.object({purpose:z.enum(['terms','privacy','community','location','marketing']),version:z.string().trim().min(1).max(60),countryCode:z.literal('IN'),locale:z.literal('en-IN'),body:z.string().trim().min(30).max(40000),reviewReference:z.string().trim().min(5).max(200)}).strict();
+export class ReleaseLegalService {
+ constructor(private readonly db:Pool){}
+ private audit(tx:PoolClient,staff:StaffPrincipal,action:string,type:string,id?:string){return tx.query("INSERT INTO ops.audit_log(actor_user_id,actor_kind,action,subject_type,subject_id) VALUES($1,'staff',$2,$3,$4)",[staff.id,action,type,id??null]);}
+ release(staff:StaffPrincipal){return transaction(this.db,async tx=>{await this.audit(tx,staff,'release.read','release');return (await tx.query('SELECT version,policy,updated_at AS "updatedAt" FROM ops.app_release_policy WHERE singleton')).rows[0];});}
+ saveRelease(staff:StaffPrincipal,input:z.infer<typeof releaseInput>){return transaction(this.db,async tx=>{
+  for(const platform of ['android','ios'] as const){const url=input.policy[platform].storeUrl;if(url&&new URL(url).hostname!==(platform==='android'?'play.google.com':'apps.apple.com'))throw new ApiError(400,'invalid-store-url','Use the official store host for this platform.');}
+  const row=(await tx.query('SELECT version FROM ops.app_release_policy WHERE singleton FOR UPDATE')).rows[0];if(row.version!==input.expectedVersion)throw new ApiError(409,'release-version-conflict','Refresh the current release policy.');
+  const saved=(await tx.query('UPDATE ops.app_release_policy SET version=version+1,policy=$1,updated_by=$2,updated_at=now() WHERE singleton RETURNING version,policy,updated_at AS "updatedAt"',[input.policy,staff.id])).rows[0];await this.audit(tx,staff,'release.update','release');return saved;
+ });}
+ legalList(staff:StaffPrincipal,limit:number,cursor?:string){return transaction(this.db,async tx=>{const scope='admin:legal',after=decodeCursor(cursor,scope);await this.audit(tx,staff,'legal.list','policy');return page((await tx.query('SELECT id,purpose,version,country_code AS "countryCode",locale,published_at AS "publishedAt",content_sha256 AS "contentHash" FROM identity.policy_documents WHERE ($1::uuid IS NULL OR id>$1) ORDER BY id LIMIT $2',[after,limit+1])).rows,limit,scope);});}
+ legal(staff:StaffPrincipal,id:string){return transaction(this.db,async tx=>{const row=(await tx.query('SELECT id,purpose,version,country_code AS "countryCode",locale,body,review_reference AS "reviewReference",published_at AS "publishedAt",content_sha256 AS "contentHash" FROM identity.policy_documents WHERE id=$1',[id])).rows[0];if(!row)throw new ApiError(404,'not-found','Policy document is unavailable.');await this.audit(tx,staff,'legal.read','policy',id);return row;});}
+ createLegal(staff:StaffPrincipal,input:z.infer<typeof legalInput>){return transaction(this.db,async tx=>{
+  const row=(await tx.query('INSERT INTO identity.policy_documents(id,purpose,version,country_code,locale,body,review_reference,created_by_staff) VALUES(gen_random_uuid(),$1,$2,$3,$4,$5,$6,$7) ON CONFLICT(purpose,country_code,locale,version) DO NOTHING RETURNING id,published_at AS "publishedAt",content_sha256 AS "contentHash"',[input.purpose,input.version,input.countryCode,input.locale,input.body,input.reviewReference,staff.id])).rows[0];if(!row)throw new ApiError(409,'policy-version-exists','Use a new version for changed legal content.');await this.audit(tx,staff,'legal.create','policy',row.id);return row;
+ });}
+ publishLegal(staff:StaffPrincipal,id:string){return transaction(this.db,async tx=>{
+  const row=(await tx.query('SELECT published_at,review_reference FROM identity.policy_documents WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!row)throw new ApiError(404,'not-found','Policy document is unavailable.');if(row.published_at)return {id,publishedAt:row.published_at};if(!row.review_reference)throw new ApiError(409,'legal-review-required','A documented review reference is required before publishing.');
+  const result=(await tx.query('UPDATE identity.policy_documents SET published_at=clock_timestamp() WHERE id=$1 RETURNING id,published_at AS "publishedAt"',[id])).rows[0];await this.audit(tx,staff,'legal.publish','policy',id);return result;
+ });}
+}

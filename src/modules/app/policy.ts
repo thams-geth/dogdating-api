@@ -4,7 +4,7 @@ const releaseSchema = z.object({
   minimumBuild: z.number().int().positive(),
   latestBuild: z.number().int().positive(),
   storeUrl: z.string().url().startsWith('https://').nullable(),
-}).refine((release) => release.latestBuild >= release.minimumBuild, 'Latest build must be at least minimum build')
+}).strict().refine((release) => release.latestBuild >= release.minimumBuild, 'Latest build must be at least minimum build')
   .refine((release) => release.minimumBuild === 1 || release.storeUrl !== null, 'A forced update needs a published store URL');
 
 export const policySchema = z.object({
@@ -12,7 +12,7 @@ export const policySchema = z.object({
   maintenance: z.boolean(),
   android: releaseSchema,
   ios: releaseSchema,
-});
+}).strict();
 export type AppPolicy = z.infer<typeof policySchema>;
 
 // Reviewed configuration deployed with the service until staff release controls exist.

@@ -1,12 +1,13 @@
+import { defaultPolicy } from '../../src/modules/app/policy.js';
 import { beforeEach,after,test } from 'node:test';import assert from 'node:assert/strict';import { randomBytes,randomUUID } from 'node:crypto';import request from 'supertest';
 import { fixture } from '../support/fixture.js';import { LocalMessageCipher } from '../../src/modules/messages/message-cipher.js';import type { StaffIdentity } from '../../src/modules/admin/staff-auth.js';
 const issuer='https://staff.test.invalid',identities=new Map<string,StaffIdentity>(),cipher=new LocalMessageCipher(randomBytes(32).toString('hex'),'test');
 const f=fixture(undefined,undefined,cipher,{async verify(token){const identity=identities.get(token);if(!identity)throw new Error('untrusted');return identity;}}),http=request(f.app);
 let one:string,two:string;
 beforeEach(async()=>{await f.setup();await f.database.query('TRUNCATE ops.staff_accounts CASCADE');identities.clear();for(const subject of ['one','two','support'])identities.set(subject,{issuer,subject,mfa:true,authenticatedAt:Date.now()/1000});
- one=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'one',['moderator','appeals','support','city_ops','operations']])).rows[0].id;
+ one=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'one',['moderator','appeals','support','city_ops','operations','release_ops','legal_ops']])).rows[0].id;
  two=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'two',['moderator','appeals']])).rows[0].id;
- await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3)',[issuer,'support',['support']]);});after(()=>f.close());
+ await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3)',[issuer,'support',['support']]);await f.database.query('INSERT INTO ops.app_release_policy(singleton,policy) VALUES(true,$1)',[defaultPolicy]);});after(()=>f.close());
 test('staff identity requires MFA, recent authentication, live provisioning and database role',async()=>{
  const user=await f.user();await http.get('/admin/v1/jobs').set('Authorization',user.header).expect(401);
  await http.get('/admin/v1/jobs').set('Authorization','Bearer support').expect(403);
@@ -37,4 +38,22 @@ test('staff can review submitted public places and reply privately to support',a
  const ticket=(await http.post('/v1/support/tickets').set('Authorization',user.header).set('Idempotency-Key',randomUUID()).send({category:'technical',message:'TEST support question'}).expect(201)).body;
  await http.post(`/admin/v1/support/tickets/${ticket.id}/messages`).set('Authorization','Bearer support').send({message:'TEST support reply',resolve:true}).expect(201);
  const detail=(await http.get(`/v1/support/tickets/${ticket.id}`).set('Authorization',user.header)).body;assert.equal(detail.ticket.state,'resolved');assert.ok(detail.messages.some((m:{body:string})=>m.body==='TEST support reply'));
+});
+
+test('release changes require role, trusted store URL and optimistic version, and reach bootstrap',async()=>{
+ const policy={...defaultPolicy,revision:'fixture-release',android:{minimumBuild:2,latestBuild:3,storeUrl:'https://play.google.com/store/apps/details?id=fixture'}};
+ await http.patch('/admin/v1/app-releases').set('Authorization','Bearer support').send({expectedVersion:1,policy,storeAvailabilityConfirmed:true}).expect(403);
+ await http.patch('/admin/v1/app-releases').set('Authorization','Bearer one').send({expectedVersion:1,policy:{...policy,android:{...policy.android,storeUrl:'https://not-a-store.invalid/app'}},storeAvailabilityConfirmed:true}).expect(400);
+ const changes=await Promise.all([1,2].map(()=>http.patch('/admin/v1/app-releases').set('Authorization','Bearer one').send({expectedVersion:1,policy,storeAvailabilityConfirmed:true})));assert.deepEqual(changes.map(r=>r.status).sort(),[200,409]);
+ const bootstrap=(await http.get('/v1/app/bootstrap?platform=android&buildNumber=1').expect(200)).body;assert.equal(bootstrap.update.action,'required');assert.equal(bootstrap.policyRevision,'fixture-release');assert.equal(bootstrap.features.pack,false);
+});
+test('legal drafts are private until explicit publication; published text stays immutable',async()=>{
+ const payload={purpose:'privacy',version:'fixture-reviewed-v1',countryCode:'IN',locale:'en-IN',body:'TEST FIXTURE CONTENT ONLY — NOT AN ACTUAL LEGAL POLICY.',reviewReference:'TEST REVIEW ONLY'};
+ const document=(await http.post('/admin/v1/legal/documents').set('Authorization','Bearer one').send(payload).expect(201)).body;
+ await http.get('/v1/legal/documents/privacy?countryCode=IN&locale=en-IN').expect(404);
+ await http.post(`/admin/v1/legal/documents/${document.id}/publish`).set('Authorization','Bearer support').send({reviewConfirmed:true}).expect(403);
+ await http.post(`/admin/v1/legal/documents/${document.id}/publish`).set('Authorization','Bearer one').send({reviewConfirmed:true}).expect(200);
+ const bootstrap=(await http.get('/v1/app/bootstrap?platform=ios&buildNumber=1').expect(200)).body;assert.equal(bootstrap.legal.privacyVersion,payload.version);
+ await assert.rejects(f.database.query('UPDATE identity.policy_documents SET body=$2 WHERE id=$1',[document.id,'changed']));
+ await http.post('/admin/v1/legal/documents').set('Authorization','Bearer one').send(payload).expect(409);
 });
