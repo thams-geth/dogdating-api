@@ -6646,9 +6646,107 @@ paths:
                         - kind
                         - state
                         - count
+                  maintenance:
+                    anyOf:
+                      - type: object
+                        additionalProperties: false
+                        properties:
+                          runId:
+                            type: string
+                            format: uuid
+                          status:
+                            type: string
+                            enum:
+                              - running
+                              - completed
+                              - failed
+                          startedAt:
+                            type: string
+                            format: date-time
+                          finishedAt:
+                            anyOf:
+                              - type: string
+                                format: date-time
+                              - type: "null"
+                          summary:
+                            anyOf:
+                              - type: object
+                                additionalProperties: false
+                                properties:
+                                  discovery:
+                                    type: object
+                                    additionalProperties: false
+                                    properties:
+                                      sessions:
+                                        type: integer
+                                        minimum: 0
+                                      reads:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - sessions
+                                      - reads
+                                  ephemeral:
+                                    type: object
+                                    additionalProperties: false
+                                    properties:
+                                      tickets:
+                                        type: integer
+                                        minimum: 0
+                                      tokens:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - tickets
+                                      - tokens
+                                  verification:
+                                    type: object
+                                    additionalProperties: false
+                                    properties:
+                                      revoked:
+                                        type: integer
+                                        minimum: 0
+                                      guardians:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - revoked
+                                      - guardians
+                                  meetups:
+                                    type: object
+                                    additionalProperties: false
+                                    properties:
+                                      expired:
+                                        type: integer
+                                        minimum: 0
+                                      reminded:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - expired
+                                      - reminded
+                                required:
+                                  - discovery
+                                  - ephemeral
+                                  - verification
+                                  - meetups
+                              - type: "null"
+                          lastErrorCode:
+                            anyOf:
+                              - type: string
+                              - type: "null"
+                        required:
+                          - runId
+                          - status
+                          - startedAt
+                          - finishedAt
+                          - summary
+                          - lastErrorCode
+                      - type: "null"
                 required:
                   - push
                   - privacy
+                  - maintenance
         "400":
           $ref: "#/components/responses/Problem"
         "401":

@@ -26,7 +26,7 @@ No credentials, provider selection, legal approval or operational response is in
 | M04 | GPS/displaced anchors and twelve-question scoring; structured temperament, city-only location and two-party dog transfers already work |
 | M05 | Production uploads/delivery, scan/moderation, document uploads, signed replay-safe provider webhooks, reviewer evidence/grants and account activation; expired grants are now swept |
 | M06 | Production discovery rollout, precise-distance matching and external scheduling of the bounded snapshot cleanup; account-wide home counters are implemented |
-| M08 | Production key wrapping/rotation, moderated attachments, typing/presence/shared read receipts, scalable event delivery and ticket retention; current sockets use bounded DB polling |
+| M08 | Production key wrapping/rotation, moderated attachments, typing/presence/shared read receipts, scalable event delivery; expired tickets are cleaned after one day, and current sockets use bounded DB polling |
 | M09 | Vendor adapter/credentials and operational scheduling; provider-neutral relay, receipts/backoff, invalid-token handling, quiet hours and dead-letter operations are implemented |
 | M10 | Reviewer response workflow and external scheduling for the implemented two-party extensions/reminders/expiry pass; optional groups/video |
 | M11 | Broader legal-response exports (photo files/shared/provider categories) and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help articles |

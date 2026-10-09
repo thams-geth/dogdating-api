@@ -95,3 +95,12 @@ test('operations browse redacted audit metadata with bounded windows and scoped 
  await http.get('/admin/v1/audit-events').query({action:'other',from:first.from,to:first.to,cursor:first.nextCursor}).set('Authorization','Bearer one').expect(400);
  await http.get('/admin/v1/audit-events').query({from:'2025-01-01T00:00:00Z',to:'2025-03-01T00:00:00Z'}).set('Authorization','Bearer one').expect(400);
 });
+
+test('operations jobs view exposes only maintenance status and aggregate counts',async()=>{
+ const {runMaintenance}=await import('../../src/modules/ops/maintenance.js');
+ const run=await runMaintenance(f.database);assert.equal(run.status,'completed');
+ const jobs=(await http.get('/admin/v1/jobs').set('Authorization','Bearer one').expect(200)).body;
+ assert.equal(jobs.maintenance.status,'completed');assert.equal(jobs.maintenance.runId,run.status==='completed'?run.runId:null);
+ assert.ok(!('privateNote' in jobs.maintenance));
+ await http.get('/admin/v1/jobs').set('Authorization','Bearer support').expect(403);
+});

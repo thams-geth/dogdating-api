@@ -23,7 +23,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 - Repo: /Users/thamaraiselvan/ReactProject/dogdating-api.
 - Own PostgreSQL container dogdating-api-postgres, port 5433, database/user waggle. Dedicated integration DB waggle_api_test is disposable; tests refuse other database names.
 - Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
-- Migrations through 0033; applied SQL is immutable. Forward migrations only.
+- Migrations through 0034; applied SQL is immutable. Forward migrations only.
 - .env is ignored. setup:dev generates the local auth secret and enables terminal-only OTP for synthetic numbers. No real SMS.
 - An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
 
@@ -86,7 +86,7 @@ M10 adds two-party extension requests with revision and duration caps and a remi
 
 ## Meetup incident reviewer queue (9 October 2026)
 
-M12 reviewer role now has audited, exclusive claim/read/dismiss/escalate APIs for private meetup review incidents. Migrations 0032–0033 create new cases and backfill previous incident/private-note reviews. Decisions do not automatically suspend users or claim operational response. Readiness requires migration 0033.
+M12 reviewer role now has audited, exclusive claim/read/dismiss/escalate APIs for private meetup review incidents. Migrations 0032–0033 create new cases and backfill previous incident/private-note reviews. Decisions do not automatically suspend users or claim operational response. Readiness requires migration 0034.
 
 ## Audit metadata browsing (9 October 2026)
 
@@ -99,3 +99,7 @@ M12 operations role can browse redacted audit metadata in bounded past windows, 
 ## Verification tier expiry (9 October 2026)
 
 M05 has a bounded, audited expiry sweep for lapsed grants. With no other current guardian tier it clears is_adult_verified, pauses that guardian’s published dogs and removes their beacons. Live onboarding/discovery gate on expiry even before the sweep. maintenance:run invokes it; verification:expire runs it alone. It never creates grants or replaces evidence/provider review.
+
+## Maintenance observability (9 October 2026)
+
+Migration 0034 persists only the latest maintenance run state/timestamps/aggregate counts or generic failure code. M12 GET /admin/v1/jobs exposes it to operations staff; null means never run, stale running suggests interruption. No scheduler has been deployed.

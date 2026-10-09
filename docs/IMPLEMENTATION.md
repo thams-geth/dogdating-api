@@ -29,10 +29,10 @@ Updated: 9 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 108 PostgreSQL integration tests at the last full run; newer maintenance tests run separately.
+- Typecheck/build passed; 8 unit/HTTP tests and 114 PostgreSQL integration tests at the latest full run.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
-- Migrations through 0033. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- Migrations through 0034. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
 - 159 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
@@ -135,3 +135,7 @@ Migrations 0032–0033 create private case entries for incident reviews and back
 ### M05 live verification expiry (9 October 2026)
 
 A bounded expiry worker revokes lapsed grants with an audited `expired` reason. When a guardian has no other live tier, it clears the stored adult-verified flag, pauses dogs published by that guardian and removes their active beacons. Live onboarding/discovery already check grant expiry without waiting for the pass. `npm run verification:expire` runs it alone; `npm run maintenance:run` includes it. No grant creation, provider review or account activation is implied.
+
+### M12 maintenance status (9 October 2026)
+
+Migration 0034 keeps one latest maintenance status record. The operations-only jobs endpoint now exposes run state, timing, aggregate counts and a redacted failure code. Interrupted runs remain visible as stale `running`; a new pass replaces them. No external scheduler has been deployed.

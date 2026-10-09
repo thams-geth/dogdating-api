@@ -213,3 +213,5 @@ Staff operations can browse bounded, redacted audit metadata through `GET /admin
 Run one bounded operations pass with `npm run maintenance:run`. Schedule it externally for timely meetup reminders and cleanup; media cleanup and encrypted exports have separate commands. Overlapping passes return `already_running`.
 
 Run `npm run verification:expire` for a standalone bounded tier-expiry sweep; the maintenance pass includes it. No verification is granted without reviewed evidence.
+
+Operations staff can inspect the latest maintenance pass through `GET /admin/v1/jobs`; a stale `running` state needs an operator check.
