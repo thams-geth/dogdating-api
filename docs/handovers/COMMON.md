@@ -12,8 +12,8 @@ OpenAPI documents implemented operations. API_PLAN.md includes future operations
 
 ## HTTP contract
 
-- Prefix `/v1`. Send `Content-Type: application/json` for JSON bodies; raw photo upload uses `image/jpeg` or `image/png` with the original bytes.
-- Protected routes require `Authorization: Bearer <accessToken>`. Public routes are marked explicitly. An object may still be inaccessible despite valid authentication.
+- Product prefix `/v1`; staff prefix `/admin/v1`. Send `Content-Type: application/json` for JSON bodies; raw photo upload uses `image/jpeg` or `image/png` with the original bytes.
+- Product routes normally require `Authorization: Bearer <accessToken>`. Staff routes require a separate staff SSO token with recent MFA. Selected safety/privacy routes also accept `Privacy-Token`; request tracking uses `Privacy-Status-Token`. Public routes are marked explicitly. An object may still be inaccessible despite valid authentication.
 - Field names use camelCase. UUIDs identify resources. Timestamps are UTC ISO strings; date-only values use `YYYY-MM-DD`. Use IANA timezones and ISO country codes exactly as documented.
 - Responses have endpoint-specific shapes: no universal `data` wrapper. A 204 response has no JSON body. Do not call a JSON decoder on it.
 - Writes reject unknown properties. Do not submit an entire GET response as a PATCH body. Never submit roles, verification, moderation or account status through profile inputs.

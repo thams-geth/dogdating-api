@@ -13,6 +13,10 @@ India-first dog social/matching backend built with TypeScript, Express and Postg
 
 The provisional launch scope is dog playdates/walks. Breeding introductions and owner dating have separate rollout plans. The founder's launch-mode clarification is still pending; common platform work is underway.
 
+## Current status (9 October 2026)
+
+139 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; exports/erasure and external delivery are not completed by request intake.
+
 ## Local development
 
 Requires Node 22+ and Docker. PostgreSQL uses port 5433 to coexist with other projects.
@@ -71,7 +75,7 @@ Integration tests refuse databases whose names do not end in `_test`. They verif
 
 Migrations 0001–0011 came from the earlier Waggle backend. Migration 0012 adds authentication market/delivery metadata; 0013 adds consent/onboarding; 0014 adds invitations and dog drafts; 0015 adds photo uploads; 0016 adds verification intake and health-record deletion metadata; 0017 adds manual location state; 0018 adds publisher-bound discovery eligibility and feed sessions. Applied SQL is immutable; add forward migrations. Countries, locales and phone delivery policy will expand through explicit configuration and reviewed migrations.
 
-Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next: likes/connections and messaging; production media/moderation and verification integration remain launch dependencies.
+Each completed module gets relevant tests, contract/examples, updated docs/memory and a focused commit. No remote push or deployment has been performed. Next work is tracked in docs/REMAINING_WORK.md; production media/moderation and verification remain launch dependencies.
 
 ## Consent and onboarding
 

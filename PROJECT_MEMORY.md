@@ -1,103 +1,65 @@
 # Project memory
 
-Last updated: 8 October 2026. Read with docs/IMPLEMENTATION.md at the start of a session.
+Updated 9 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md.
 
-## Confirmed user decisions
+## User instructions
 
-- Backend-only dog dating/social app. India first, then other countries.
-- TypeScript + Express + PostgreSQL; do not reintroduce NestJS.
-- Repository: /Users/thamaraiselvan/ReactProject/dogdating-api.
-- Research and plan the whole API journey, then implement modules. Commit each completed module with a meaningful message; maintain docs and this memory.
-- Latest user instruction: continue next module and create mobile/web handovers for every module, with API/status/error/request/response details and wire diagrams. No remote push/deployment requested.
+- Build an India-first dog social/dating backend in TypeScript, Express and PostgreSQL, with later country expansion.
+- Continue modules automatically; commit each completed module with a meaningful message.
+- Maintain the API plan, implementation ledger, this memory and per-module mobile/web handovers with methods, statuses, errors, request/response contracts, examples, Mermaid flows and wireframes.
+- No remote push/deployment requested. Do not fabricate provider success, verified evidence, legal content or completion of privacy processing.
+- Pack/playdates remains the provisional shared-platform scope. Breeding, owner dating and live safety have no explicit product approval.
 
-## Product assumptions and open inputs
+## Source of truth
 
-- Pack/playdates first remains provisional: the question about breeding/owner dating has no recorded answer. Shared platform work is authorized.
-- One metro at a time; Bengaluru is seed data, not a confirmed launch city.
-- Adult guardian accounts, phone OTP, multi-dog/multi-guardian households; likes → mutual connection → chat → meetup.
-- Production SMS/DLT, verification/media providers, legal text/translations, domains/store IDs and final launch city remain unresolved.
-- Never fabricate legal acceptance, age/identity verification or production readiness. New accounts remain pending; live onboarding readiness is distinct from identity account status.
+Latest user instructions → docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md for actual state → docs/API_PLAN.md for planned scope. docs/openapi.yaml describes delivered HTTP routes. docs/handovers includes all 16 modules; unimplemented growth modules remain labeled planned.
 
-## Sources of truth
+Generate handovers from scripts/handover-notes.mjs and OpenAPI using npm run docs:handovers. Add route mapping in scripts/generate-handovers.mjs; verify npm run check:handovers. Do not hand-edit generated module files.
 
-Latest user decisions → docs/API_PLAN.md → docs/IMPLEMENTATION.md for actual state. docs/RESEARCH.md contains dated sources. docs/openapi.yaml and docs/requests.http describe implemented endpoints.
-
-Historical input lives in /Users/thamaraiselvan/Dog dating/waggle-plan and /Users/thamaraiselvan/Dog dating/waggle. The old NestJS plan does not override the Express repository. Its Android client is a draft and needs contract reconciliation later.
+Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Their NestJS plan does not override this Express repository.
 
 ## Environment
 
-- PostgreSQL: dogdating-api-postgres, localhost:5433, database/user waggle. Redis configured on 6380, not used yet.
-- Ports 5432/6379 belong to campusone. Do not touch unrelated containers/databases.
-- Migrations 0001–0011 inherited; 0012 auth metadata, 0013 consent/onboarding, 0014 dog drafts/invitations; 0015 private photo uploads; 0016 verification intake; 0017 manual location; 0018 discovery. Add migrations; never rewrite applied SQL.
-- TEST_DATABASE_URL must name a dedicated DB ending in _test. Local test DB waggle_api_test uses port 5433. Tests clear its fixture identity/household data.
-- npm run setup:dev generates an ignored local secret and opts into terminal-only OTP for synthetic numbers. Do not print secrets or enable this in production.
-- A previous compiled server may still own port 3000. Do not assume it serves the latest code; use npm run dev or restart only the known Waggle process.
+- Repo: /Users/thamaraiselvan/ReactProject/dogdating-api.
+- Own PostgreSQL container dogdating-api-postgres, port 5433, database/user waggle. Dedicated integration DB waggle_api_test is disposable; tests refuse other database names.
+- Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
+- Migrations through 0026; applied SQL is immutable. Forward migrations only.
+- .env is ignored. setup:dev generates the local auth secret and enables terminal-only OTP for synthetic numbers. No real SMS.
+- An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
 
-## Delivered modules / commits
+## Delivered development modules
 
-- d0b4746 baseline; 898efff research/plan; f4236eb app lifecycle; 23e75eb auth/session core.
-- 5da00c6 consent and resumable onboarding. Published policy rows are immutable; no legal content is seeded. Adult declaration is not verification. Active dog selection always rechecks household membership. Live missing steps override historical completedAt.
-- Household/dog core follows 5da00c6; use git log for exact hash. Roles, manual phone-bound invitations, last-owner protection, private dog drafts, declared breed mix, structured temperament, filters/schedule, gated publication/pause/memorialisation/beacons.
-- Household writes lock the household before checking membership. Multi-resource operations lock user before household; avoid reversing this order. Profile edits reset publication; identity/breed changes revoke dog tiers.
-- Impression-scoped discovery profiles and manual city selection are implemented. Precise GPS capture, transfer and twelve-question temperament scoring remain pending.
-- Local checks: 8 unit/HTTP + 65 PostgreSQL tests passed; build/typecheck and OpenAPI checks passed. CI configured, not remotely run. No deployment.
+- M01 bootstrap/countries/areas/breeds/update guidance, plus private area waitlist (dee3b40).
+- M02 OTP/signup/login, refresh rotation/reuse, sessions/revocation/private profile; verified recent-auth phone changes (20c2323).
+- M03 immutable policy acceptance/withdrawal and live resumable onboarding.
+- M04 household roles/invitations, dog drafts/details/breeds/structured temperament/preferences/schedule/publication/pause/memorial/beacons; consented manual-city location.
+- M05 private local photo upload/re-encode/checksum/order/deletion/cleanup; verification intent and self-reported health metadata. No automatic moderation/grants.
+- M06 live-gated city-only discovery with signed feed snapshots/impressions (e1823e2); account-wide real home counters (fbb8bd7).
+- M07 interest/pass quotas, idempotency, pending likes, atomic mutual matches and unmatch (072065f).
+- M08 encrypted text, sequencing/deduplication, read/mute/archive and ticketed development WebSockets (fa26512).
+- M09 durable inbox, preferences and encrypted session-bound device registration (f5a4d46). Push awaits provider.
+- M10 reviewed-place proposals/counters, revision checks, attendance and delayed reviews (7d0145d).
+- M11 blocks, encrypted reports/support, notices/appeals and restricted privacy OTP plus request tracking (425b241). Export/erasure NOT executed.
+- M12 separate staff OIDC/MFA, DB roles, case claims/audits, support replies, suspend/reinstate/independent appeals, place review and job counts (737f2f0).
 
-## Next work
+## Invariants
 
-M07 likes/connections, then M08 messaging; production media moderation and verification integrations still required before opening discovery. Read the implementation ledger first. New public discovery must enforce live consent, blocking, visibility and verification; a published row alone does not authorize disclosure. Keep module docs and commits current.
+- Household permission checks lock the household before checking current membership. Multi-resource writes lock user before household; multi-household locks use sorted IDs.
+- Social writes/blocks/chat/home use socialLock advisory lock BEFORE user/household locks. Development throughput is intentionally serialized; do not remove it without concurrency evidence.
+- Discovery requires current caller and publisher consent/account/adult verification/current tier, eligible dogs, approved photos and both allowCityOnly=true. Distance is unknown; photos are metadata only. Publishing records published_by. Never seed ordinary accounts with fake evidence.
+- Discovery tokens expire after ten minutes, bind caller/actor and never bypass live privacy checks. Quotas: 60 snapshots/hour and 200 distinct dogs/UTC day.
+- Interest quota: 12 new interests/user/Asia-Kolkata day across dogs; no refunds. Ended/blocked matches never reopen. Conversations include original editors only and require current editor membership.
+- MESSAGE_KEY is separate from AUTH_SECRET. Local AES-GCM wrapping is forbidden in production. Random per-conversation keys encrypt text; this is not E2EE. Missing key means unavailable, never plaintext fallback.
+- WS /v1/realtime uses a one-use 30-second ticket in the first frame, not URL. Auth within 5 seconds, 15-minute connection lifetime, 2-second persisted-history polling; REST is authoritative.
+- Inbox and awaiting_provider delivery intents commit with social events. Device tokens are encrypted, installation-bound and removed on session-family logout/revocation.
+- Meetup mutations use revision checks; block/unmatch cancels active meetings in a DB trigger. Reviews reveal peer feedback only after both submit or seven days; private incident fields never leave participant APIs.
+- Privacy-Token is OTP-purpose-bound and restricted to safety/privacy routes, including suspended users. It cannot authenticate normal product routes. Privacy-Status-Token allows only minimal request tracking.
+- Deletion requests revoke sessions, pause publication and end relationships but remain needs_review. No file export or physical erasure has occurred.
+- Phone changes require original family sign-in within 15 minutes and caller-bound destination proof; destination collisions never merge accounts. Success revokes all sessions/devices/privacy tokens, and requires sign-in to the new number.
+- Staff issuer/JWKS/audience must be configured together over HTTPS. Require RS256/ES256, amr=mfa, auth_time within 15 minutes and provisioned active DB roles. No user role claim or seeded staff account grants access. Provisioning CLI is available but was not run on real staff.
 
-## Photo foundation handoff
+## Next work and required inputs
 
-60673c3 implements private photo uploads. Opt-in MEDIA_MODE=local / MEDIA_LOCAL_DIR, local adapter forbidden in production. Only re-encoded JPEG bytes stored, no public content route, moderation remains pending. Use npm run media:cleanup regularly (100 items/run). Verification requests/status/withdrawal and health metadata now implemented; find module commit after 60673c3 in git log. Provider stays unconfigured: requests record intent only and never grant tiers. Production object storage/moderation/providers and optional GPS capture remain pending.
+See docs/REMAINING_WORK.md. Provider choices/credentials, reviewed legal/retention rules, actual launch city/store links/support staffing and optional-mode approval remain unresolved. An async provider question was already asked; no answer recorded. M13–M16 remain unimplemented, not implicitly approved or launched.
 
-## Verification handoff
-
-Guardian requests bind to caller; dog requests require editor membership. Active requests deduplicate, max 3 new requests/user/day. Health metadata is explicitly self_reported; dates validated, 100 live/dog and 10 new/dog/day. Removing reviewed evidence revokes health tiers and publication. Future health eligibility must check deleted_at, verified_at and live expiry; future callbacks must recheck membership, request state and current identity. No identity documents or numbers are accepted. Tests now total 73; OpenAPI has 71 operations. Next concrete shared-platform task: likes/connections with current eligibility and blocks enforced.
-
-## Location and developer handover
-
-GET /app/areas; GET/PUT/DELETE /households/{id}/location implemented. source=manual_area, precision=city, current location consent required. City selection is an explicit no-GPS path; metro_id only, inherited anchor cells/origins cleared. Do not derive precise distance buckets from city selection. Area changes serialized per household and limited to 24h; identical save is idempotent, clear retains deadline. Both change/clear reset publication and cancel beacons. Bengaluru remains development-only seed data.
-
-User requires handover per module from now on. All 16 have docs/handovers/Mxx.md, plus COMMON.md and index with end-to-end wire flow; planned modules clearly have no callable contracts. Keep OpenAPI, scripts/handover-notes.mjs and API_PLAN current; run docs:handovers and check:handovers before each module commit. CI includes drift check. This requirement is also in AGENTS.md.
-
-## Blocking foundation
-
-ec2f80b: M11 POST/GET /me/blocks and DELETE /me/blocks/{userId} implemented. Max 500 outgoing, private list, idempotent, reciprocal blocks use sorted user locks. Existing cross-household matches/conversations close; unblock never restores. Shared household membership is not removed. M06 now enforces blocks on feed/profile reads.
-
-## Discovery handoff
-
-M06 home/feed/empty-reason/discovery-preferences and impression-scoped profile implemented after ec2f80b; use git log for exact hash. DISCOVERY_MODE=development + AUTH_SECRET, off by default and forbidden in production. Bootstrap flags remain false. Cards provide approved-photo metadata only, mediaDelivery=unavailable. Home future counters are explicitly not_implemented/null.
-
-0018 adds published_by, allow_city_only=false default, live eligibility views, snapshot sessions and daily exposure rows. Publishing attributes current editor; old publications need republish. Actor and publisher need active account, is_adult_verified, current guardian tier and current four policy consents. Never fabricate these in ordinary local accounts. Both dogs require allowCityOnly=true, with distance unknown and radius filtering explicitly not applied.
-
-Snapshot IDs ranked by energy/style/size/same-timezone schedule; 200 max, ten-minute signed cursor, every page/profile rechecks current eligibility and bilateral household blocks. Limits 60 snapshots/hour and 200 distinct dog exposures/user/UTC day. npm run discovery:cleanup clears day-old sessions/prior-day reads; no scheduler. M07 must verify impression scope/expiry AND recheck eligibility/blocks and serialize relationship writes consistently with blocking; signed impressions are not standing permission. Existing blocked/ended matches are excluded and never silently restored.
-
-## M07 connections delivered (8 October 2026)
-
-Impression-bound pack interests/passes, sent/received likes, withdrawal, atomic mutual connections, unmatch and free daily entitlements are implemented. Migration 0019 adds durable interest budgets and idempotency receipts. Social writes serialize with blocking. Development discovery prerequisites remain required; production integrations remain unavailable. See docs/handovers/M07.md for contracts and wire diagram. Next: M08 messaging.
-
-## M08 text messaging delivered (8 October 2026)
-
-Encrypted text messages, deduplicated sends, bigint sequence history, private read markers, mute/archive and development WebSockets with single-use tickets are implemented. Migration 0020. MESSAGE_KEY is separate, opt-in and forbidden in production; KMS and attachments remain unavailable. Socket history polls PostgreSQL every two seconds; REST is authoritative. See docs/handovers/M08.md. Next: M09 notifications.
-
-## M09 notification foundation delivered (8 October 2026)
-
-Atomic match/message inbox events, private read markers, preferences and encrypted session-bound device registration are implemented. Migration 0021. Push jobs remain awaiting_provider; external push delivery/retry/dead-letter worker is still pending. Logout revokes registrations. See docs/handovers/M09.md. Next: M10 meetups.
-
-## M10 meetup core delivered (9 October 2026)
-
-Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups, extensions or reminder scheduler are fabricated. See docs/handovers/M10.md. Next: M11 reports/support/privacy.
-
-## M11 safety and privacy foundation (9 October 2026)
-
-Private reports, encrypted support, notices/appeals, purpose-bound restricted privacy OTP, and export/deletion request tracking are implemented. Migration 0023. Deletion requests revoke normal access and close social relationships immediately; full erasure and export processing remain needs_review, never completed. Existing restricted accounts can use Privacy-Token only for safety/privacy routes. See docs/handovers/M11.md. Next: M12 staff operations.
-
-## M12 staff operations foundation (9 October 2026)
-
-Separate OIDC/MFA staff auth, database roles, exclusive report claims/audited narratives, support replies, suspend/reinstate, independent appeals, public-place reviews and job counts are implemented. Migration 0024. No staff identities are seeded; configure SSO and explicitly provision approved subjects. Verification grants, full release/legal administration, push and privacy processing remain unavailable. See docs/handovers/M12.md.
-
-Home integration: GET /home now reports account-wide live connection/unread message/upcoming meetup/unread notification counts with current access and blocks enforced. Messaging stays unavailable/null without encryption configuration.
-
-M01 waitlist extension (9 October 2026): authenticated area opt-in/list/withdrawal, five-area cap, same-country rollout checks and idempotency; migration 0025. Launch notification delivery remains unavailable.
-
-M02 phone-change extension (9 October 2026): recent original-family sign-in plus caller-bound destination OTP, durable failed-attempt limits, collision protection, audit and full session/device/privacy-token revocation. Migration 0026. Same-country only; no account merging.
+Continue authorized independent backend work without repeated permission requests. Integrations require real contracts/test credentials; do not invent them. All commits are local. Re-run relevant tests, typecheck/build and contract/handover checks before each module commit.

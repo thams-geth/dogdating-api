@@ -1,6 +1,8 @@
 # Waggle API plan
 
-Plan version: 1.0 • 7 October 2026 • Backend: TypeScript + Express + PostgreSQL.
+Plan version: 1.1 • status reconciled 9 October 2026 • Backend: TypeScript + Express + PostgreSQL.
+
+This is the complete design inventory, not a claim that every listed API exists. Current implementation: 139 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
 
 ## 1. Product and release boundaries
 

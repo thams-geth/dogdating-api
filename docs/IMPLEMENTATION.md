@@ -1,15 +1,15 @@
 # Implementation ledger
 
-Updated: 8 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents delivered routes.
+Updated: 9 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents delivered routes.
 
 | Module | State | Evidence / remaining work |
 | --- | --- | --- |
 | Baseline | Complete | Express/TypeScript, PostgreSQL migrations; d0b4746 |
 | Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
 | M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
-| M01 rollout/content extensions | Planned | Waitlist enrollment, staff release administration, enforced update gates; bootstrap legal-version hints remain unconfigured |
+| M01 rollout/content extensions | Waitlist implemented; remainder planned | Private waitlist opt-in/list/withdrawal; staff releases, enforced update gates and legal-version hints remain pending |
 | M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me; 23e75eb |
-| M02 production/recovery | Planned | SMS + DLT, shared throttling, security audit events, phone-change/recovery |
+| M02 phone changes / production | Phone changes implemented; integrations pending | Recent-auth destination proof and revocation; SMS/DLT, distributed limits and optional recovery remain pending |
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
 | M04 household/dog profile core | Complete | Ownership, roles/invites, drafts, breed mix, structured temperament, preferences/schedule, gated publishing, pause, memorialisation, beacons |
 | M04 manual location | Complete | Public area lookup; consented household city selection/read/clear; roles, 24-hour limit and live onboarding checks |
@@ -23,16 +23,17 @@ Updated: 8 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 | M08 messaging | Development text/realtime complete | Encrypted bodies, sequences, recovery, ticketed sockets; fa26512; production KMS/attachments pending |
 | M09 notifications | Foundation complete | Durable inbox, preferences, encrypted devices; f5a4d46; push delivery worker/provider pending |
 | M10 meetups | Core implemented | Places, proposals, attendance and reviews; extensions/groups/video and operations pending |
-| M11–M12 remaining launch modules | In progress / planned | Reports/privacy/support and staff operations |
+| M11 safety/privacy | Foundation implemented | Reports/support/appeals and restricted privacy OTP; actual export/erasure pipeline remains pending |
+| M12 staff operations | Foundation implemented | Separate OIDC/MFA, DB roles, cases/support/appeals/place review/job counts; broader reviewer/release/privacy tooling pending |
 | M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 65 PostgreSQL integration tests passed (73 total).
+- Typecheck/build passed; 8 unit/HTTP tests and 91 PostgreSQL integration tests (99 total; latest full run recorded below).
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
-- Migrations through 0018. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 71 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- Migrations through 0026. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- 139 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions
@@ -45,9 +46,9 @@ M04 is the household/profile core, not every endpoint in the full plan. Current 
 
 The launch-mode question remains unanswered. Playdates/walks are provisional; this does not authorize opening breeding or owner dating.
 
-## Next session
+## Next work
 
-Build M07 likes/connections with impression validation, live bilateral blocks, atomic matching and idempotency; then M08 messaging. Keep public discovery gates closed until production dependencies are ready. Before enabling a provider, document credentials/configuration, callback verification, storage restrictions and production availability. Keep legal text, actual launch city and provider selection as explicit inputs rather than fabricated configuration.
+See [remaining work and inputs](REMAINING_WORK.md). M07–M12 foundations, home counters, waitlist and phone changes are delivered. Production integrations and privacy processing remain incomplete; M13–M16 are not implemented. Do not mark the whole app complete or public-launch ready.
 
 ## Definition of module completion
 
@@ -67,7 +68,7 @@ Blocking tests cover private lists, cursor scope, validation, reciprocal concurr
 
 Discovery verification: ten integration tests cover live consent/publisher/verification/photo/account gates, household-wide block directions, matching filters, whole-city opt-in, scoped and expired tokens, stable pagination, changed context, durable quotas and truthful home states. New dog publications record published_by. Old publications with no publisher stay hidden until republished. Source-provided identity verification and reviewed legal content are not fabricated.
 
-Remaining discovery gaps: cloud photo delivery/moderation, provider verification and account activation, public rollout, GPS/distance matching, full home counters and automated cleanup scheduling. DISCOVERY_MODE=development is off by default and forbidden in production; bootstrap flags remain false. A city-only opt-in explicitly overrides radius filtering with unknown distance.
+Remaining discovery gaps: cloud photo delivery/moderation, provider verification and account activation, public rollout, GPS/distance matching, automated cleanup scheduling. DISCOVERY_MODE=development is off by default and forbidden in production; bootstrap flags remain false. A city-only opt-in explicitly overrides radius filtering with unknown distance.
 
 ## M07 connections delivered (8 October 2026)
 

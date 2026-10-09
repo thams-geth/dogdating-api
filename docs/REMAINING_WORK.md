@@ -1,0 +1,47 @@
+# Remaining work and launch dependencies
+
+Updated 9 October 2026. The checked-in backend has 139 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
+
+## Required integration inputs
+
+| Input | Why it is needed | Current behavior |
+| --- | --- | --- |
+| Production SMS provider and India DLT sender/templates | Real OTP delivery, delivery callbacks and shared throttling | Opt-in terminal-only development OTP |
+| Object storage, moderation/scan service and key management | Private object delivery, approved photos, encrypted production chat/cases and deletion | Local adapters forbidden in production; no approved image delivery |
+| Guardian/dog verification provider and evidence policy | Verified adulthood/identity, evidence callbacks, reviewer grants and account activation | Request intake only; no fabricated badges or activation |
+| Push credentials/provider | FCM/APNs/Web Push delivery, invalid registration handling and retry worker | Durable inbox works; push jobs wait for provider |
+| Staff OIDC issuer/JWKS/audience and approved staff subjects | Real SSO/MFA and role provisioning | Admin routes unavailable without trusted identity configuration |
+| Reviewed legal/support content and retention/hold policy | Publish current documents, provide support contacts, process exports/erasure/vendor/backup retention | No legal text seeded; privacy requests remain needs_review |
+| Launch city, store IDs/URLs, supported locales and support staffing | Public rollout, obtainable mandatory updates, place review and incident handling | India/Bengaluru development configuration only |
+| Billing/store products and provider | Verified receipts, webhooks, subscriptions/refunds and entitlement lifecycle | Free persisted quotas only; purchases unavailable |
+
+No credentials, provider selection, legal approval or operational response is inferred from a request to implement backend features.
+
+## Remaining backend work
+
+| Module | Remaining scope |
+| --- | --- |
+| M01 | Audited release/country administration, enforced update policy and live legal-version hints; waitlist outbound delivery |
+| M02 | Production SMS/DLT, distributed abuse controls and broader security audit/monitoring; optional OAuth/passkeys/recovery factors |
+| M04 | GPS/displaced anchors, two-party dog transfer and twelve-question scoring; structured temperament and city-only location already work |
+| M05 | Production uploads/delivery, scan/moderation, document uploads, signed replay-safe provider webhooks, reviewer evidence/grants and account activation |
+| M06 | Production discovery rollout, precise-distance matching and scheduled snapshot cleanup; account-wide home counters are implemented |
+| M08 | Production key wrapping/rotation, moderated attachments, typing/presence/shared read receipts, scalable event delivery and ticket retention; current sockets use bounded DB polling |
+| M09 | Push relay with backoff/deduplication/invalid-token handling/dead-letter operations, quiet-hour enforcement at delivery and operational scheduling |
+| M10 | Extensions with agreement, reminders/expiry cleanup, reviewer response workflow; optional groups/video |
+| M11 | Actual export generation/download and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help articles |
+| M12 | Verification review/provider evidence, incident-review queue, complete audit browsing, legal/release tooling, privacy job execution and operational metrics; current report decisions support dismiss/escalate, with suspension handled separately |
+| M13 | Store offerings, verified receipt/restore, subscription/cancellation/refund/grace rules, signed billing webhooks and referral/growth behavior |
+| M14 | Additional market configuration, local content/providers, quota-zone rules and reviewed residency/rollout policy |
+| M15 | Optional breeding mode requires explicit product approval and reviewed jurisdiction/evidence rules before implementation/enablement |
+| M16 | Optional human dating and live safety require explicit product approval, isolated privacy design and real response capability |
+
+## Suggested next implementation sequence
+
+1. Choose SMS, storage/KMS, moderation and verification providers; implement their authenticated adapters and callbacks with provider test environments.
+2. Complete export/erasure processing against the reviewed retention policy and shared-household rules; requests must never be marked completed while data remains unprocessed.
+3. Add the push relay, operational scheduling and incident-review tooling.
+4. Finish legal/release administration, rollout checks and production verification.
+5. Implement approved growth/expansion modes only after their product and provider contracts are decided.
+
+No provider integration, public rollout, remote push or deployment was performed in the implementation session.
