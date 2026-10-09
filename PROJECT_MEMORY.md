@@ -99,3 +99,5 @@ Separate OIDC/MFA staff auth, database roles, exclusive report claims/audited na
 Home integration: GET /home now reports account-wide live connection/unread message/upcoming meetup/unread notification counts with current access and blocks enforced. Messaging stays unavailable/null without encryption configuration.
 
 M01 waitlist extension (9 October 2026): authenticated area opt-in/list/withdrawal, five-area cap, same-country rollout checks and idempotency; migration 0025. Launch notification delivery remains unavailable.
+
+M02 phone-change extension (9 October 2026): recent original-family sign-in plus caller-bound destination OTP, durable failed-attempt limits, collision protection, audit and full session/device/privacy-token revocation. Migration 0026. Same-country only; no account merging.

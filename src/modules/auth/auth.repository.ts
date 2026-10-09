@@ -9,7 +9,7 @@ export interface SessionRow {
   refresh_hash: string; expires_at: Date; rotated_at: Date | null; revoked_at: Date | null;
 }
 export interface ChallengeRow {
-  id: string; code_hash: string; attempt_count: number; max_attempts: number;
+  requested_by?:string|null; id: string; code_hash: string; attempt_count: number; max_attempts: number;
   country_code: string; expires_at: Date; delivered_at: Date | null;
 }
 

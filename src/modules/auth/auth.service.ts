@@ -37,7 +37,7 @@ export class AuthService {
     return result.value;
   }
 
-  async requestOtp(phone: string, countryCode: string, purpose:'auth'|'privacy'='auth'): Promise<void> {
+  async requestOtp(phone: string, countryCode: string, purpose:'auth'|'privacy'|'phone_change'='auth',requestedBy?:string): Promise<void> {
     const index = this.hash('phone', phone);
     const code = String(randomInt(0, 1_000_000)).padStart(6, '0');
     const id = await transaction(this.database, async (tx) => {
@@ -48,8 +48,8 @@ export class AuthService {
       if (recent.rows[0]!.count >= 3 || recent.rows[0]!.too_soon) return null;
       await tx.query('UPDATE identity.otp_challenges SET consumed_at=now() WHERE phone_blind_index=$1 AND consumed_at IS NULL', [index]);
       const challengeId = randomUUID();
-      await tx.query(`INSERT INTO identity.otp_challenges (id, phone_blind_index, code_hash, country_code, expires_at,purpose)
-        VALUES ($1,$2,$3,$4,now()+interval '10 minutes',$5)`, [challengeId, index, this.hash('otp', `${index}:${code}`), countryCode,purpose]);
+      await tx.query(`INSERT INTO identity.otp_challenges (id, phone_blind_index, code_hash, country_code, expires_at,purpose,requested_by)
+        VALUES ($1,$2,$3,$4,now()+interval '10 minutes',$5,$6)`, [challengeId, index, this.hash('otp', `${index}:${code}`), countryCode,purpose,requestedBy??null]);
       return challengeId;
     });
     if (id === null) return;
@@ -109,6 +109,41 @@ export class AuthService {
     if(!/^[A-Za-z0-9_-]{43}$/.test(token))throw invalidSession();
     const row=(await this.database.query('SELECT user_id FROM identity.privacy_tokens WHERE token_hash=$1 AND expires_at>now()',[this.hash('privacy',token)])).rows[0];
     if(!row)throw invalidSession();return {userId:row.user_id};
+  }
+
+  private async recentPhoneChange(tx:PoolClient,principal:Principal){
+    const row=(await tx.query(`SELECT min(created_at)>now()-interval '15 minutes' AS recent,
+      bool_or(id=$3 AND revoked_at IS NULL AND expires_at>now()) AS active
+      FROM identity.sessions WHERE user_id=$1 AND family_id=$2`,[principal.userId,principal.familyId,principal.sessionId])).rows[0];
+    if(!row?.recent||!row.active)throw new ApiError(403,'reauthentication-required','Sign in again before changing your phone.');
+  }
+  async requestPhoneChange(principal:Principal,phone:string,countryCode:string){
+    await transaction(this.database,async tx=>{await this.recentPhoneChange(tx,principal);const row=(await tx.query('SELECT country_code,phone_blind_index FROM identity.users WHERE id=$1',[principal.userId])).rows[0];
+      if(row.country_code!==countryCode)throw new ApiError(400,'country-change-unavailable','Phone changes must stay in your account country.');
+      if(row.phone_blind_index===this.phoneIndex(phone))throw new ApiError(409,'phone-unchanged','This phone number is already yours.');
+    });await this.requestOtp(phone,countryCode,'phone_change',principal.userId);
+  }
+  async verifyPhoneChange(principal:Principal,phone:string,code:string){
+    const index=this.phoneIndex(phone);
+    const result=await transaction<Result<{status:string}>>(this.database,async tx=>{
+      await lockScope(tx,`phone:${index}`);
+      const user=(await tx.query<UserRow>('SELECT * FROM identity.users WHERE id=$1 FOR UPDATE',[principal.userId])).rows[0];
+      await this.recentPhoneChange(tx,principal);
+      if(!user||!usable(user.status)||user.deletion_requested_at||user.deleted_at)return {error:invalidSession()};
+      const challenge=await this.repo.latestChallenge(tx,index,'phone_change');
+      if(!challenge||challenge.requested_by!==principal.userId||!challenge.delivered_at||challenge.expires_at<=new Date()||challenge.attempt_count>=challenge.max_attempts)return {error:invalidOtp()};
+      if(!this.equal(this.hash('otp',`${index}:${code}`),challenge.code_hash)){
+        await tx.query('UPDATE identity.otp_challenges SET attempt_count=attempt_count+1,consumed_at=CASE WHEN attempt_count+1>=max_attempts THEN now() ELSE NULL END WHERE id=$1',[challenge.id]);return {error:invalidOtp()};
+      }
+      await tx.query('UPDATE identity.otp_challenges SET consumed_at=now() WHERE id=$1',[challenge.id]);
+      if(challenge.country_code!==user.country_code)return {error:new ApiError(400,'country-change-unavailable','Phone changes must stay in your account country.')};
+      if((await tx.query('SELECT 1 FROM identity.users WHERE phone_blind_index=$1',[index])).rowCount)return {error:new ApiError(409,'phone-unavailable','This verified destination cannot be linked to this account.')};
+      await tx.query('UPDATE identity.users SET phone_e164=$2,phone_blind_index=$3,phone_verified_at=now(),updated_at=now() WHERE id=$1',[principal.userId,phone,index]);
+      await tx.query("UPDATE identity.sessions SET revoked_at=coalesce(revoked_at,now()),revoked_reason='phone_changed' WHERE user_id=$1",[principal.userId]);
+      await tx.query('DELETE FROM identity.devices WHERE user_id=$1',[principal.userId]);await tx.query('DELETE FROM identity.privacy_tokens WHERE user_id=$1',[principal.userId]);
+      await tx.query("INSERT INTO ops.audit_log(actor_user_id,actor_kind,action,subject_type,subject_id) VALUES($1,'user','phone.changed','user',$1)",[principal.userId]);
+      return {value:{status:'sign_in_required'}};
+    });return this.unwrap(result);
   }
 
   private async issue(tx: PoolClient, userId: string, deviceId: string, familyId: string, expiresAt: Date): Promise<TokenPair> {

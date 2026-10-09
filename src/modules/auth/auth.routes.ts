@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { authenticate } from '../../http/authenticate.js';
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
@@ -25,6 +26,8 @@ export function authRoutes(service?: AuthService): Router {
   router.post('/auth/refresh', limiter, asyncHandler(async (req, res) => res.json(await service!.refresh(refreshSchema.parse(req.body).refreshToken))));
   router.use(authenticate(service));
   const principal = (locals: Record<string, unknown>) => locals.principal as Principal;
+  router.post('/auth/phone-change/request',limiter,asyncHandler(async(req,res)=>{const input=requestOtpSchema.parse(req.body);await service!.requestPhoneChange(principal(res.locals),input.phoneE164,input.countryCode);res.status(202).json({status:'accepted'});}));
+  router.post('/auth/phone-change/verify',limiter,asyncHandler(async(req,res)=>{const input=z.object({phoneE164:requestOtpSchema.shape.phoneE164,code:z.string().regex(/^\d{6}$/)}).strict().parse(req.body);res.json(await service!.verifyPhoneChange(principal(res.locals),input.phoneE164,input.code));}));
   router.post('/auth/logout', asyncHandler(async (_req, res) => { await service!.logout(principal(res.locals)); res.sendStatus(204); }));
   router.post('/auth/logout-all', asyncHandler(async (_req, res) => { await service!.logoutAll(principal(res.locals)); res.sendStatus(204); }));
   router.get('/auth/sessions', asyncHandler(async (_req, res) => res.json(await service!.sessions(principal(res.locals)))));
