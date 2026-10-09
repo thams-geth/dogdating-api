@@ -6831,6 +6831,148 @@ paths:
               required:
                 - message
                 - resolve
+  /v1/waitlist:
+    post:
+      operationId: joinWaitlist
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  metroId:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    format: date-time
+                  notificationDelivery:
+                    const: unavailable
+                required:
+                  - id
+                  - metroId
+                  - createdAt
+                  - notificationDelivery
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                metroId:
+                  type: string
+                  format: uuid
+              required:
+                - metroId
+    get:
+      operationId: ownWaitlist
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        metroId:
+                          type: string
+                          format: uuid
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - metroId
+                        - createdAt
+                required:
+                  - items
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /v1/waitlist/{id}:
+    delete:
+      operationId: leaveWaitlist
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Completed; no body
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:

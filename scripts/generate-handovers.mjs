@@ -10,6 +10,7 @@ const sections = [...plan.matchAll(/^### (M\d+) — (.+)\n([\s\S]*?)(?=^### M|^#
 const ids = Object.keys(notes).sort();
 const operations = Object.fromEntries(ids.map(id => [id, []]));
 function moduleFor(path) {
+  if(path.startsWith('/v1/waitlist'))return 'M01';
   if (path.startsWith('/admin/v1/')) return 'M12';
   if (/^\/v1\/(places|meetups)(?:\/|$)/.test(path)) return 'M10';
   if (/^\/v1\/(notifications|me\/devices|me\/notification-preferences)(?:\/|$)/.test(path)) return 'M09';

@@ -1,3 +1,4 @@
+import { waitlistRoutes } from './modules/app/waitlist.js';
 import { StaffAuth,OidcStaffVerifier,type StaffVerifier } from './modules/admin/staff-auth.js';
 import { AdminService } from './modules/admin/admin.service.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
@@ -64,7 +65,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0024']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0025']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -79,6 +80,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
     ? new AuthService(database, config.AUTH_SECRET, new DevelopmentOtpSender(config.NODE_ENV)) : undefined);
   const messageCipher=deps.messageCipher ?? (config.MESSAGE_KEY?new LocalMessageCipher(config.MESSAGE_KEY,config.NODE_ENV):undefined);
   app.use('/v1',safetyRoutes(new SafetyService(database,messageCipher),new PrivacyService(database),auth));
+  app.use('/v1/waitlist',waitlistRoutes(database,auth));
   app.use('/v1', authRoutes(auth));
   const onboarding=new OnboardingService(database);
   app.use('/v1/legal',legalRoutes(onboarding));

@@ -97,3 +97,5 @@ Private reports, encrypted support, notices/appeals, purpose-bound restricted pr
 Separate OIDC/MFA staff auth, database roles, exclusive report claims/audited narratives, support replies, suspend/reinstate, independent appeals, public-place reviews and job counts are implemented. Migration 0024. No staff identities are seeded; configure SSO and explicitly provision approved subjects. Verification grants, full release/legal administration, push and privacy processing remain unavailable. See docs/handovers/M12.md.
 
 Home integration: GET /home now reports account-wide live connection/unread message/upcoming meetup/unread notification counts with current access and blocks enforced. Messaging stays unavailable/null without encryption configuration.
+
+M01 waitlist extension (9 October 2026): authenticated area opt-in/list/withdrawal, five-area cap, same-country rollout checks and idempotency; migration 0025. Launch notification delivery remains unavailable.
