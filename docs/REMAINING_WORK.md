@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 9 October 2026. The checked-in backend has 139 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
+Updated 9 October 2026. The checked-in backend has 140 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
 
 ## Required integration inputs
 
@@ -29,7 +29,7 @@ No credentials, provider selection, legal approval or operational response is in
 | M08 | Production key wrapping/rotation, moderated attachments, typing/presence/shared read receipts, scalable event delivery and ticket retention; current sockets use bounded DB polling |
 | M09 | Push relay with backoff/deduplication/invalid-token handling/dead-letter operations, quiet-hour enforcement at delivery and operational scheduling |
 | M10 | Extensions with agreement, reminders/expiry cleanup, reviewer response workflow; optional groups/video |
-| M11 | Actual export generation/download and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help articles |
+| M11 | Broader legal-response exports (photo files/shared/provider categories) and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help articles |
 | M12 | Verification review/provider evidence, incident-review queue, complete audit browsing, legal/release tooling, privacy job execution and operational metrics; current report decisions support dismiss/escalate, with suspension handled separately |
 | M13 | Store offerings, verified receipt/restore, subscription/cancellation/refund/grace rules, signed billing webhooks and referral/growth behavior |
 | M14 | Additional market configuration, local content/providers, quota-zone rules and reviewed residency/rollout policy |
@@ -39,7 +39,7 @@ No credentials, provider selection, legal approval or operational response is in
 ## Suggested next implementation sequence
 
 1. Choose SMS, storage/KMS, moderation and verification providers; implement their authenticated adapters and callbacks with provider test environments.
-2. Complete export/erasure processing against the reviewed retention policy and shared-household rules; requests must never be marked completed while data remains unprocessed.
+2. Complete broader export/erasure processing against the reviewed retention policy and shared-household rules; requests must never be marked completed while data remains unprocessed.
 3. Add the push relay, operational scheduling and incident-review tooling.
 4. Finish legal/release administration, rollout checks and production verification.
 5. Implement approved growth/expansion modes only after their product and provider contracts are decided.

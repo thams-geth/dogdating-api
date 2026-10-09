@@ -63,3 +63,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 See docs/REMAINING_WORK.md. Provider choices/credentials, reviewed legal/retention rules, actual launch city/store links/support staffing and optional-mode approval remain unresolved. An async provider question was already asked; no answer recorded. M13–M16 remain unimplemented, not implicitly approved or launched.
 
 Continue authorized independent backend work without repeated permission requests. Integrations require real contracts/test credentials; do not invent them. All commits are local. Re-run relevant tests, typecheck/build and contract/handover checks before each module commit.
+
+## Scoped account exports (9 October 2026)
+
+M11 now queues account_data_v1 exports, processes encrypted snapshots with npm run privacy:exports, and serves owner-only/recent-auth JSON downloads for 24 hours. Migration 0027. Explicit exclusions include photo file bytes, others’ content, shared documents, provider records and internal notes; this is not a full legal-response archive. Size failures go to review without truncation. Deletion remains unprocessed/needs_review.

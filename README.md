@@ -15,7 +15,7 @@ The provisional launch scope is dog playdates/walks. Breeding introductions and 
 
 ## Current status (9 October 2026)
 
-139 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; exports/erasure and external delivery are not completed by request intake.
+140 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
 
 ## Local development
 
@@ -187,3 +187,7 @@ Home integration: GET /home now reports account-wide live connection/unread mess
 M01 waitlist extension (9 October 2026): authenticated area opt-in/list/withdrawal, five-area cap, same-country rollout checks and idempotency; migration 0025. Launch notification delivery remains unavailable.
 
 M02 phone-change extension (9 October 2026): recent original-family sign-in plus caller-bound destination OTP, durable failed-attempt limits, collision protection, audit and full session/device/privacy-token revocation. Migration 0026. Same-country only; no account merging.
+
+## Scoped account exports (9 October 2026)
+
+M11 now queues account_data_v1 exports, processes encrypted snapshots with npm run privacy:exports, and serves owner-only/recent-auth JSON downloads for 24 hours. Migration 0027. Explicit exclusions include photo file bytes, others’ content, shared documents, provider records and internal notes; this is not a full legal-response archive. Size failures go to review without truncation. Deletion remains unprocessed/needs_review.

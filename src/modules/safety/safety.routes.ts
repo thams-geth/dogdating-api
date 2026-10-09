@@ -7,11 +7,12 @@ export function safetyRoutes(service:SafetyService,privacy:PrivacyService,auth?:
  const limiter=rateLimit({windowMs:15*60000,limit:30,standardHeaders:'draft-7',legacyHeaders:false});
  router.post('/privacy/deletion/otp/request',limiter,asyncHandler(async(req,res)=>{if(!auth)throw new ApiError(503,'auth-unavailable','Phone verification is unavailable.');const input=requestOtpSchema.parse(req.body);await auth.requestOtp(input.phoneE164,input.countryCode,'privacy');res.status(202).json({status:'accepted'});}));
  router.post('/privacy/deletion/otp/verify',limiter,asyncHandler(async(req,res)=>{if(!auth)throw new ApiError(503,'auth-unavailable','Phone verification is unavailable.');const input=z.object({phoneE164:requestOtpSchema.shape.phoneE164,code:z.string().regex(/^\d{6}$/)}).strict().parse(req.body);res.json(await auth.verifyPrivacyOtp(input.phoneE164,input.code));}));
- for(const path of ['data-exports','deletion-requests'])router.get(`/me/${path}/:id`,asyncHandler(async(req,res)=>{res.json(await privacy.status(id(req.params.id),req.get('Privacy-Status-Token')??''));}));
+ for(const path of ['data-exports','deletion-requests'])router.get(`/me/${path}/:id`,asyncHandler(async(req,res)=>{res.json(await privacy.status(id(req.params.id),req.get('Privacy-Status-Token')??'',path==='data-exports'?'export':'deletion'));}));
  router.use(asyncHandler(async(req,res,next)=>{
   if(!auth)throw new ApiError(503,'auth-unavailable','Authentication is unavailable.');const token=req.get('Privacy-Token');
   if(token)res.locals.safetyPrincipal=await auth.authenticatePrivacy(token);else{const header=req.get('Authorization');if(!header?.startsWith('Bearer ')||header.length>4096)throw new ApiError(401,'unauthenticated','Authentication is required.');res.locals.safetyPrincipal=await auth.authenticate(header.slice(7));}next();
  }));const user=(res:{locals:Record<string,any>})=>res.locals.safetyPrincipal as {userId:string;familyId?:string};
+ router.get('/me/data-exports/:id/download',asyncHandler(async(req,res)=>{const p=user(res),requestId=id(req.params.id);const artifact=await privacy.download(p.userId,requestId,p.familyId);res.setHeader('Content-Disposition',`attachment; filename=waggle-account-${requestId}.json`);res.json(artifact);}));
  router.post('/reports',asyncHandler(async(req,res)=>{res.status(201).json(await service.report(user(res).userId,reportInput.parse(req.body),id(req.get('Idempotency-Key'))));}));
  router.get('/reports/:id',asyncHandler(async(req,res)=>{res.json(await service.reportStatus(user(res).userId,id(req.params.id)));}));
  router.post('/support/tickets',asyncHandler(async(req,res)=>{res.status(201).json(await service.ticket(user(res).userId,ticketInput.parse(req.body),id(req.get('Idempotency-Key'))));}));

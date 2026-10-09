@@ -99,3 +99,7 @@ Home integration: GET /home now reports account-wide live connection/unread mess
 M01 waitlist extension (9 October 2026): authenticated area opt-in/list/withdrawal, five-area cap, same-country rollout checks and idempotency; migration 0025. Launch notification delivery remains unavailable.
 
 M02 phone-change extension (9 October 2026): recent original-family sign-in plus caller-bound destination OTP, durable failed-attempt limits, collision protection, audit and full session/device/privacy-token revocation. Migration 0026. Same-country only; no account merging.
+
+## Scoped account exports (9 October 2026)
+
+M11 now queues account_data_v1 exports, processes encrypted snapshots with npm run privacy:exports, and serves owner-only/recent-auth JSON downloads for 24 hours. Migration 0027. Explicit exclusions include photo file bytes, others’ content, shared documents, provider records and internal notes; this is not a full legal-response archive. Size failures go to review without truncation. Deletion remains unprocessed/needs_review.

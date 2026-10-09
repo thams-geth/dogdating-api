@@ -5381,9 +5381,17 @@ paths:
                   statusToken:
                     type: string
                   nextAction:
-                    const: awaiting_privacy_review
+                    enum:
+                      - awaiting_export_generation
+                      - awaiting_privacy_review
                   completed:
                     const: false
+                  scope:
+                    const: account_data_v1
+                  excludedCategories:
+                    type: array
+                    items:
+                      type: string
                 required:
                   - id
                   - kind
@@ -5392,6 +5400,8 @@ paths:
                   - statusToken
                   - nextAction
                   - completed
+                  - scope
+                  - excludedCategories
         "400":
           $ref: "#/components/responses/Problem"
         "401":
@@ -5463,7 +5473,16 @@ paths:
                       - type: string
                       - type: "null"
                   downloadAvailable:
-                    const: false
+                    type: boolean
+                  expiresAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  scope:
+                    anyOf:
+                      - const: account_data_v1
+                      - type: "null"
                 required:
                   - id
                   - kind
@@ -5472,6 +5491,8 @@ paths:
                   - updatedAt
                   - errorCode
                   - downloadAvailable
+                  - expiresAt
+                  - scope
         "400":
           $ref: "#/components/responses/Problem"
         "401":
@@ -5599,7 +5620,16 @@ paths:
                       - type: string
                       - type: "null"
                   downloadAvailable:
-                    const: false
+                    type: boolean
+                  expiresAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  scope:
+                    anyOf:
+                      - const: account_data_v1
+                      - type: "null"
                 required:
                   - id
                   - kind
@@ -5608,6 +5638,8 @@ paths:
                   - updatedAt
                   - errorCode
                   - downloadAvailable
+                  - expiresAt
+                  - scope
         "400":
           $ref: "#/components/responses/Problem"
         "401":
@@ -7074,6 +7106,770 @@ paths:
               required:
                 - phoneE164
                 - code
+  /v1/me/data-exports/{id}/download:
+    get:
+      operationId: downloadAccountExport
+      security:
+        - bearerAuth: []
+        - privacyToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  formatVersion:
+                    const: 1
+                  scope:
+                    const: account_data_v1
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  excludedCategories:
+                    type: array
+                    items:
+                      type: string
+                  data:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      profile:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            phoneE164:
+                              type: string
+                            email:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            displayName:
+                              type: string
+                            dateOfBirth:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            isAdultVerified:
+                              type: boolean
+                            countryCode:
+                              type: string
+                            residencyRegion:
+                              type: string
+                            locale:
+                              type: string
+                            timezone:
+                              type: string
+                            status:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                            deletionRequestedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - id
+                            - phoneE164
+                            - email
+                            - displayName
+                            - dateOfBirth
+                            - isAdultVerified
+                            - countryCode
+                            - residencyRegion
+                            - locale
+                            - timezone
+                            - status
+                            - createdAt
+                            - deletionRequestedAt
+                      preferences:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            mode:
+                              type: string
+                            adultDeclared:
+                              type: boolean
+                            adultDeclaredAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                            activeDogId:
+                              anyOf:
+                                - type: string
+                                  format: uuid
+                                - type: "null"
+                            discoveryPaused:
+                              type: boolean
+                            readReceipts:
+                              type: boolean
+                            onboardingCompletedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - mode
+                            - adultDeclared
+                            - adultDeclaredAt
+                            - activeDogId
+                            - discoveryPaused
+                            - readReceipts
+                            - onboardingCompletedAt
+                      notificationPreferences:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            messages:
+                              type: boolean
+                            connections:
+                              type: boolean
+                            meetups:
+                              type: boolean
+                            pushEnabled:
+                              type: boolean
+                            timezone:
+                              type: string
+                            quietStart:
+                              anyOf:
+                                - type: integer
+                                - type: "null"
+                            quietEnd:
+                              anyOf:
+                                - type: integer
+                                - type: "null"
+                          required:
+                            - messages
+                            - connections
+                            - meetups
+                            - pushEnabled
+                            - timezone
+                            - quietStart
+                            - quietEnd
+                      consents:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                            action:
+                              type: string
+                            recordedAt:
+                              type: string
+                              format: date-time
+                            documentId:
+                              type: string
+                              format: uuid
+                            purpose:
+                              type: string
+                            version:
+                              type: string
+                            locale:
+                              type: string
+                            documentHash:
+                              type: string
+                          required:
+                            - id
+                            - action
+                            - recordedAt
+                            - documentId
+                            - purpose
+                            - version
+                            - locale
+                            - documentHash
+                      memberships:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            householdId:
+                              type: string
+                              format: uuid
+                            role:
+                              type: string
+                            acceptedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - householdId
+                            - role
+                            - acceptedAt
+                      sessions:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            deviceId:
+                              type: string
+                              format: uuid
+                            createdAt:
+                              type: string
+                              format: date-time
+                            expiresAt:
+                              type: string
+                              format: date-time
+                            revokedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                            revokedReason:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                          required:
+                            - deviceId
+                            - createdAt
+                            - expiresAt
+                            - revokedAt
+                            - revokedReason
+                      waitlist:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            metroId:
+                              type: string
+                              format: uuid
+                            createdAt:
+                              type: string
+                              format: date-time
+                          required:
+                            - id
+                            - metroId
+                            - createdAt
+                      decisions:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            actorDogId:
+                              type: string
+                              format: uuid
+                            targetDogId:
+                              type: string
+                              format: uuid
+                            mode:
+                              type: string
+                            verdict:
+                              type: string
+                            decidedAt:
+                              type: string
+                              format: date-time
+                            withdrawnAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - id
+                            - actorDogId
+                            - targetDogId
+                            - mode
+                            - verdict
+                            - decidedAt
+                            - withdrawnAt
+                      attendance:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            meetupId:
+                              type: string
+                              format: uuid
+                            dogId:
+                              type: string
+                              format: uuid
+                            rsvp:
+                              type: string
+                            checkedInAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                            checkedOutAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - meetupId
+                            - dogId
+                            - rsvp
+                            - checkedInAt
+                            - checkedOutAt
+                      uploads:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            mediaId:
+                              type: string
+                              format: uuid
+                            dogId:
+                              type: string
+                              format: uuid
+                            contentType:
+                              type: string
+                            state:
+                              type: string
+                            moderationState:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                            completedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - mediaId
+                            - dogId
+                            - contentType
+                            - state
+                            - moderationState
+                            - createdAt
+                            - completedAt
+                      verificationRequests:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            subjectType:
+                              type: string
+                            subjectId:
+                              type: string
+                              format: uuid
+                            targetTier:
+                              type: integer
+                            state:
+                              type: string
+                            reasonCode:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            createdAt:
+                              type: string
+                              format: date-time
+                          required:
+                            - id
+                            - subjectType
+                            - subjectId
+                            - targetTier
+                            - state
+                            - reasonCode
+                            - createdAt
+                      authoredHealthRecords:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            dogId:
+                              type: string
+                              format: uuid
+                            recordType:
+                              type: string
+                            testedAt:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            expiresAt:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            resultCode:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            verifiedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                            deletedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - id
+                            - dogId
+                            - recordType
+                            - testedAt
+                            - expiresAt
+                            - resultCode
+                            - verifiedAt
+                            - deletedAt
+                      notifications:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            category:
+                              type: string
+                            conversationId:
+                              type: string
+                              format: uuid
+                            createdAt:
+                              type: string
+                              format: date-time
+                            readAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - id
+                            - category
+                            - conversationId
+                            - createdAt
+                            - readAt
+                      supportTickets:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            category:
+                              type: string
+                            state:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                            updatedAt:
+                              type: string
+                              format: date-time
+                          required:
+                            - id
+                            - category
+                            - state
+                            - createdAt
+                            - updatedAt
+                      safetyNotices:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            action:
+                              type: string
+                            reasonCode:
+                              type: string
+                            policyRef:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                            expiresAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                            reversedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - id
+                            - action
+                            - reasonCode
+                            - policyRef
+                            - createdAt
+                            - expiresAt
+                            - reversedAt
+                      authoredMessages:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            conversationId:
+                              type: string
+                              format: uuid
+                            seq:
+                              type: string
+                            kind:
+                              type: string
+                            body:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            createdAt:
+                              type: string
+                              format: date-time
+                            deletedAt:
+                              anyOf:
+                                - type: string
+                                  format: date-time
+                                - type: "null"
+                          required:
+                            - id
+                            - conversationId
+                            - seq
+                            - kind
+                            - body
+                            - createdAt
+                            - deletedAt
+                      reports:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            subjectType:
+                              type: string
+                            subjectId:
+                              type: string
+                              format: uuid
+                            category:
+                              type: string
+                            state:
+                              type: string
+                            details:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            createdAt:
+                              type: string
+                              format: date-time
+                          required:
+                            - id
+                            - subjectType
+                            - subjectId
+                            - category
+                            - state
+                            - details
+                            - createdAt
+                      appeals:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            actionId:
+                              type: string
+                              format: uuid
+                            state:
+                              type: string
+                            statement:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            outcome:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            createdAt:
+                              type: string
+                              format: date-time
+                          required:
+                            - id
+                            - actionId
+                            - state
+                            - statement
+                            - outcome
+                            - createdAt
+                      authoredSupportMessages:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            ticketId:
+                              type: string
+                              format: uuid
+                            body:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                          required:
+                            - id
+                            - ticketId
+                            - body
+                            - createdAt
+                      authoredReviews:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            meetupId:
+                              type: string
+                              format: uuid
+                            showedUp:
+                              type: boolean
+                            onTime:
+                              anyOf:
+                                - type: boolean
+                                - type: "null"
+                            dogAsDescribed:
+                              anyOf:
+                                - type: integer
+                                  minimum: 1
+                                  maximum: 5
+                                - type: "null"
+                            humanRespectful:
+                              anyOf:
+                                - type: integer
+                                  minimum: 1
+                                  maximum: 5
+                                - type: "null"
+                            playCompatibility:
+                              anyOf:
+                                - type: integer
+                                  minimum: 1
+                                  maximum: 5
+                                - type: "null"
+                            wouldRepeat:
+                              type: boolean
+                            incidentOccurred:
+                              type: boolean
+                            incidentType:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            privateNote:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            publicNote:
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            createdAt:
+                              type: string
+                              format: date-time
+                          required:
+                            - id
+                            - meetupId
+                            - showedUp
+                            - onTime
+                            - dogAsDescribed
+                            - humanRespectful
+                            - playCompatibility
+                            - wouldRepeat
+                            - incidentOccurred
+                            - incidentType
+                            - privateNote
+                            - publicNote
+                            - createdAt
+                    required:
+                      - profile
+                      - preferences
+                      - notificationPreferences
+                      - consents
+                      - memberships
+                      - sessions
+                      - waitlist
+                      - decisions
+                      - attendance
+                      - uploads
+                      - verificationRequests
+                      - authoredHealthRecords
+                      - notifications
+                      - supportTickets
+                      - safetyNotices
+                      - authoredMessages
+                      - reports
+                      - appeals
+                      - authoredSupportMessages
+                      - authoredReviews
+                required:
+                  - formatVersion
+                  - scope
+                  - generatedAt
+                  - excludedCategories
+                  - data
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
