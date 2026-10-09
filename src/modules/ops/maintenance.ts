@@ -1,5 +1,6 @@
 import type { Pool } from 'pg';
 import { cleanupDiscovery } from '../discovery/cleanup.service.js';
+import { processVerificationExpiry } from '../verification/expiry-worker.js';
 import { processMeetupReminders } from '../meetups/reminder-worker.js';
 
 // A single pass for jobs whose expiry semantics are already defined. The
@@ -18,8 +19,9 @@ export async function runMaintenance(db:Pool){
   ), tokens AS (
    DELETE FROM identity.privacy_tokens WHERE expires_at<now()-interval '1 day' RETURNING 1
   ) SELECT (SELECT count(*)::int FROM tickets) AS tickets,(SELECT count(*)::int FROM tokens) AS tokens`);
+  const verification=await processVerificationExpiry(db);
   const meetups=await processMeetupReminders(db);
-  return {status:'completed' as const,discovery,ephemeral:ephemeral.rows[0],meetups};
+  return {status:'completed' as const,discovery,ephemeral:ephemeral.rows[0],verification,meetups};
  }finally{
   try{if(held)await lock.query('SELECT pg_advisory_unlock($1)',[70419002]);}
   finally{lock.release();}

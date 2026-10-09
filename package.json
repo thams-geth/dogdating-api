@@ -23,7 +23,8 @@
     "staff:provision": "tsx src/modules/admin/provision.ts",
     "privacy:exports": "tsx src/modules/safety/export-worker.ts",
     "meetups:reminders": "tsx src/modules/meetups/reminder-cli.ts",
-    "maintenance:run": "tsx src/modules/ops/maintenance-cli.ts"
+    "maintenance:run": "tsx src/modules/ops/maintenance-cli.ts",
+    "verification:expire": "tsx src/modules/verification/expiry-cli.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

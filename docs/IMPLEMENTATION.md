@@ -131,3 +131,7 @@ Migrations 0032–0033 create private case entries for incident reviews and back
 ### Bounded operations maintenance (9 October 2026)
 
 `npm run maintenance:run` now performs one overlap-safe pass for audit partition provisioning, bounded discovery cleanup, expired realtime tickets/privacy tokens, and meetup reminders/proposal expiry. It uses a database advisory lock and returns `already_running` if another pass owns it. It emits counts only. An external scheduler, monitoring, media cleanup, encrypted export processing, push provider and reviewed audit retention remain separate operational tasks.
+
+### M05 live verification expiry (9 October 2026)
+
+A bounded expiry worker revokes lapsed grants with an audited `expired` reason. When a guardian has no other live tier, it clears the stored adult-verified flag, pauses dogs published by that guardian and removes their active beacons. Live onboarding/discovery already check grant expiry without waiting for the pass. `npm run verification:expire` runs it alone; `npm run maintenance:run` includes it. No grant creation, provider review or account activation is implied.

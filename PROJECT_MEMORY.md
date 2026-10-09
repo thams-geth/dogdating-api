@@ -95,3 +95,7 @@ M12 operations role can browse redacted audit metadata in bounded past windows, 
 ## Operations maintenance pass (9 October 2026)
 
 `npm run maintenance:run` runs a single bounded pass under a database advisory lock: current/next audit partitions, old discovery snapshots/exposure rows, expired realtime tickets/privacy tokens, and up to 50 meetup reminders/expiries. Another pass returns already_running. It has no scheduler deployment and does not process media, exports, push or audit retention. Dedicated commands for those remain separate.
+
+## Verification tier expiry (9 October 2026)
+
+M05 has a bounded, audited expiry sweep for lapsed grants. With no other current guardian tier it clears is_adult_verified, pauses that guardian’s published dogs and removes their beacons. Live onboarding/discovery gate on expiry even before the sweep. maintenance:run invokes it; verification:expire runs it alone. It never creates grants or replaces evidence/provider review.
