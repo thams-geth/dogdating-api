@@ -15,7 +15,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 | M09 | [Notifications and devices](M09.md) | Implemented foundation; see limitations | 6 |
 | M10 | [Meetups and places](M10.md) | Implemented foundation; see limitations | 12 |
 | M11 | [Trust, safety, privacy and support](M11.md) | Implemented foundation; see limitations | 18 |
-| M12 | [Operations and staff](M12.md) | Not implemented | 0 |
+| M12 | [Operations and staff](M12.md) | Implemented foundation; see limitations | 16 |
 | M13 | [Billing and growth](M13.md) | Not implemented | 0 |
 | M14 | [Country expansion](M14.md) | Not implemented | 0 |
 | M15 | [Breeding introductions](M15.md) | Not implemented | 0 |
@@ -36,10 +36,10 @@ flowchart TD
   I --> G
   H -->|Yes| J["M04: Publish / enable discovery preference"]
   J --> K["M06: Home and discovery - development"]
-  K -. planned .-> L["M07: Likes and connections"]
-  L -. planned .-> M["M08: Messages"]
-  M -. planned .-> N["M10: Meetups"]
-  N -. planned .-> O["M09/M11: Notifications, safety and support"]
+  K --> L["M07: Likes and connections"]
+  L --> M["M08: Messages"]
+  M --> N["M10: Meetups"]
+  N --> O["M09/M11: Notifications, safety and support"]
 ```
 
 Media approval, verification providers and reviewed legal documents are current onboarding blockers. Wireframes are integration sketches, not finished visual designs. Planned flows must remain disabled in public clients.

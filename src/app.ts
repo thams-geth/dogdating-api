@@ -1,3 +1,6 @@
+import { StaffAuth,OidcStaffVerifier,type StaffVerifier } from './modules/admin/staff-auth.js';
+import { AdminService } from './modules/admin/admin.service.js';
+import { adminRoutes } from './modules/admin/admin.routes.js';
 import { SafetyService } from './modules/safety/safety.service.js';
 import { PrivacyService } from './modules/safety/privacy.service.js';
 import { safetyRoutes } from './modules/safety/safety.routes.js';
@@ -43,7 +46,7 @@ import { blockRoutes } from './modules/safety/blocks.routes.js';
 import { DiscoveryService } from './modules/discovery/discovery.service.js';
 import { discoveryRoutes } from './modules/discovery/discovery.routes.js';
 
-export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage; discoverySecret?: string; messageCipher?: MessageCipher } = {}) {
+export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage; discoverySecret?: string; messageCipher?: MessageCipher; staffVerifier?:StaffVerifier } = {}) {
   const database = deps.database ?? pool;
   const app = express();
   app.disable('x-powered-by');
@@ -61,7 +64,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0023']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0024']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -104,6 +107,8 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   }));
   app.use('/v1',notificationRoutes(new NotificationsService(database,messageCipher),auth));
   app.use('/v1',meetupRoutes(new MeetupsService(database,messageCipher),auth));
+  const staffVerifier=deps.staffVerifier ?? (config.STAFF_ISSUER&&config.STAFF_JWKS_URL&&config.STAFF_AUDIENCE?new OidcStaffVerifier(config.STAFF_ISSUER,config.STAFF_JWKS_URL,config.STAFF_AUDIENCE):undefined);
+  app.use('/admin/v1',adminRoutes(new AdminService(database,messageCipher),new StaffAuth(database,staffVerifier)));
   app.use(notFound);
   app.use(errorHandler);
   return app;

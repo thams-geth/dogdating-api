@@ -5726,6 +5726,1111 @@ paths:
               required:
                 - phoneE164
                 - code
+  /admin/v1/reports:
+    get:
+      operationId: adminReports
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        subjectType:
+                          type: string
+                        category:
+                          type: string
+                        severity:
+                          type: integer
+                        state:
+                          type: string
+                        assignedStaffId:
+                          anyOf:
+                            - type: string
+                              format: uuid
+                            - type: "null"
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - subjectType
+                        - category
+                        - severity
+                        - state
+                        - assignedStaffId
+                        - createdAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/reports/{id}/claim:
+    post:
+      operationId: claimReport
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    const: in_review
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties: {}
+              required: []
+  /admin/v1/reports/{id}:
+    get:
+      operationId: adminReport
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  subjectType:
+                    type: string
+                  subjectId:
+                    type: string
+                    format: uuid
+                  category:
+                    type: string
+                  state:
+                    type: string
+                  details:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - id
+                  - subjectType
+                  - subjectId
+                  - category
+                  - state
+                  - details
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/reports/{id}/decide:
+    post:
+      operationId: decideReport
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    enum:
+                      - dismissed
+                      - escalated
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                decision:
+                  enum:
+                    - dismissed
+                    - escalated
+                reason:
+                  type: string
+                  minLength: 5
+                  maxLength: 300
+              required:
+                - decision
+                - reason
+  /admin/v1/users/{id}:
+    get:
+      operationId: adminUser
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                  countryCode:
+                    type: string
+                  deletionRequestedAt:
+                    anyOf:
+                      - type: string
+                        format: date-time
+                      - type: "null"
+                  createdAt:
+                    type: string
+                    format: date-time
+                required:
+                  - id
+                  - status
+                  - countryCode
+                  - deletionRequestedAt
+                  - createdAt
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/users/{id}/actions:
+    post:
+      operationId: adminUserAction
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                  actionId:
+                    type: string
+                    format: uuid
+                required:
+                  - id
+                  - status
+                  - actionId
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                action:
+                  enum:
+                    - suspend
+                    - reinstate
+                reasonCode:
+                  type: string
+                  pattern: ^[a-z0-9_-]{3,60}$
+                policyRef:
+                  type: string
+                  minLength: 3
+                  maxLength: 120
+              required:
+                - action
+                - reasonCode
+                - policyRef
+  /admin/v1/appeals:
+    get:
+      operationId: adminAppeals
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        actionId:
+                          type: string
+                          format: uuid
+                        state:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - actionId
+                        - state
+                        - createdAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/appeals/{id}:
+    get:
+      operationId: adminAppeal
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    type: string
+                  statement:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  reasonCode:
+                    type: string
+                  policyRef:
+                    type: string
+                required:
+                  - id
+                  - state
+                  - statement
+                  - reasonCode
+                  - policyRef
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/appeals/{id}/decide:
+    post:
+      operationId: decideAppeal
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    enum:
+                      - upheld
+                      - overturned
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                decision:
+                  enum:
+                    - uphold
+                    - overturn
+                outcome:
+                  type: string
+                  minLength: 5
+                  maxLength: 300
+              required:
+                - decision
+                - outcome
+  /admin/v1/places:
+    get:
+      operationId: adminPlaces
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        kind:
+                          type: string
+                        state:
+                          type: string
+                        metroId:
+                          anyOf:
+                            - type: string
+                              format: uuid
+                            - type: "null"
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - name
+                        - kind
+                        - state
+                        - metroId
+                        - createdAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/places/{id}:
+    get:
+      operationId: adminPlace
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                  latitude:
+                    type: number
+                  longitude:
+                    type: number
+                  address:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  state:
+                    type: string
+                  metroId:
+                    anyOf:
+                      - type: string
+                        format: uuid
+                      - type: "null"
+                  isFenced:
+                    anyOf:
+                      - type: boolean
+                      - type: "null"
+                  hasWater:
+                    anyOf:
+                      - type: boolean
+                      - type: "null"
+                required:
+                  - id
+                  - name
+                  - kind
+                  - latitude
+                  - longitude
+                  - address
+                  - state
+                  - metroId
+                  - isFenced
+                  - hasWater
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: reviewPlace
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    enum:
+                      - approved
+                      - rejected
+                      - closed
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                state:
+                  enum:
+                    - approved
+                    - rejected
+                    - closed
+              required:
+                - state
+  /admin/v1/jobs:
+    get:
+      operationId: adminJobCounts
+      security:
+        - staffBearer: []
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  push:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        state:
+                          type: string
+                        count:
+                          type: integer
+                      required:
+                        - state
+                        - count
+                  privacy:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        kind:
+                          type: string
+                        state:
+                          type: string
+                        count:
+                          type: integer
+                      required:
+                        - kind
+                        - state
+                        - count
+                required:
+                  - push
+                  - privacy
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/support/tickets:
+    get:
+      operationId: adminSupportTickets
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        category:
+                          type: string
+                        state:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - category
+                        - state
+                        - createdAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - items
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/support/tickets/{id}:
+    get:
+      operationId: adminSupportTicket
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  ticket:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      state:
+                        type: string
+                      category:
+                        type: string
+                    required:
+                      - id
+                      - state
+                      - category
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        author:
+                          enum:
+                            - user
+                            - support
+                        body:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - id
+                        - author
+                        - body
+                        - createdAt
+                  nextCursor:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - ticket
+                  - messages
+                  - nextCursor
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/support/tickets/{id}/messages:
+    post:
+      operationId: adminSupportReply
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  state:
+                    enum:
+                      - resolved
+                      - in_review
+                required:
+                  - id
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 4000
+                resolve:
+                  type: boolean
+              required:
+                - message
+                - resolve
 components:
   responses:
     Problem:
@@ -7816,3 +8921,7 @@ components:
       type: apiKey
       in: header
       name: Privacy-Status-Token
+    staffBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: OIDC access token with recent MFA

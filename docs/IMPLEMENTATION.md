@@ -88,3 +88,7 @@ Reviewed-place lookup/suggestions, two-guardian proposals with retry identities,
 ## M11 safety and privacy foundation (9 October 2026)
 
 Private reports, encrypted support, notices/appeals, purpose-bound restricted privacy OTP, and export/deletion request tracking are implemented. Migration 0023. Deletion requests revoke normal access and close social relationships immediately; full erasure and export processing remain needs_review, never completed. Existing restricted accounts can use Privacy-Token only for safety/privacy routes. See docs/handovers/M11.md. Next: M12 staff operations.
+
+## M12 staff operations foundation (9 October 2026)
+
+Separate OIDC/MFA staff auth, database roles, exclusive report claims/audited narratives, support replies, suspend/reinstate, independent appeals, public-place reviews and job counts are implemented. Migration 0024. No staff identities are seeded; configure SSO and explicitly provision approved subjects. Verification grants, full release/legal administration, push and privacy processing remain unavailable. See docs/handovers/M12.md.

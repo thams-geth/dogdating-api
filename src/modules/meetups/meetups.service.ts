@@ -12,7 +12,7 @@ export class MeetupsService {
  async place(id:string){const row=(await this.db.query(`SELECT ${placeProjection} FROM meetup.places WHERE id=$1 AND state='approved' AND verified_at IS NOT NULL`,[id])).rows[0];if(!row)throw new ApiError(404,'not-found','Place is unavailable.');return row;}
  suggest(userId:string,input:z.infer<typeof placeSuggestion>){return transaction(this.db,async tx=>{
   await tx.query('SELECT id FROM identity.users WHERE id=$1 FOR UPDATE',[userId]);
-  if(!(await tx.query(`SELECT 1 FROM ops.metros m JOIN identity.users u ON u.country_code=m.country_code WHERE m.id=$1 AND u.id=$2`,[input.metroId,userId])).rowCount)throw new ApiError(404,'not-found','Area is unavailable.');
+  if(!(await tx.query(`SELECT 1 FROM ops.metros m JOIN identity.users u ON u.country_code=m.country WHERE m.id=$1 AND u.id=$2`,[input.metroId,userId])).rowCount)throw new ApiError(404,'not-found','Area is unavailable.');
   if((await tx.query("SELECT count(*)::int n FROM meetup.places WHERE submitted_by=$1 AND created_at>now()-interval '1 day'",[userId])).rows[0].n>=3)throw new ApiError(429,'place-suggestion-limit','Three suggestions per day are allowed.');
   return (await tx.query(`INSERT INTO meetup.places(id,name,kind,latitude,longitude,address,metro_id,is_fenced,has_water,submitted_by) VALUES(gen_random_uuid(),$1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id,state`,[input.name,input.kind,input.latitude,input.longitude,input.address,input.metroId,input.isFenced,input.hasWater,userId])).rows[0];
  });}

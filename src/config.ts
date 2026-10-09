@@ -9,9 +9,13 @@ const schema = z.object({
   MEDIA_MODE: z.enum(['disabled', 'local']).default('disabled'),
   MEDIA_LOCAL_DIR: z.string().min(1).default('.local/media'),
   DISCOVERY_MODE: z.enum(['disabled','development']).default('disabled'),
+  STAFF_ISSUER:z.string().url().startsWith('https://').optional(),
+  STAFF_JWKS_URL:z.string().url().startsWith('https://').optional(),
+  STAFF_AUDIENCE:z.string().min(1).optional(),
   MESSAGE_KEY: z.preprocess(v=>v===''?undefined:v,z.string().regex(/^[a-f0-9]{64}$/).optional()),
   AUTH_SECRET: z.preprocess((value) => value === '' ? undefined : value, z.string().min(64).optional()),
 }).superRefine((value, context) => {
+  if([value.STAFF_ISSUER,value.STAFF_JWKS_URL,value.STAFF_AUDIENCE].filter(Boolean).length%3!==0)context.addIssue({code:'custom',message:'Configure all staff OIDC settings together.'});
   if(value.MESSAGE_KEY&&value.NODE_ENV==='production')context.addIssue({code:'custom',message:'Local message encryption is forbidden in production.'});
   if (value.DISCOVERY_MODE==='development' && (value.NODE_ENV==='production' || !value.AUTH_SECRET)) {
     context.addIssue({code:'custom',message:'Development discovery needs AUTH_SECRET and cannot run in production.'});

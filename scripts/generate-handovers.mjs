@@ -10,6 +10,7 @@ const sections = [...plan.matchAll(/^### (M\d+) — (.+)\n([\s\S]*?)(?=^### M|^#
 const ids = Object.keys(notes).sort();
 const operations = Object.fromEntries(ids.map(id => [id, []]));
 function moduleFor(path) {
+  if (path.startsWith('/admin/v1/')) return 'M12';
   if (/^\/v1\/(places|meetups)(?:\/|$)/.test(path)) return 'M10';
   if (/^\/v1\/(notifications|me\/devices|me\/notification-preferences)(?:\/|$)/.test(path)) return 'M09';
   if (/^\/v1\/(conversations|realtime)(?:\/|$)/.test(path)) return 'M08';
@@ -52,6 +53,9 @@ function shape(input, indent = 0) {
 }
 function access({path,method,op}) {
   if (!op.security?.length) return 'Public';
+  if(op.security.some(s=>s.staffBearer))return 'Provisioned staff SSO + recent MFA; endpoint role required';
+  if(op.security.some(s=>s.privacyStatusToken))return 'Request-specific Privacy-Status-Token';
+  if(op.security.some(s=>s.privacyToken))return 'Own account: bearer session or restricted Privacy-Token';
   if (path.endsWith('/profile')) return 'Eligible selected-dog editor; matching impression token required';
   if (path.endsWith('/discovery-preferences')) return 'Owner/co-guardian';
   if (path.startsWith('/v1/feed')) return 'Signed-in caller; eligible selected-dog editor to receive cards';
@@ -125,7 +129,7 @@ for (const id of ids) {
       const [method,url]=e.request.split(' ');
       const endpoint=ops.find(o=>o.method===method && new RegExp('^'+o.path.replace(/\{[^}]+\}/g,'[^/]+')+'$').test(url.split('?')[0]));
       if(!endpoint)throw new Error(`Example does not match an implemented endpoint: ${e.request}`);
-      const authorization=endpoint.op.security?.length?'\nAuthorization: Bearer <accessToken>':'';
+      const authorization=endpoint.op.security?.some(s=>s.staffBearer)?'\nAuthorization: Bearer <staffSsoToken>':endpoint.op.security?.some(s=>s.privacyStatusToken)?'\nPrivacy-Status-Token: <statusToken>':endpoint.op.security?.length?'\nAuthorization: Bearer <accessToken>':'';
       md+=`\n### ${e.title}\n\n${fence('http',e.request+authorization+(e.body?'\nContent-Type: application/json\n\n'+JSON.stringify(e.body,null,2):''))}\n`;
       if (e.response) md+=`\nResponse: HTTP ${e.status??200}\n\n${fence('json',JSON.stringify(e.response,null,2))}\n`;
     }
@@ -146,7 +150,7 @@ for (const id of ids) {
   md+='\n---\n\nMaintained through `scripts/handover-notes.mjs`, `docs/API_PLAN.md`, OpenAPI and source error codes. Regenerate with `npm run docs:handovers`; verify with `npm run check:handovers`.\n';
   output.set(`docs/handovers/${id}.md`,md);
 }
-const index=`# Mobile and web developer handover\n\nStart with [shared conventions](COMMON.md) and the module for your screen. Every planned module has a document, a flow diagram and a wireframe. **Implemented foundations do not imply production launch readiness.**\n\n| Module | Handover | Status | APIs |\n| --- | --- | --- | --- |\n${ids.map(id=>`| ${id} | [${sections.find(s=>s[1]===id)[2].replace(/ \[.*\]$/,'')}](${id}.md) | ${operations[id].length?'Implemented foundation; see limitations':'Not implemented'} | ${operations[id].length} |`).join('\n')}\n\n## End-to-end wire diagram\n\n${fence('mermaid','flowchart TD\n  A["M01: Bootstrap and update state"] --> B["M02: Phone and OTP"]\n  B --> C["M03: Profile, policies and progress"]\n  C --> D["M04: Household and dog draft"]\n  D --> E["M05: Photos and verification intake"]\n  E --> F["M04: Consented city selection"]\n  F --> G["M03: Recompute missing prerequisites"]\n  G --> H{"Ready?"}\n  H -->|No| I["Show missing step or dependency unavailable"]\n  I --> G\n  H -->|Yes| J["M04: Publish / enable discovery preference"]\n  J --> K["M06: Home and discovery - development"]\n  K -. planned .-> L["M07: Likes and connections"]\n  L -. planned .-> M["M08: Messages"]\n  M -. planned .-> N["M10: Meetups"]\n  N -. planned .-> O["M09/M11: Notifications, safety and support"]')}\n\nMedia approval, verification providers and reviewed legal documents are current onboarding blockers. Wireframes are integration sketches, not finished visual designs. Planned flows must remain disabled in public clients.\n\n## Keeping the handover current\n\n1. Update the implemented OpenAPI contract and module guidance in scripts/handover-notes.mjs.\n2. Add/update relevant tests and HTTP examples.\n3. Run npm run docs:handovers and npm run check:handovers. The check fails on missing or stale generated module docs.\n4. Commit the module with its handover and implementation status.\n\nContract reference: [OpenAPI](../openapi.yaml). Runnable examples: [requests.http](../requests.http). Backend scope/status: [implementation ledger](../IMPLEMENTATION.md).\n`;
+const index=`# Mobile and web developer handover\n\nStart with [shared conventions](COMMON.md) and the module for your screen. Every planned module has a document, a flow diagram and a wireframe. **Implemented foundations do not imply production launch readiness.**\n\n| Module | Handover | Status | APIs |\n| --- | --- | --- | --- |\n${ids.map(id=>`| ${id} | [${sections.find(s=>s[1]===id)[2].replace(/ \[.*\]$/,'')}](${id}.md) | ${operations[id].length?'Implemented foundation; see limitations':'Not implemented'} | ${operations[id].length} |`).join('\n')}\n\n## End-to-end wire diagram\n\n${fence('mermaid','flowchart TD\n  A["M01: Bootstrap and update state"] --> B["M02: Phone and OTP"]\n  B --> C["M03: Profile, policies and progress"]\n  C --> D["M04: Household and dog draft"]\n  D --> E["M05: Photos and verification intake"]\n  E --> F["M04: Consented city selection"]\n  F --> G["M03: Recompute missing prerequisites"]\n  G --> H{"Ready?"}\n  H -->|No| I["Show missing step or dependency unavailable"]\n  I --> G\n  H -->|Yes| J["M04: Publish / enable discovery preference"]\n  J --> K["M06: Home and discovery - development"]\n  K --> L["M07: Likes and connections"]\n  L --> M["M08: Messages"]\n  M --> N["M10: Meetups"]\n  N --> O["M09/M11: Notifications, safety and support"]')}\n\nMedia approval, verification providers and reviewed legal documents are current onboarding blockers. Wireframes are integration sketches, not finished visual designs. Planned flows must remain disabled in public clients.\n\n## Keeping the handover current\n\n1. Update the implemented OpenAPI contract and module guidance in scripts/handover-notes.mjs.\n2. Add/update relevant tests and HTTP examples.\n3. Run npm run docs:handovers and npm run check:handovers. The check fails on missing or stale generated module docs.\n4. Commit the module with its handover and implementation status.\n\nContract reference: [OpenAPI](../openapi.yaml). Runnable examples: [requests.http](../requests.http). Backend scope/status: [implementation ledger](../IMPLEMENTATION.md).\n`;
 output.set('docs/handovers/README.md',index);
 const stale=[];
 for(const [path,content]of output){if(check){if(await read(path).catch(()=>null)!==content)stale.push(path);}else await writeFile(new URL(path,root),content);}

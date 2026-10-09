@@ -19,7 +19,8 @@
     "media:cleanup": "tsx src/modules/media/cleanup.ts",
     "docs:handovers": "node scripts/generate-handovers.mjs",
     "check:handovers": "node scripts/generate-handovers.mjs --check",
-    "discovery:cleanup": "tsx src/modules/discovery/cleanup.ts"
+    "discovery:cleanup": "tsx src/modules/discovery/cleanup.ts",
+    "staff:provision": "tsx src/modules/admin/provision.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

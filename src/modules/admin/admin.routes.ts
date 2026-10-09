@@ -1,0 +1,23 @@
+import { Router } from 'express';import { z } from 'zod';import { asyncHandler } from '../../http/async-handler.js';import { ApiError } from '../../middleware/error.js';import { pageQuery } from '../../http/pagination.js';
+import type { StaffAuth,StaffPrincipal,StaffRole } from './staff-auth.js';import type { AdminService } from './admin.service.js';
+export function adminRoutes(service:AdminService,auth:StaffAuth){const router=Router(),id=(v:unknown)=>z.string().uuid().parse(v);
+ router.use(asyncHandler(async(req,res,next)=>{const header=req.get('Authorization');if(!header?.startsWith('Bearer ')||header.length>16000)throw new ApiError(401,'staff-unauthenticated','Staff bearer token required.');res.locals.staff=await auth.authenticate(header.slice(7));next();}));
+ const staff=(res:{locals:Record<string,any>})=>res.locals.staff as StaffPrincipal;
+ const role=(required:StaffRole)=>asyncHandler(async(_req,res,next)=>{if(!staff(res).roles.includes(required))throw new ApiError(403,'staff-forbidden','This staff role is required.');next();});
+ router.get('/reports',role('moderator'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.reports(staff(res),q.limit,q.cursor));}));
+ router.get('/reports/:id',role('moderator'),asyncHandler(async(req,res)=>{res.json(await service.report(staff(res),id(req.params.id)));}));
+ router.post('/reports/:id/claim',role('moderator'),asyncHandler(async(req,res)=>{z.object({}).strict().parse(req.body);res.json(await service.claim(staff(res),id(req.params.id)));}));
+ router.post('/reports/:id/decide',role('moderator'),asyncHandler(async(req,res)=>{const q=z.object({decision:z.enum(['dismissed','escalated']),reason:z.string().trim().min(5).max(300)}).strict().parse(req.body);res.json(await service.decideReport(staff(res),id(req.params.id),q.decision,q.reason));}));
+ router.get('/users/:id',role('support'),asyncHandler(async(req,res)=>{res.json(await service.user(staff(res),id(req.params.id)));}));
+ router.post('/users/:id/actions',role('moderator'),asyncHandler(async(req,res)=>{const q=z.object({action:z.enum(['suspend','reinstate']),reasonCode:z.string().regex(/^[a-z0-9_-]{3,60}$/),policyRef:z.string().trim().min(3).max(120)}).strict().parse(req.body);res.json(await service.userAction(staff(res),id(req.params.id),q));}));
+ router.get('/appeals',role('appeals'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.appeals(staff(res),q.limit,q.cursor));}));
+ router.get('/appeals/:id',role('appeals'),asyncHandler(async(req,res)=>{res.json(await service.appeal(staff(res),id(req.params.id)));}));
+ router.post('/appeals/:id/decide',role('appeals'),asyncHandler(async(req,res)=>{const q=z.object({decision:z.enum(['uphold','overturn']),outcome:z.string().trim().min(5).max(300)}).strict().parse(req.body);res.json(await service.decideAppeal(staff(res),id(req.params.id),q.outcome,q.decision));}));
+ router.get('/places',role('city_ops'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.places(staff(res),q.limit,q.cursor));}));
+ router.get('/places/:id',role('city_ops'),asyncHandler(async(req,res)=>{res.json(await service.place(staff(res),id(req.params.id)));}));
+ router.patch('/places/:id',role('city_ops'),asyncHandler(async(req,res)=>{const q=z.object({state:z.enum(['approved','rejected','closed'])}).strict().parse(req.body);res.json(await service.decidePlace(staff(res),id(req.params.id),q.state));}));
+ router.get('/jobs',role('operations'),asyncHandler(async(_req,res)=>{res.json(await service.jobs(staff(res)));}));
+ router.get('/support/tickets',role('support'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.support(staff(res),q.limit,q.cursor));}));
+ router.get('/support/tickets/:id',role('support'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.supportDetail(staff(res),id(req.params.id),q.limit,q.cursor));}));
+ router.post('/support/tickets/:id/messages',role('support'),asyncHandler(async(req,res)=>{const q=z.object({message:z.string().trim().min(1).max(4000),resolve:z.boolean()}).strict().parse(req.body);res.status(201).json(await service.reply(staff(res),id(req.params.id),q.message,q.resolve));}));return router;
+}
