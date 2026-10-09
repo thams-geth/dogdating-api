@@ -13,7 +13,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 | M07 | [Likes, connections and entitlements](M07.md) | Implemented foundation; see limitations | 8 |
 | M08 | [Messages and realtime](M08.md) | Implemented foundation; see limitations | 6 |
 | M09 | [Notifications and devices](M09.md) | Implemented foundation; see limitations | 6 |
-| M10 | [Meetups and places](M10.md) | Not implemented | 0 |
+| M10 | [Meetups and places](M10.md) | Implemented foundation; see limitations | 12 |
 | M11 | [Trust, safety, privacy and support](M11.md) | Implemented foundation; see limitations | 3 |
 | M12 | [Operations and staff](M12.md) | Not implemented | 0 |
 | M13 | [Billing and growth](M13.md) | Not implemented | 0 |

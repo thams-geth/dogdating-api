@@ -1,3 +1,5 @@
+import { MeetupsService } from './modules/meetups/meetups.service.js';
+import { meetupRoutes } from './modules/meetups/meetups.routes.js';
 import { NotificationsService } from './modules/notifications/notifications.service.js';
 import { notificationRoutes } from './modules/notifications/notifications.routes.js';
 import { RealtimeService } from './modules/messages/realtime.js';
@@ -56,7 +58,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0021']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0022']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');
@@ -97,6 +99,7 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
     res.status(201).json(await realtime.ticket(currentUser(res)));
   }));
   app.use('/v1',notificationRoutes(new NotificationsService(database,messageCipher),auth));
+  app.use('/v1',meetupRoutes(new MeetupsService(database,messageCipher),auth));
   app.use(notFound);
   app.use(errorHandler);
   return app;

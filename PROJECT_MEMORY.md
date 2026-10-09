@@ -83,3 +83,7 @@ Encrypted text messages, deduplicated sends, bigint sequence history, private re
 ## M09 notification foundation delivered (8 October 2026)
 
 Atomic match/message inbox events, private read markers, preferences and encrypted session-bound device registration are implemented. Migration 0021. Push jobs remain awaiting_provider; external push delivery/retry/dead-letter worker is still pending. Logout revokes registrations. See docs/handovers/M09.md. Next: M10 meetups.
+
+## M10 meetup core delivered (9 October 2026)
+
+Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups, extensions or reminder scheduler are fabricated. See docs/handovers/M10.md. Next: M11 reports/support/privacy.

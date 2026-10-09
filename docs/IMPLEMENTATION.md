@@ -19,7 +19,11 @@ Updated: 8 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 | M05 production integrations | Planned | Object storage, scan/moderation, approved-photo delivery, identity/document provider, signed webhooks and authorized reviewer grants |
 | M06 home/discovery foundation | Complete for opt-in development | Home/tasks, city-only metadata feed, signed snapshots/impressions, live publisher eligibility, bilateral blocks/preferences, profile projection and durable exposure limits |
 | M11 blocking foundation | Complete | Private paginated block list, idempotent block/unblock; existing cross-household matches/conversations close |
-| M07–M12 remaining launch modules | Planned | Likes/connections, chat, notifications, meetups, reports/privacy/support, staff operations |
+| M07 connections | Development core complete | Impression decisions, quotas, matching, withdrawal/unmatch; 072065f |
+| M08 messaging | Development text/realtime complete | Encrypted bodies, sequences, recovery, ticketed sockets; fa26512; production KMS/attachments pending |
+| M09 notifications | Foundation complete | Durable inbox, preferences, encrypted devices; f5a4d46; push delivery worker/provider pending |
+| M10 meetups | Core implemented | Places, proposals, attendance and reviews; extensions/groups/video and operations pending |
+| M11–M12 remaining launch modules | In progress / planned | Reports/privacy/support and staff operations |
 | M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
 
 ## Latest local verification
@@ -76,3 +80,7 @@ Encrypted text messages, deduplicated sends, bigint sequence history, private re
 ## M09 notification foundation delivered (8 October 2026)
 
 Atomic match/message inbox events, private read markers, preferences and encrypted session-bound device registration are implemented. Migration 0021. Push jobs remain awaiting_provider; external push delivery/retry/dead-letter worker is still pending. Logout revokes registrations. See docs/handovers/M09.md. Next: M10 meetups.
+
+## M10 meetup core delivered (9 October 2026)
+
+Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups, extensions or reminder scheduler are fabricated. See docs/handovers/M10.md. Next: M11 reports/support/privacy.
