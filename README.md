@@ -15,7 +15,7 @@ The provisional launch scope is dog playdates/walks. Breeding introductions and 
 
 ## Current status (9 October 2026)
 
-152 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
+154 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
 
 ## Local development
 
@@ -172,7 +172,7 @@ Atomic match/message inbox events, private read markers, preferences and encrypt
 
 ## M10 meetup core delivered (9 October 2026)
 
-Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups, extensions or reminder scheduler are fabricated. See docs/handovers/M10.md. Next: M11 reports/support/privacy.
+Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups or reminder scheduler are fabricated. Constrained two-party extensions and a manual reminder pass are available. See docs/handovers/M10.md. Next: M11 reports/support/privacy.
 
 ## M11 safety and privacy foundation (9 October 2026)
 
@@ -203,3 +203,5 @@ M12 now has dedicated release_ops/legal_ops roles, optimistic audited release-po
 ## Push queue relay (9 October 2026)
 
 Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials/adapter wiring and scheduling are still absent; pushAvailable remains false.
+
+Meetup reminder/expiry pass: `npm run meetups:reminders` (requires external scheduling). See [M10 handover](docs/handovers/M10.md).

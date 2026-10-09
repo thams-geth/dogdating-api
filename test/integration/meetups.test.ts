@@ -48,3 +48,32 @@ test('reviews hide peer feedback until both submit and never expose encrypted in
  const released=(await http.get(path+'/reviews').set('Authorization',p.b.header)).body;assert.equal(released.released,true);assert.equal(released.reviews.length,2);assert.ok(!JSON.stringify(released).includes('PRIVATE'));assert.ok(!JSON.stringify(released).includes('incident'));
  await http.post(path+'/reviews').set('Authorization',p.a.header).send(body).expect(409);
 });
+
+test('extension requires the other guardian, preserves revision and caps duration',async()=>{
+ const p=await pair(),m=await proposal(p),path=`/v1/meetups/${m.id}`;
+ await http.post(path+'/respond').set('Authorization',p.b.header).send({action:'accept',revision:1}).expect(200);
+ const x=(await http.post(path+'/extend').set('Authorization',p.a.header).send({revision:2,additionalMinutes:30}).expect(201)).body;
+ assert.equal(x.baseRevision,2);
+ assert.equal((await http.get(path).set('Authorization',p.b.header).expect(200)).body.pendingExtension.id,x.id);
+ await http.post(path+`/extensions/${x.id}/respond`).set('Authorization',p.a.header).send({revision:2,accept:true}).expect(409);
+ const updated=(await http.post(path+`/extensions/${x.id}/respond`).set('Authorization',p.b.header).send({revision:2,accept:true}).expect(200)).body;
+ assert.equal(updated.revision,3);assert.equal(new Date(updated.windowEnd).getTime()-new Date(p.body.windowEnd).getTime(),30*60000);
+ assert.equal((await http.post(path+`/extensions/${x.id}/respond`).set('Authorization',p.b.header).send({revision:2,accept:true}).expect(200)).body.revision,3);
+ await http.post(path+'/extend').set('Authorization',p.a.header).send({revision:2,additionalMinutes:15}).expect(409);
+ await http.post(path+'/extend').set('Authorization',p.a.header).send({revision:3,additionalMinutes:60}).expect(201);
+ await http.post(path+'/extend').set('Authorization',p.b.header).send({revision:3,additionalMinutes:15}).expect(409);
+});
+
+test('reminder pass sends once to participants and expires stale proposals',async()=>{
+ const {processMeetupReminders}=await import('../../src/modules/meetups/reminder-worker.js');
+ const p=await pair(),m=await proposal(p),path=`/v1/meetups/${m.id}`;
+ await http.post(path+'/respond').set('Authorization',p.b.header).send({action:'accept',revision:1}).expect(200);
+ await f.database.query("UPDATE meetup.meetups SET window_start=now()+interval '10 minutes',window_end=now()+interval '1 hour' WHERE id=$1",[m.id]);
+ assert.equal((await processMeetupReminders(f.database)).reminded,1);
+ assert.equal((await processMeetupReminders(f.database)).reminded,0);
+ assert.equal((await f.database.query("SELECT count(*)::int n FROM identity.notifications WHERE category='meetups' AND user_id=ANY($1::uuid[])",[[p.a.userId,p.b.userId]])).rows[0].n,6);
+ const second=await proposal(p);
+ await f.database.query("UPDATE meetup.meetups SET window_start=now()-interval '1 minute' WHERE id=$1",[second.id]);
+ assert.equal((await processMeetupReminders(f.database)).expired,1);
+ assert.equal((await f.database.query('SELECT state FROM meetup.meetups WHERE id=$1',[second.id])).rows[0].state,'cancelled');
+});

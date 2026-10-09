@@ -84,7 +84,7 @@ Atomic match/message inbox events, private read markers, preferences and encrypt
 
 ## M10 meetup core delivered (9 October 2026)
 
-Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups, extensions or reminder scheduler are fabricated. See docs/handovers/M10.md. Next: M11 reports/support/privacy.
+Reviewed-place lookup/suggestions, two-guardian proposals with retry identities, optimistic accept/counter/decline, cancellation, self-declared attendance and delayed reviews are implemented. Migration 0022 cancels active meetups when connections end. Private incident notes are encrypted and never exposed to participants. No reviewed places, staffed safety response, video/groups or reminder scheduler are fabricated. Constrained two-party extensions and a manual reminder pass are available. See docs/handovers/M10.md. Next: M11 reports/support/privacy.
 
 ## M11 safety and privacy foundation (9 October 2026)
 
@@ -115,3 +115,7 @@ M12 now has dedicated release_ops/legal_ops roles, optimistic audited release-po
 ## Push queue relay (9 October 2026)
 
 Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials/adapter wiring and scheduling are still absent; pushAvailable remains false.
+
+### M10 extension and reminder update (9 October 2026)
+
+Migration 0031 adds consented two-party extension requests and durable reminder receipts. POST /v1/meetups/{id}/extend and /extensions/{extensionId}/respond use current revisions; requests expire and cannot exceed four total hours or ten requests per meetup. The meetup detail includes pendingExtension. Only recorded participants receive meetup notifications. The optional `npm run meetups:reminders` pass expires unaccepted proposals and creates one generic inbox reminder for accepted meetups near start; external scheduling is not installed. Meetups whose windows ended no longer occupy the three-future-meetup limit. Reviewer response workflow, groups/video and operational safety response remain pending.

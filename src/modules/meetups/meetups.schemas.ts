@@ -10,3 +10,6 @@ export const respondInput=z.discriminatedUnion('action',[
 export const revisionInput=z.object({revision}).strict();
 export const cancelInput=revisionInput.extend({reason:z.enum(['schedule_changed','not_comfortable','other'])});
 export const reviewInput=z.object({showedUp:z.boolean(),onTime:z.boolean().nullable(),dogAsDescribed:z.number().int().min(1).max(5).nullable(),humanRespectful:z.number().int().min(1).max(5).nullable(),playCompatibility:z.number().int().min(1).max(5).nullable(),wouldRepeat:z.boolean(),incidentOccurred:z.boolean(),incidentType:z.enum(['injury','harassment','unsafe_behavior','other']).nullable(),privateNote:z.string().trim().max(2000).nullable(),publicNote:z.string().trim().max(500).nullable()}).strict().refine(v=>v.incidentOccurred?v.incidentType!==null:v.incidentType===null);
+
+export const extendInput=revisionInput.extend({additionalMinutes:z.union([z.literal(15),z.literal(30),z.literal(60)])}).strict();
+export const extensionResponseInput=revisionInput.extend({accept:z.boolean()}).strict();

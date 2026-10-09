@@ -3928,6 +3928,37 @@ paths:
                         - rsvp
                         - checkedInAt
                         - checkedOutAt
+                  pendingExtension:
+                    anyOf:
+                      - type: object
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          requestedBy:
+                            type: string
+                            format: uuid
+                          baseRevision:
+                            type: integer
+                            minimum: 1
+                          proposedEnd:
+                            type: string
+                            format: date-time
+                          expiresAt:
+                            type: string
+                            format: date-time
+                          state:
+                            type: string
+                            const: pending
+                        required:
+                          - id
+                          - requestedBy
+                          - baseRevision
+                          - proposedEnd
+                          - expiresAt
+                          - state
+                      - type: "null"
                 required:
                   - id
                   - matchId
@@ -3940,6 +3971,7 @@ paths:
                   - proposedBy
                   - cancellationReason
                   - participants
+                  - pendingExtension
         "400":
           $ref: "#/components/responses/Problem"
         "401":
@@ -8881,6 +8913,187 @@ paths:
               additionalProperties: false
               properties: {}
               required: []
+  /v1/meetups/{id}/extend:
+    post:
+      operationId: requestMeetupExtension
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  requestedBy:
+                    type: string
+                    format: uuid
+                  baseRevision:
+                    type: integer
+                    minimum: 1
+                  proposedEnd:
+                    type: string
+                    format: date-time
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  state:
+                    type: string
+                    const: pending
+                required:
+                  - id
+                  - requestedBy
+                  - baseRevision
+                  - proposedEnd
+                  - expiresAt
+                  - state
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                revision:
+                  type: integer
+                  minimum: 1
+                additionalMinutes:
+                  type: integer
+                  enum:
+                    - 15
+                    - 30
+                    - 60
+              required:
+                - revision
+                - additionalMinutes
+  /v1/meetups/{id}/extensions/{extensionId}/respond:
+    post:
+      operationId: respondMeetupExtension
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: extensionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  matchId:
+                    type: string
+                    format: uuid
+                  placeId:
+                    type: string
+                    format: uuid
+                  kind:
+                    type: string
+                  windowStart:
+                    type: string
+                    format: date-time
+                  windowEnd:
+                    type: string
+                    format: date-time
+                  state:
+                    type: string
+                  revision:
+                    type: integer
+                    minimum: 1
+                  proposedBy:
+                    type: string
+                    format: uuid
+                  cancellationReason:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required:
+                  - id
+                  - matchId
+                  - placeId
+                  - kind
+                  - windowStart
+                  - windowEnd
+                  - state
+                  - revision
+                  - proposedBy
+                  - cancellationReason
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                revision:
+                  type: integer
+                  minimum: 1
+                accept:
+                  type: boolean
+              required:
+                - revision
+                - accept
 components:
   responses:
     Problem:

@@ -21,7 +21,8 @@
     "check:handovers": "node scripts/generate-handovers.mjs --check",
     "discovery:cleanup": "tsx src/modules/discovery/cleanup.ts",
     "staff:provision": "tsx src/modules/admin/provision.ts",
-    "privacy:exports": "tsx src/modules/safety/export-worker.ts"
+    "privacy:exports": "tsx src/modules/safety/export-worker.ts",
+    "meetups:reminders": "tsx src/modules/meetups/reminder-cli.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

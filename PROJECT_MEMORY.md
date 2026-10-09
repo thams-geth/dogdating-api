@@ -79,3 +79,7 @@ M12 now has dedicated release_ops/legal_ops roles, optimistic audited release-po
 ## Push queue relay (9 October 2026)
 
 Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials/adapter wiring and scheduling are still absent; pushAvailable remains false.
+
+## Meetup extensions and reminders (9 October 2026)
+
+M10 adds two-party extension requests with revision and duration caps and a reminder/expiry pass. Migration 0031. Only recorded participants receive meetup events. Worker must be externally scheduled; it writes generic inbox reminders once, not proof of attendance or emergency response. No real scheduler was installed.

@@ -4,7 +4,7 @@ import { ApiError } from '../../middleware/error.js';import { page,decodeCursor 
 import { bodyHash,receipt,saveReceipt } from '../../http/idempotency.js';
 import { ConnectionsRepository } from '../connections/connections.repository.js';import { notifyConversation } from '../notifications/notifications.events.js';
 import type { MessageCipher } from '../messages/message-cipher.js';
-import type { placeSuggestion,proposeInput,respondInput,cancelInput,reviewInput } from './meetups.schemas.js';
+import type { placeSuggestion,proposeInput,respondInput,cancelInput,reviewInput,extendInput,extensionResponseInput } from './meetups.schemas.js';
 const placeProjection=`id,name,kind,latitude::float8,longitude::float8,address,metro_id AS "metroId",is_fenced AS "isFenced",has_water AS "hasWater"`;
 export class MeetupsService {
  private readonly connections=new ConnectionsRepository();constructor(private readonly db:Pool,private readonly cipher?:MessageCipher){}
@@ -30,7 +30,7 @@ export class MeetupsService {
   }
   return {row,match,participant};
  }
- private async event(tx:PoolClient,conversationId:string){await notifyConversation(tx,conversationId,randomUUID(),'meetups');}
+ private async event(tx:PoolClient,conversationId:string,meetupId:string){const participants=(await tx.query('SELECT user_id FROM meetup.meetup_participants WHERE meetup_id=$1',[meetupId])).rows.map(r=>r.user_id);await notifyConversation(tx,conversationId,randomUUID(),'meetups',undefined,participants);}
  propose(userId:string,input:z.infer<typeof proposeInput>,key:string){return transaction(this.db,async tx=>{
   await socialLock(tx);const match=await this.connections.match(tx,userId,input.matchId);
   if(![match.dogAId,match.dogBId].includes(input.hostDogId)||input.guestUserId===userId)throw new ApiError(400,'invalid-participants','Choose the two connected dogs and different guardians.');
@@ -38,12 +38,12 @@ export class MeetupsService {
   await this.connections.match(tx,input.guestUserId,input.matchId);await this.participant(tx,input.guestUserId,guestDog);
   const hash=bodyHash(input),cached=await receipt(tx,userId,'meetup',key,hash);if(cached)return this.projection((await this.access(tx,userId,cached.id)).row);
   this.window(input.windowStart,input.windowEnd);await this.approvedPlace(tx,input.placeId,input.matchId);
-  if((await tx.query("SELECT count(*)::int n FROM meetup.meetups WHERE match_id=$1 AND state IN ('proposed','accepted','in_progress')",[input.matchId])).rows[0].n>=3)throw new ApiError(409,'meetup-limit','At most three active meetups per connection.');
+  if((await tx.query("SELECT count(*)::int n FROM meetup.meetups WHERE match_id=$1 AND state IN ('proposed','accepted','in_progress') AND window_end>now()",[input.matchId])).rows[0].n>=3)throw new ApiError(409,'meetup-limit','At most three active meetups per connection.');
   const row=(await tx.query(`INSERT INTO meetup.meetups(id,match_id,place_id,kind,window_start,window_end,proposed_by) VALUES(gen_random_uuid(),$1,$2,$3,$4,$5,$6) RETURNING *`,[input.matchId,input.placeId,input.kind,input.windowStart,input.windowEnd,userId])).rows[0];
   await tx.query("INSERT INTO meetup.meetup_participants(meetup_id,dog_id,user_id,rsvp) VALUES($1,$2,$3,'yes'),($1,$4,$5,'pending')",[row.id,input.hostDogId,userId,guestDog,input.guestUserId]);
-  await this.event(tx,match.conversationId);await saveReceipt(tx,userId,'meetup',key,hash,{id:row.id});return this.projection(row);
+  await this.event(tx,match.conversationId,row.id);await saveReceipt(tx,userId,'meetup',key,hash,{id:row.id});return this.projection(row);
  });}
- get(userId:string,id:string){return transaction(this.db,async tx=>{await socialLock(tx);const {row}=await this.access(tx,userId,id);const participants=(await tx.query('SELECT dog_id AS "dogId",user_id AS "userId",rsvp,checked_in_at AS "checkedInAt",checked_out_at AS "checkedOutAt" FROM meetup.meetup_participants WHERE meetup_id=$1 ORDER BY dog_id',[id])).rows;return {...this.projection(row),participants};});}
+ get(userId:string,id:string){return transaction(this.db,async tx=>{await socialLock(tx);const {row}=await this.access(tx,userId,id);const participants=(await tx.query('SELECT dog_id AS "dogId",user_id AS "userId",rsvp,checked_in_at AS "checkedInAt",checked_out_at AS "checkedOutAt" FROM meetup.meetup_participants WHERE meetup_id=$1 ORDER BY dog_id',[id])).rows;return {...this.projection(row),participants,pendingExtension:await this.pendingExtension(tx,id,row)};});}
  list(userId:string,limit:number,cursor?:string){return transaction(this.db,async tx=>{
   await socialLock(tx);const scope=`meetups:${userId}`,after=decodeCursor(cursor,scope),rows=(await tx.query('SELECT m.id FROM meetup.meetups m JOIN meetup.meetup_participants p ON p.meetup_id=m.id WHERE p.user_id=$1 AND ($2::uuid IS NULL OR m.id>$2) ORDER BY m.id LIMIT $3',[userId,after,limit+1])).rows;
   const result=page(rows,limit,scope),items=[];for(const row of result.items){try{items.push(this.projection((await this.access(tx,userId,row.id)).row));}catch(e){if(!(e instanceof ApiError&&e.status===404))throw e;}}return {items,nextCursor:result.nextCursor};
@@ -57,12 +57,12 @@ export class MeetupsService {
    await tx.query('UPDATE meetup.meetups SET place_id=$2,window_start=$3,window_end=$4,proposed_by=$5 WHERE id=$1',[id,input.placeId,input.windowStart,input.windowEnd,userId]);
    await tx.query("UPDATE meetup.meetup_participants SET rsvp=CASE WHEN user_id=$2 THEN 'yes'::meetup.rsvp ELSE 'pending'::meetup.rsvp END WHERE meetup_id=$1",[id,userId]);
   }else{if(input.action==='accept')await this.approvedPlace(tx,row.place_id,row.match_id);await tx.query('UPDATE meetup.meetups SET state=$2 WHERE id=$1',[id,input.action==='accept'?'accepted':'declined']);await tx.query('UPDATE meetup.meetup_participants SET rsvp=$3 WHERE meetup_id=$1 AND user_id=$2',[id,userId,input.action==='accept'?'yes':'no']);}
-  const updated=(await tx.query('UPDATE meetup.meetups SET revision=revision+1,updated_at=now() WHERE id=$1 RETURNING *',[id])).rows[0];await this.event(tx,match.conversationId);return this.projection(updated);
+  const updated=(await tx.query('UPDATE meetup.meetups SET revision=revision+1,updated_at=now() WHERE id=$1 RETURNING *',[id])).rows[0];await this.event(tx,match.conversationId,id);return this.projection(updated);
  });}
  cancel(userId:string,id:string,input:z.infer<typeof cancelInput>){return transaction(this.db,async tx=>{
   await socialLock(tx);const {row,match}=await this.access(tx,userId,id);if(row.state==='cancelled')return this.projection(row);this.revision(row,input.revision);
   if(!['proposed','accepted','in_progress'].includes(row.state))throw new ApiError(409,'invalid-meetup-state','This meetup is already finished.');
-  const updated=(await tx.query("UPDATE meetup.meetups SET state='cancelled',cancellation_reason=$2,revision=revision+1,updated_at=now() WHERE id=$1 RETURNING *",[id,input.reason])).rows[0];await this.event(tx,match.conversationId);return this.projection(updated);
+  const updated=(await tx.query("UPDATE meetup.meetups SET state='cancelled',cancellation_reason=$2,revision=revision+1,updated_at=now() WHERE id=$1 RETURNING *",[id,input.reason])).rows[0];await this.event(tx,match.conversationId,id);return this.projection(updated);
  });}
  attendance(userId:string,id:string,revision:number,action:'check-in'|'check-out'){return transaction(this.db,async tx=>{
   await socialLock(tx);const {row,participant,match}=await this.access(tx,userId,id);const field=action==='check-in'?'checked_in_at':'checked_out_at';
@@ -73,7 +73,38 @@ export class MeetupsService {
   }else if(!participant.checked_in_at)throw new ApiError(409,'check-in-required','Check in before checking out.');
   await tx.query(`UPDATE meetup.meetup_participants SET ${field}=now() WHERE meetup_id=$1 AND user_id=$2`,[id,userId]);
   const pending=(await tx.query('SELECT count(*)::int n FROM meetup.meetup_participants WHERE meetup_id=$1 AND checked_out_at IS NULL',[id])).rows[0].n;
-  const updated=(await tx.query('UPDATE meetup.meetups SET state=$2,revision=revision+1,updated_at=now() WHERE id=$1 RETURNING *',[id,pending?'in_progress':'completed'])).rows[0];await this.event(tx,match.conversationId);return this.projection(updated);
+  const updated=(await tx.query('UPDATE meetup.meetups SET state=$2,revision=revision+1,updated_at=now() WHERE id=$1 RETURNING *',[id,pending?'in_progress':'completed'])).rows[0];await this.event(tx,match.conversationId,id);return this.projection(updated);
+ });}
+ private async pendingExtension(tx:PoolClient,id:string,row:Record<string,any>){
+  await tx.query("UPDATE meetup.extension_requests SET state='expired' WHERE meetup_id=$1 AND state='pending' AND (expires_at<=now() OR base_revision<>$2 OR $3::text NOT IN ('accepted','in_progress'))",[id,row.revision,row.state]);
+  return (await tx.query(`SELECT id,requested_by AS "requestedBy",base_revision AS "baseRevision",proposed_end AS "proposedEnd",expires_at AS "expiresAt",state FROM meetup.extension_requests WHERE meetup_id=$1 AND state='pending'`,[id])).rows[0]??null;
+ }
+ extend(userId:string,id:string,input:z.infer<typeof extendInput>){return transaction(this.db,async tx=>{
+  await socialLock(tx);const {row,match}=await this.access(tx,userId,id);this.revision(row,input.revision);
+  if(!['accepted','in_progress'].includes(row.state)||new Date(row.window_end).getTime()<=Date.now())throw new ApiError(409,'extension-unavailable','Extend an accepted meetup before its window ends.');
+  if(await this.pendingExtension(tx,id,row))throw new ApiError(409,'extension-pending','Respond to the pending extension first.');
+  const end=new Date(new Date(row.window_end).getTime()+input.additionalMinutes*60000);
+  if(end.getTime()-new Date(row.window_start).getTime()>4*3600000)throw new ApiError(400,'invalid-meetup-window','Total meetup duration cannot exceed four hours.');
+  if((await tx.query('SELECT count(*)::int n FROM meetup.extension_requests WHERE meetup_id=$1',[id])).rows[0].n>=10)throw new ApiError(429,'extension-limit','At most ten extension requests per meetup.');
+  await this.approvedPlace(tx,row.place_id,row.match_id);
+  await tx.query(`INSERT INTO meetup.extension_requests(meetup_id,requested_by,base_revision,proposed_end,expires_at) VALUES($1,$2,$3,$4,LEAST(now()+interval '15 minutes',$5::timestamptz))`,[id,userId,row.revision,end,row.window_end]);
+  await this.event(tx,match.conversationId,id);return (await this.pendingExtension(tx,id,row))!;
+ });}
+ respondExtension(userId:string,id:string,extensionId:string,input:z.infer<typeof extensionResponseInput>){return transaction(this.db,async tx=>{
+  await socialLock(tx);const {row,match}=await this.access(tx,userId,id);
+  const extension=(await tx.query('SELECT * FROM meetup.extension_requests WHERE id=$1 AND meetup_id=$2',[extensionId,id])).rows[0];
+  if(!extension)throw new ApiError(404,'not-found','Extension is unavailable.');
+  if(extension.requested_by===userId)throw new ApiError(409,'extension-responder-required','The other participant must respond.');
+  if(extension.state===(input.accept?'accepted':'declined'))return this.projection(row);
+  this.revision(row,input.revision);
+  if(extension.state!=='pending'||extension.base_revision!==row.revision||new Date(extension.expires_at).getTime()<=Date.now()||!['accepted','in_progress'].includes(row.state))throw new ApiError(409,'extension-unavailable','Extension expired or meetup changed; refresh the meetup.');
+  if(input.accept){
+   for(const p of (await tx.query('SELECT dog_id,user_id FROM meetup.meetup_participants WHERE meetup_id=$1',[id])).rows)await this.participant(tx,p.user_id,p.dog_id);
+   await this.approvedPlace(tx,row.place_id,row.match_id);
+   await tx.query('UPDATE meetup.meetups SET window_end=$2,revision=revision+1,updated_at=now() WHERE id=$1',[id,extension.proposed_end]);
+  }
+  await tx.query('UPDATE meetup.extension_requests SET state=$2 WHERE id=$1',[extensionId,input.accept?'accepted':'declined']);
+  await this.event(tx,match.conversationId,id);return this.projection((await tx.query('SELECT * FROM meetup.meetups WHERE id=$1',[id])).rows[0]);
  });}
  review(userId:string,id:string,input:z.infer<typeof reviewInput>){return transaction(this.db,async tx=>{
   await socialLock(tx);const {row}=await this.access(tx,userId,id);
