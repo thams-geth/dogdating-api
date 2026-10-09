@@ -15,7 +15,7 @@ The provisional launch scope is dog playdates/walks. Breeding introductions and 
 
 ## Current status (9 October 2026)
 
-168 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
+169 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md) and the [production boundary note](docs/PRODUCTION_READINESS.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
 
 ## Local development
 
@@ -114,6 +114,8 @@ Run `npm run media:cleanup` regularly while using local uploads. Each run handle
 ## Verification intake and health records
 
 `POST /v1/verifications` accepts `{ "kind": "guardian" }` for the signed-in user or `{ "kind": "dog", "dogId": "..." }` for an owned/co-guarded dog. The server selects the target tier (1 or 2). Retries return the same active request; at most three new requests per user/day are allowed. Read it at `GET /v1/verifications/{id}` and withdraw an open request with `POST /v1/verifications/{id}/withdraw` and `{}`. Requests are private to their requester; dog requests also require current household membership.
+
+`POST /webhooks/verification` is a provider-only boundary. An injected verifier must authenticate the exact raw body, timestamp and source before a normalized result can be applied. Matching event replays are acknowledged; conflicting IDs are rejected. Approval grants a time-limited tier only after current request, account and dog ownership checks. **The normal server has no verifier configured and returns 503**, so no local or production client can use this route to claim an approved identity. A disposable test signer exercises it only in the test database. The provider's real callback format, evidence policy and credentials are still required.
 
 **Provider integration is not configured:** new requests return `pending` with `nextAction: awaiting_provider_setup`. This records intent only. No provider session, review SLA, verified badge, identity-document upload or webhook is available yet. Do not submit identity numbers/documents as profile photos.
 

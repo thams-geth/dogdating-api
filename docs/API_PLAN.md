@@ -2,7 +2,7 @@
 
 Plan version: 1.1 • status reconciled 9 October 2026 • Backend: TypeScript + Express + PostgreSQL.
 
-This is the complete design inventory, not a claim that every listed API exists. Current implementation: 168 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md) and [remaining work](REMAINING_WORK.md). M13–M16 remain planned.
+This is the complete design inventory, not a claim that every listed API exists. Current implementation: 169 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md), [remaining work](REMAINING_WORK.md) and [production boundary](PRODUCTION_READINESS.md). M13–M16 remain planned.
 
 ## 1. Product and release boundaries
 
@@ -132,7 +132,7 @@ Do not let a walker/view-only member edit health, ownership or profile data. Bir
 | POST/GET `/dogs/{id}/health-records`; DELETE `/dogs/{id}/health-records/{id}` | Editor | Vaccination/health evidence; verification provenance |
 | POST `/webhooks/verification`; POST `/webhooks/media` | W | Durable event ingestion, signature/replay checks |
 
-Delivery status (8 October 2026): local private photo upload/status/order/delete and verification-intent/health-metadata APIs are implemented. Local content uses authenticated PUT rather than a signed object-store URL. Moderation, approved delivery, identity/document providers, webhooks and review grants remain planned; see IMPLEMENTATION.md.
+Delivery status (10 October 2026): local private photo upload/status/order/delete and verification-intent/health-metadata APIs are implemented. A provider-neutral verification callback boundary and replay ledger are implemented, with no verifier wired into the normal server. Local content uses authenticated PUT rather than a signed object-store URL. Moderation, approved delivery, selected identity/document provider integration and reviewer decisions remain planned; see IMPLEMENTATION.md.
 
 Uploads remain quarantined until scan/moderation; strip EXIF, cap pixel counts, generate variants, clean abandoned objects. Document access is tightly scoped and audited. Self-reported health and provider/reviewer-verified health are different. Expiry removes the corresponding verified claim. Choose a vendor after checking India coverage, data handling, price and operating process.
 

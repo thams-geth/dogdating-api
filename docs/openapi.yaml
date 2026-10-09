@@ -6,6 +6,55 @@ info:
 servers:
   - url: http://localhost:3000
 paths:
+  /webhooks/verification:
+    post:
+      operationId: receiveVerificationProviderEvent
+      summary: Process a verified provider event with replay protection
+      description: >-
+        Provider-only callback. The raw JSON body, authentication headers and
+        timestamp format depend on the selected provider adapter. No adapter
+        is installed by default, so the route returns 503. Mobile and web
+        clients must never call this route. The adapter must authenticate the
+        exact raw bytes before normalizing an event. Test fixtures are not a
+        production provider contract.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Provider-specific payload; no production vendor selected.
+              additionalProperties: true
+      responses:
+        "200":
+          description: Authenticated event accepted, or exact replay acknowledged
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [accepted, requestId, duplicate]
+                properties:
+                  accepted:
+                    const: true
+                  requestId:
+                    type: string
+                    format: uuid
+                  duplicate:
+                    type: boolean
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "413":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
   /v1/health:
     get:
       operationId: health

@@ -8,7 +8,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 | M02 | [Authentication and sessions](M02.md) | Implemented foundation; see limitations | 9 |
 | M03 | [Guardian profile, consent and resumable onboarding](M03.md) | Implemented foundation; see limitations | 12 |
 | M04 | [Households and dog profiles](M04.md) | Implemented foundation; see limitations | 29 |
-| M05 | [Uploads and verification](M05.md) | Implemented foundation; see limitations | 13 |
+| M05 | [Uploads and verification](M05.md) | Implemented foundation; see limitations | 14 |
 | M06 | [Home and discovery](M06.md) | Implemented foundation; see limitations | 5 |
 | M07 | [Likes, connections and entitlements](M07.md) | Implemented foundation; see limitations | 8 |
 | M08 | [Messages and realtime](M08.md) | Implemented foundation; see limitations | 6 |

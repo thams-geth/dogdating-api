@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 10 October 2026. The checked-in backend has 168 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md) and [module handovers](handovers/README.md).
+Updated 10 October 2026. The checked-in backend has 169 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md), [module handovers](handovers/README.md) and [production boundary note](PRODUCTION_READINESS.md).
 
 ## Required integration inputs
 
@@ -8,7 +8,7 @@ Updated 10 October 2026. The checked-in backend has 168 documented HTTP operatio
 | --- | --- | --- |
 | Production SMS provider and India DLT sender/templates | Real OTP delivery, delivery callbacks and shared throttling | Opt-in terminal-only development OTP |
 | Object storage, moderation/scan service and key management | Private object delivery, approved photos, encrypted production chat/cases and deletion | Local adapters forbidden in production; no approved image delivery |
-| Guardian/dog verification provider and evidence policy | Verified adulthood/identity, evidence callbacks, reviewer grants and account activation | Request intake only; no fabricated badges or activation |
+| Guardian/dog verification provider and evidence policy | Verified adulthood/identity, vendor-specific callback authentication, reviewer grants and account activation | Provider-neutral callback, replay ledger and atomic grant transitions exist; no real verifier installed, so callbacks return 503 and no production badge or activation is available |
 | Push credentials/provider | FCM/APNs/Web Push delivery, invalid registration handling and retry worker | Durable inbox works; push jobs wait for provider |
 | Staff OIDC issuer/JWKS/audience and approved staff subjects | Real SSO/MFA and role provisioning | Admin routes unavailable without trusted identity configuration |
 | Reviewed legal/support content and retention/hold policy | Publish current documents, provide support contacts, process exports/erasure/vendor/backup retention | No legal text seeded; privacy requests remain needs_review |
@@ -24,7 +24,7 @@ No credentials, provider selection, legal approval or operational response is in
 | M01 | Country administration and waitlist outbound delivery. Audited release edits, legal-version hints and conditional API update enforcement are implemented |
 | M02 | Production SMS/DLT, distributed abuse controls and broader security audit/monitoring; optional OAuth/passkeys/recovery factors |
 | M04 | GPS/displaced anchors and twelve-question scoring; structured temperament, city-only location and two-party dog transfers already work |
-| M05 | Production uploads/delivery, scan/moderation, document uploads, signed replay-safe provider webhooks, reviewer evidence/grants and account activation; expired grants are now swept |
+| M05 | Production uploads/delivery, scan/moderation, document uploads, selected provider's raw signature/timestamp adapter, reviewer evidence policy and account activation; provider-neutral callback/replay ledger and expiry sweep are implemented |
 | M06 | Production discovery rollout, precise-distance matching and external scheduling of the bounded snapshot cleanup; account-wide home counters are implemented |
 | M08 | Production key wrapping/rotation, moderated attachments, typing/presence/shared read receipts, scalable event delivery; expired tickets are cleaned after one day, and current sockets use bounded DB polling |
 | M09 | Vendor adapter/credentials and operational scheduling; provider-neutral relay, receipts/backoff, invalid-token handling, quiet hours and dead-letter operations are implemented |

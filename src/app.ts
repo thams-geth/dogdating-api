@@ -1,3 +1,4 @@
+import { VerificationProviderEvents,type VerificationEventVerifier } from './modules/verification/provider-events.js';
 import { updateGate } from './modules/app/update-gate.js';
 import { HelpService } from './modules/help/help.service.js';
 import { helpRoutes } from './modules/help/help.routes.js';
@@ -53,7 +54,7 @@ import { blockRoutes } from './modules/safety/blocks.routes.js';
 import { DiscoveryService } from './modules/discovery/discovery.service.js';
 import { discoveryRoutes } from './modules/discovery/discovery.routes.js';
 
-export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage; discoverySecret?: string; messageCipher?: MessageCipher; staffVerifier?:StaffVerifier } = {}) {
+export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: AuthService; photoStorage?: PhotoStorage; discoverySecret?: string; messageCipher?: MessageCipher; staffVerifier?:StaffVerifier; verificationEventVerifier?:VerificationEventVerifier } = {}) {
   const database = deps.database ?? pool;
   const app = express();
   app.disable('x-powered-by');
@@ -67,11 +68,16 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
     res.setHeader('Cache-Control', 'no-store');
     next();
   });
+  const verificationEvents = new VerificationProviderEvents(database, deps.verificationEventVerifier);
+  app.post('/webhooks/verification', express.raw({ type: 'application/json', limit: '16kb' }),
+    asyncHandler(async (req, res) => {
+      res.json(await verificationEvents.handle(req.body, req.headers));
+    }));
   app.use(express.json({ limit: '64kb' }));
   app.get('/v1/health', (_req, res) => res.json({ status: 'ok' }));
   app.get('/v1/ready', asyncHandler(async (_req, res) => {
     try {
-      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0035']);
+      const result = await database.query('SELECT version FROM ops.schema_migrations WHERE version = $1', ['0036']);
       if (!result.rowCount) throw new Error('Schema not ready');
     } catch {
       throw new ApiError(503, 'not-ready', 'Database or required schema is unavailable.');

@@ -15,8 +15,8 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | M04 manual location | Complete | Public area lookup; consented household city selection/read/clear; roles, 24-hour limit and live onboarding checks |
 | M04 GPS/transfer extensions | Two-party transfer implemented | Manual owner transfer works; encrypted GPS/displaced anchor remains planned |
 | M05 private photo foundation | Complete for local development | Real JPEG/PNG uploads, checksum/type/size checks, EXIF removal, status/order/deletion and retryable cleanup; pending moderation only |
-| M05 verification intake / health metadata | Complete as a foundation | Request/status/withdrawal, requester permissions, deduplication, limits and private self-reported health records; no badges granted |
-| M05 production integrations | Planned | Object storage, scan/moderation, approved-photo delivery, identity/document provider, signed webhooks and authorized reviewer grants |
+| M05 verification intake / health metadata | Complete as a foundation | Request/status/withdrawal, requester permissions, deduplication, limits, private self-reported health records and provider-neutral callback/replay ledger; no real provider adapter or production badges |
+| M05 production integrations | Planned | Object storage, scan/moderation, approved-photo delivery, identity/document provider, vendor-specific signed callback adapter and authorized reviewer grants |
 | M06 home/discovery foundation | Complete for opt-in development | Home/tasks, city-only metadata feed, signed snapshots/impressions, live publisher eligibility, bilateral blocks/preferences, profile projection and durable exposure limits |
 | M11 blocking foundation | Complete | Private paginated block list, idempotent block/unblock; existing cross-household matches/conversations close |
 | M07 connections | Development core complete | Impression decisions, quotas, matching, withdrawal/unmatch; 072065f |
@@ -29,11 +29,11 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 
 ## Latest local verification
 
-- Typecheck/build passed; 9 unit/HTTP tests and 116 PostgreSQL integration tests at the latest full run.
+- Typecheck/build passed; 9 unit/HTTP tests and 122 PostgreSQL integration tests at the latest full run.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
-- Migrations through 0034. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 168 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- Migrations through 0036. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- 169 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions
@@ -135,6 +135,10 @@ Migrations 0032–0033 create private case entries for incident reviews and back
 ### M05 live verification expiry (9 October 2026)
 
 A bounded expiry worker revokes lapsed grants with an audited `expired` reason. When a guardian has no other live tier, it clears the stored adult-verified flag, pauses dogs published by that guardian and removes their active beacons. Live onboarding/discovery already check grant expiry without waiting for the pass. `npm run verification:expire` runs it alone; `npm run maintenance:run` includes it. No grant creation, provider review or account activation is implied.
+
+### M05 provider callback boundary (10 October 2026)
+
+Migration 0036 adds a replay ledger. `POST /webhooks/verification` receives raw JSON only when an injected provider verifier authenticates the exact bytes and returns a normalized, typed event. It atomically checks request state, requester eligibility and current dog ownership, records the provider event, then applies approved/rejected/needs_more_info. An approved event grants an expiring subject tier; exact replay is idempotent, while an event ID reused with different bytes is rejected. The server bootstrap injects no verifier, so the route returns 503. A timestamped HMAC signer exists only inside disposable integration tests; it is neither production evidence nor a vendor protocol. The provider contract, assurance policy, real credentials, document handling and account activation remain outstanding. See [production boundary](PRODUCTION_READINESS.md).
 
 ### M12 maintenance status (9 October 2026)
 

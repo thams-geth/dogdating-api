@@ -23,7 +23,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 - Repo: /Users/thamaraiselvan/ReactProject/dogdating-api.
 - Own PostgreSQL container dogdating-api-postgres, port 5433, database/user waggle. Dedicated integration DB waggle_api_test is disposable; tests refuse other database names.
 - Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
-- Migrations through 0035; applied SQL is immutable. Forward migrations only.
+- Migrations through 0036; applied SQL is immutable. Forward migrations only.
 - .env is ignored. setup:dev generates the local auth secret and enables terminal-only OTP for synthetic numbers. No real SMS.
 - An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
 
@@ -110,7 +110,9 @@ M11 now exposes reporter-only incident case list/detail under /v1/me/incident-re
 
 ## Reviewed help workflow (10 October 2026)
 
-M11 public en-IN help list/detail now reads published articles only. M12 legal_ops can create reviewed-reference drafts, publish a version (retiring prior public slug version), and retire it. Published content is immutable, all staff access audited, no content seeded. Migration 0035; OpenAPI 168 HTTP operations.
+M11 public en-IN help list/detail now reads published articles only. M12 legal_ops can create reviewed-reference drafts, publish a version (retiring prior public slug version), and retire it. Published content is immutable, all staff access audited, no content seeded. Migration 0035.
+
+M05 provider-neutral callback boundary uses migration 0036 and `POST /webhooks/verification`. A selected verifier must authenticate raw bytes/timestamp/source before normalization. Default server has no verifier and responds 503. Disposable integration tests use a fixture-only timestamped HMAC signer. Transaction records replay IDs/hashes, checks current request/account/dog ownership and applies approved/rejected/needs_more_info; approved creates an expiring tier. No production provider, evidence policy, document upload, reviewer decisions or account activation is connected. See docs/PRODUCTION_READINESS.md. OpenAPI 169 HTTP operations.
 
 ## Conditional app update gate (10 October 2026)
 

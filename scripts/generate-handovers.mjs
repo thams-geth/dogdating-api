@@ -10,6 +10,7 @@ const sections = [...plan.matchAll(/^### (M\d+) — (.+)\n([\s\S]*?)(?=^### M|^#
 const ids = Object.keys(notes).sort();
 const operations = Object.fromEntries(ids.map(id => [id, []]));
 function moduleFor(path) {
+  if(path==='/webhooks/verification')return 'M05';
   if(path.startsWith('/v1/dog-transfers'))return 'M04';
   if(path.startsWith('/v1/waitlist'))return 'M01';
   if(path.startsWith('/v1/help/'))return 'M11';
@@ -47,7 +48,7 @@ function shape(input, indent = 0) {
   let text;
   if (s.type === 'object' || s.properties) {
     const fields = Object.entries(s.properties ?? {});
-    text = fields.length ? `{\n${fields.map(([key,v])=>`${' '.repeat(indent+2)}${key}${s.required?.includes(key)?'':'?'}: ${shape(v,indent+2)}`).join('\n')}\n${' '.repeat(indent)}}` : '{}';
+    text = fields.length ? `{\n${fields.map(([key,v])=>`${' '.repeat(indent+2)}${key}${s.required?.includes(key)?'':'?'}: ${shape(v,indent+2)}`).join('\n')}\n${' '.repeat(indent)}}` : s.additionalProperties === true ? 'Record<string, unknown>' : '{}';
   } else if (s.type === 'array') text = `Array<${shape(s.items,indent)}>`;
   else text = s.type ?? 'unknown';
   const constraints = ['format','pattern','minimum','maximum','minLength','maxLength','minItems','maxItems','uniqueItems','default','minProperties']
@@ -55,6 +56,7 @@ function shape(input, indent = 0) {
   return text + (constraints.length ? ` /* ${constraints.join(', ')} */` : '');
 }
 function access({path,method,op}) {
+  if(path==='/webhooks/verification')return 'Selected provider adapter: verified raw body, timestamp and replay ID';
   if (!op.security?.length) return 'Public';
   if(op.security.some(s=>s.staffBearer))return 'Provisioned staff SSO + recent MFA; endpoint role required';
   if(op.security.some(s=>s.privacyStatusToken))return 'Request-specific Privacy-Status-Token';
