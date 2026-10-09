@@ -209,3 +209,5 @@ Meetup reminder/expiry pass: `npm run meetups:reminders` (requires external sche
 Staff `reviewer` role now has an audited, exclusive meetup incident queue. See [M12 handover](docs/handovers/M12.md).
 
 Staff operations can browse bounded, redacted audit metadata through `GET /admin/v1/audit-events`.
+
+Run one bounded operations pass with `npm run maintenance:run`. Schedule it externally for timely meetup reminders and cleanup; media cleanup and encrypted exports have separate commands. Overlapping passes return `already_running`.

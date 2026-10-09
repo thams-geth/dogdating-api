@@ -23,7 +23,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 - Repo: /Users/thamaraiselvan/ReactProject/dogdating-api.
 - Own PostgreSQL container dogdating-api-postgres, port 5433, database/user waggle. Dedicated integration DB waggle_api_test is disposable; tests refuse other database names.
 - Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
-- Migrations through 0026; applied SQL is immutable. Forward migrations only.
+- Migrations through 0033; applied SQL is immutable. Forward migrations only.
 - .env is ignored. setup:dev generates the local auth secret and enables terminal-only OTP for synthetic numbers. No real SMS.
 - An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
 
@@ -91,3 +91,7 @@ M12 reviewer role now has audited, exclusive claim/read/dismiss/escalate APIs fo
 ## Audit metadata browsing (9 October 2026)
 
 M12 operations role can browse redacted audit metadata in bounded past windows, exact filters and scoped cursors. Responses include normalized from/to for paging. No before/after JSON is returned. Every browse is audited. Audit retention/partition scheduler remains pending.
+
+## Operations maintenance pass (9 October 2026)
+
+`npm run maintenance:run` runs a single bounded pass under a database advisory lock: current/next audit partitions, old discovery snapshots/exposure rows, expired realtime tickets/privacy tokens, and up to 50 meetup reminders/expiries. Another pass returns already_running. It has no scheduler deployment and does not process media, exports, push or audit retention. Dedicated commands for those remain separate.

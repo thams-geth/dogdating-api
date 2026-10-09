@@ -7,13 +7,13 @@ Updated: 9 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 | Baseline | Complete | Express/TypeScript, PostgreSQL migrations; d0b4746 |
 | Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
 | M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
-| M01 rollout/content extensions | Waitlist implemented; remainder planned | Private waitlist opt-in/list/withdrawal; staff releases, enforced update gates and legal-version hints remain pending |
+| M01 rollout/content extensions | Waitlist and release/legal operations implemented | Private waitlist; staff release policy and legal publishing; enforced update gates remain pending |
 | M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me; 23e75eb |
 | M02 phone changes / production | Phone changes implemented; integrations pending | Recent-auth destination proof and revocation; SMS/DLT, distributed limits and optional recovery remain pending |
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
 | M04 household/dog profile core | Complete | Ownership, roles/invites, drafts, breed mix, structured temperament, preferences/schedule, gated publishing, pause, memorialisation, beacons |
 | M04 manual location | Complete | Public area lookup; consented household city selection/read/clear; roles, 24-hour limit and live onboarding checks |
-| M04 GPS/transfer extensions | Planned | Encrypted GPS/displaced anchor and two-party transfer; M06 now provides impression-scoped profile projection |
+| M04 GPS/transfer extensions | Two-party transfer implemented | Manual owner transfer works; encrypted GPS/displaced anchor remains planned |
 | M05 private photo foundation | Complete for local development | Real JPEG/PNG uploads, checksum/type/size checks, EXIF removal, status/order/deletion and retryable cleanup; pending moderation only |
 | M05 verification intake / health metadata | Complete as a foundation | Request/status/withdrawal, requester permissions, deduplication, limits and private self-reported health records; no badges granted |
 | M05 production integrations | Planned | Object storage, scan/moderation, approved-photo delivery, identity/document provider, signed webhooks and authorized reviewer grants |
@@ -21,19 +21,19 @@ Updated: 9 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents
 | M11 blocking foundation | Complete | Private paginated block list, idempotent block/unblock; existing cross-household matches/conversations close |
 | M07 connections | Development core complete | Impression decisions, quotas, matching, withdrawal/unmatch; 072065f |
 | M08 messaging | Development text/realtime complete | Encrypted bodies, sequences, recovery, ticketed sockets; fa26512; production KMS/attachments pending |
-| M09 notifications | Foundation complete | Durable inbox, preferences, encrypted devices; f5a4d46; push delivery worker/provider pending |
-| M10 meetups | Core implemented | Places, proposals, attendance and reviews; extensions/groups/video and operations pending |
-| M11 safety/privacy | Foundation implemented | Reports/support/appeals and restricted privacy OTP; actual export/erasure pipeline remains pending |
-| M12 staff operations | Foundation implemented | Separate OIDC/MFA, DB roles, cases/support/appeals/place review/job counts; broader reviewer/release/privacy tooling pending |
+| M09 notifications | Provider-neutral relay complete | Durable inbox, encrypted devices, leased retry queue; real provider/scheduler pending |
+| M10 meetups | Two-party flow implemented | Places, proposals, consented extensions, reminders, attendance, reviews; external scheduler/groups/video pending |
+| M11 safety/privacy | Scoped export foundation implemented | Reports/support/appeals and restricted privacy OTP; encrypted account_data_v1 export; full legal response/erasure pending |
+| M12 staff operations | Core case tooling implemented | OIDC/MFA, roles, reports/incidents/support/appeals, place/release/legal review and redacted audit browsing; provider/privacy tooling pending |
 | M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
 
 ## Latest local verification
 
-- Typecheck/build passed; 8 unit/HTTP tests and 91 PostgreSQL integration tests (99 total; latest full run recorded below).
+- Typecheck/build passed; 8 unit/HTTP tests and 108 PostgreSQL integration tests at the last full run; newer maintenance tests run separately.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
-- Migrations through 0026. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 139 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- Migrations through 0033. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- 159 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions
@@ -127,3 +127,7 @@ Migrations 0032–0033 create private case entries for incident reviews and back
 ### M12 bounded audit browsing (9 October 2026)
 
 `GET /admin/v1/audit-events` lets provisioned operations staff browse seven days by default or a chosen past range up to 31 days, with exact filters and scoped descending ID pagination. It returns event metadata only; before/after JSON is withheld. Each browse creates its own audit entry. Partition/retention scheduling and monitoring remain operational work.
+
+### Bounded operations maintenance (9 October 2026)
+
+`npm run maintenance:run` now performs one overlap-safe pass for audit partition provisioning, bounded discovery cleanup, expired realtime tickets/privacy tokens, and meetup reminders/proposal expiry. It uses a database advisory lock and returns `already_running` if another pass owns it. It emits counts only. An external scheduler, monitoring, media cleanup, encrypted export processing, push provider and reviewed audit retention remain separate operational tasks.
