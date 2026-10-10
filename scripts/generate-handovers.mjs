@@ -13,6 +13,7 @@ function moduleFor(path) {
   if(path==='/webhooks/verification')return 'M05';
   if(path.startsWith('/v1/dog-transfers'))return 'M04';
   if(path.startsWith('/v1/waitlist'))return 'M01';
+  if(path.startsWith('/admin/v1/areas'))return 'M01';
   if(path.startsWith('/v1/help/'))return 'M11';
   if (path.startsWith('/admin/v1/')) return 'M12';
   if (/^\/v1\/(places|meetups)(?:\/|$)/.test(path)) return 'M10';

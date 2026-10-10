@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 10 October 2026. The checked-in backend has 169 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md), [module handovers](handovers/README.md) and [production boundary note](PRODUCTION_READINESS.md).
+Updated 10 October 2026. The checked-in backend has 171 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md), [module handovers](handovers/README.md) and [production boundary note](PRODUCTION_READINESS.md).
 
 ## Required integration inputs
 
@@ -23,7 +23,7 @@ For the current development phase, photo integration and real SMS delivery are d
 
 | Module | Remaining scope |
 | --- | --- |
-| M01 | Country administration and waitlist outbound delivery. Audited release edits, legal-version hints and conditional API update enforcement are implemented |
+| M01 | Country administration, reviewed public-area opening and waitlist outbound delivery. Audited nonpublic India area edits, release edits, legal-version hints and conditional API update enforcement are implemented |
 | M02 | Production SMS/DLT, distributed abuse controls and broader security audit/monitoring; optional OAuth/passkeys/recovery factors |
 | M04 | GPS/displaced anchors and twelve-question scoring; structured temperament, city-only location and two-party dog transfers already work |
 | M05 | Production uploads/delivery, scan/moderation, document uploads, selected provider's raw signature/timestamp adapter, reviewer evidence policy and account activation; provider-neutral callback/replay ledger and expiry sweep are implemented |

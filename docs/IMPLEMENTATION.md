@@ -7,7 +7,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | Baseline | Complete | Express/TypeScript, PostgreSQL migrations; d0b4746 |
 | Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
 | M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
-| M01 rollout/content extensions | Waitlist and release/legal operations implemented | Private waitlist; staff release policy and legal publishing; conditional product update gate implemented |
+| M01 rollout/content extensions | Waitlist, release/legal and nonpublic area operations implemented | Private waitlist; staff release policy and legal publishing; conditional product update gate; city_ops versioned India area edits among nonpublic states only |
 | M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me and one fixed local-only sign-in fixture; production SMS remains unavailable |
 | M02 phone changes / production | Phone changes implemented; integrations pending | Recent-auth destination proof and revocation; SMS/DLT, distributed limits and optional recovery remain pending |
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
@@ -33,7 +33,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
 - Migrations through 0036. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
-- 169 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
+- 171 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 
 ## Explicit gaps and decisions

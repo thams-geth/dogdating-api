@@ -119,3 +119,7 @@ M05 provider-neutral callback boundary uses migration 0036 and `POST /webhooks/v
 ## Conditional app update gate (10 October 2026)
 
 M01 now checks X-App-Platform/X-App-Build on product routes against live persisted release policy. Once staff raise either minimum above 1, both headers are required; old builds get 426 update-required. Bootstrap, help/legal, auth, reports/support, blocks, privacy/deletion, appeals and incident review status remain reachable. Both minimums still default to 1. Missing/invalid policy fails 503. No store rollout was performed.
+
+## Nonpublic area administration (10 October 2026)
+
+M01 city_ops can list India metros and change only prospect/seeding/waitlist/gated via versioned, audited PATCH. Migrations 0037–0038 add rollout version metadata; 0038 removes the staff FK so deprovisioning/test truncation cannot cascade into metros. Public opening, country administration and waitlist delivery remain unimplemented. Moving out of seeding resets affected dog publication to draft and cancels beacons; live onboarding/discovery also use the current state. Returning to seeding never republishes dogs automatically. OpenAPI has 171 operations. Use test phone +919000000001 and 000000 for local sign-in; photo/SMS providers remain deferred.

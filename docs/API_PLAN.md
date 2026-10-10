@@ -60,6 +60,7 @@ Paths below are planned unless IMPLEMENTATION.md marks them complete. Each metho
 | GET `/app/countries` | P | Supported markets, rollout state, language/currency/unit settings |
 | GET `/dogs/breeds` | P | Canonical catalogue; no private user data |
 | GET `/app/areas?countryCode=&query=` | P | Supported launch areas and waitlist state; no precise household counts |
+| GET `/admin/v1/areas`; PATCH `/admin/v1/areas/{id}` | S (`city_ops`) | Audit and version India area changes among prospect/seeding/waitlist/gated only; public opening needs a separate reviewed workflow |
 | POST `/waitlist`; DELETE `/waitlist/{id}` | U | Opt in/out of a selected launch-area notification |
 | GET `/legal/documents/{kind}?countryCode=&locale=&version=` | P | Published, reviewed terms/privacy/community text; immutable versions |
 

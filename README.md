@@ -13,9 +13,9 @@ India-first dog social/matching backend built with TypeScript, Express and Postg
 
 The provisional launch scope is dog playdates/walks. Breeding introductions and owner dating have separate rollout plans. The founder's launch-mode clarification is still pending; common platform work is underway.
 
-## Current status (9 October 2026)
+## Current status (10 October 2026)
 
-169 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md) and the [production boundary note](docs/PRODUCTION_READINESS.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
+171 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md) and the [production boundary note](docs/PRODUCTION_READINESS.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
 
 ## Local development
 
@@ -49,11 +49,13 @@ If port 3000 is already occupied, stop your previous Waggle process or set `PORT
 | Private photos | Upload, status, order, deletion and local cleanup; see below |
 | Verification/health | Request/status/withdrawal and self-reported health records; see below |
 
-Bootstrap example: `/v1/app/bootstrap?platform=android&buildNumber=1&countryCode=IN&locale=en-IN`. India is marked `development`; unbuilt product features remain disabled. Published store links, reviewed legal documents, rollout administration and enforced minimum-build gates are pending. Release policy is currently reviewed code in `src/modules/app/policy.ts`.
+Bootstrap example: `/v1/app/bootstrap?platform=android&buildNumber=1&countryCode=IN&locale=en-IN`. India is marked `development`; unbuilt product features remain disabled. Published store links, reviewed legal documents and public rollout are pending. Staff can edit the stored release policy; product routes enforce a confirmed minimum build once it exceeds 1. Area administration only supports nonpublic India states.
 
 OTP signup and returning-user login share one flow. New accounts require a name and remain `pending`; live onboarding readiness is tracked separately from account status. Access JWTs last 15 minutes; refresh families last 30 days. Serialize refresh calls on the client: reusing a rotated refresh token revokes its whole family. Logout/device revocation takes effect on subsequent authenticated requests. Profile edits cannot change verification, roles or account status.
 
 Phone resend/attempt limits are persisted in PostgreSQL. IP limits are currently per process; shared rate limiting and a production SMS provider remain launch requirements. This is a development milestone, not a production-ready app.
+
+City operations staff can list India areas at `GET /admin/v1/areas` and edit their nonpublic rollout state at `PATCH /admin/v1/areas/{id}` with an expected version and reason code. The route cannot open an area publicly; see [M01 handover](docs/handovers/M01.md) for the contract and readiness effects.
 
 ## Checks
 

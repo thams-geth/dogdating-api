@@ -10145,6 +10145,64 @@ paths:
           $ref: "#/components/responses/Problem"
         "503":
           $ref: "#/components/responses/Problem"
+  /admin/v1/areas:
+    get:
+      operationId: staffListAreas
+      summary: List India areas and their rollout versions for city operations
+      security:
+        - staffBearer: []
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 50, default: 20}
+        - name: cursor
+          in: query
+          schema: {type: string, maxLength: 400}
+      responses:
+        "200":
+          description: Versioned India area page
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: {$ref: "#/components/schemas/StaffArea"}
+                  nextCursor: {type: [string, "null"]}
+        default: {$ref: "#/components/responses/Problem"}
+  /admin/v1/areas/{id}:
+    patch:
+      operationId: staffUpdateAreaRollout
+      summary: Change an India area among nonpublic rollout states
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expectedVersion, state, reasonCode]
+              properties:
+                expectedVersion: {type: integer, minimum: 1}
+                state: {type: string, enum: [prospect, seeding, waitlist, gated]}
+                reasonCode: {type: string, pattern: '^[a-z0-9_-]{3,60}$'}
+      responses:
+        "200":
+          description: Current area rollout
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/StaffArea"}
+        default: {$ref: "#/components/responses/Problem"}
   /admin/v1/app-releases:
     get:
       operationId: staffReleasePolicy
@@ -13788,6 +13846,19 @@ components:
         - createdAt
         - provenance
         - expired
+    StaffArea:
+      type: object
+      additionalProperties: false
+      required: [id, name, countryCode, adminRegion, timezone, state, version, updatedAt]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+        countryCode: {type: string, enum: [IN]}
+        adminRegion: {type: [string, "null"]}
+        timezone: {type: string}
+        state: {type: string, enum: [prospect, seeding, waitlist, soft_launch, gated, open]}
+        version: {type: integer, minimum: 1}
+        updatedAt: {type: string, format: date-time}
     Area:
       type: object
       additionalProperties: false

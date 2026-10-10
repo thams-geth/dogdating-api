@@ -4,7 +4,9 @@ import { fixture } from '../support/fixture.js';import { LocalMessageCipher } fr
 const issuer='https://staff.test.invalid',identities=new Map<string,StaffIdentity>(),cipher=new LocalMessageCipher(randomBytes(32).toString('hex'),'test');
 const f=fixture(undefined,undefined,cipher,{async verify(token){const identity=identities.get(token);if(!identity)throw new Error('untrusted');return identity;}}),http=request(f.app);
 let one:string,two:string;
-beforeEach(async()=>{await f.setup();await f.database.query('TRUNCATE ops.staff_accounts CASCADE');identities.clear();for(const subject of ['one','two','support'])identities.set(subject,{issuer,subject,mfa:true,authenticatedAt:Date.now()/1000});
+beforeEach(async()=>{await f.setup();await f.database.query(`INSERT INTO ops.metros(id,name,country,admin_region,timezone,currency,launch_state)
+ VALUES('01920000-0000-7000-8000-0000000e0001','Bengaluru','IN','KA','Asia/Kolkata','INR','seeding') ON CONFLICT(id) DO NOTHING`);
+ await f.database.query('TRUNCATE ops.staff_accounts CASCADE');identities.clear();for(const subject of ['one','two','support'])identities.set(subject,{issuer,subject,mfa:true,authenticatedAt:Date.now()/1000});
  one=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'one',['moderator','appeals','support','city_ops','operations','release_ops','legal_ops','reviewer']])).rows[0].id;
  two=(await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3) RETURNING id',[issuer,'two',['moderator','appeals']])).rows[0].id;
  await f.database.query('INSERT INTO ops.staff_accounts(issuer,subject,roles) VALUES($1,$2,$3)',[issuer,'support',['support']]);await f.database.query('INSERT INTO ops.app_release_policy(singleton,policy) VALUES(true,$1)',[defaultPolicy]);});after(()=>f.close());
@@ -15,6 +17,34 @@ test('staff identity requires MFA, recent authentication, live provisioning and 
  identities.set('old',{issuer,subject:'one',mfa:true,authenticatedAt:Date.now()/1000-1000});await http.get('/admin/v1/jobs').set('Authorization','Bearer old').expect(401);
  await http.get('/admin/v1/jobs').set('Authorization','Bearer one').expect(200);
  await f.database.query('UPDATE ops.staff_accounts SET active=false WHERE id=$1',[one]);await http.get('/admin/v1/jobs').set('Authorization','Bearer one').expect(403);
+});
+test('city operations edit only India development rollout with version and audit',async()=>{
+ const id=randomUUID(),foreign=randomUUID();
+ await f.database.query(`INSERT INTO ops.metros(id,name,country,admin_region,timezone,currency,launch_state)
+   VALUES($1,'Test City','IN','KA','Asia/Kolkata','INR','prospect'),($2,'Foreign Test','US','CA','America/Los_Angeles','USD','prospect')`,[id,foreign]);
+ const path=`/admin/v1/areas/${id}`,auth={Authorization:'Bearer one'};
+ await http.get('/admin/v1/areas').set('Authorization','Bearer support').expect(403);
+ const listed=(await http.get('/admin/v1/areas').set(auth).expect(200)).body;
+ assert.ok(listed.items.some((a:{id:string})=>a.id===id));assert.ok(!listed.items.some((a:{id:string})=>a.id===foreign));
+ await http.patch(path).set('Authorization','Bearer support').send({expectedVersion:1,state:'seeding',reasonCode:'test_ready'}).expect(403);
+ await http.patch(path).set(auth).send({expectedVersion:1,state:'open',reasonCode:'test_ready'}).expect(400);
+ await http.patch(`/admin/v1/areas/${foreign}`).set(auth).send({expectedVersion:1,state:'seeding',reasonCode:'test_ready'}).expect(404);
+ const changed=(await http.patch(path).set(auth).send({expectedVersion:1,state:'seeding',reasonCode:'test_ready'}).expect(200)).body;
+ assert.equal(changed.version,2);assert.equal(changed.state,'seeding');
+ const user=await f.user(),householdId=await f.household(user.userId),dogId=await f.dog(householdId);
+ await f.database.query("UPDATE identity.households SET metro_id=$2,location_source='manual_area' WHERE id=$1",[householdId,id]);
+ await f.database.query("UPDATE graph.dogs SET publication_state='published' WHERE id=$1",[dogId]);
+ await f.database.query("INSERT INTO graph.dog_availability(id,dog_id,beacon_until) VALUES($1,$2,now()+interval '1 hour')",[randomUUID(),dogId]);
+ assert.ok((await http.get('/v1/app/areas?countryCode=IN&query=Test%20City').expect(200)).body.areas.some((a:{id:string,selectable:boolean})=>a.id===id&&a.selectable));
+ await http.patch(path).set(auth).send({expectedVersion:1,state:'waitlist',reasonCode:'test_pause'}).expect(409).then(r=>assert.equal(r.body.code,'area-version-conflict'));
+ const paused=(await http.patch(path).set(auth).send({expectedVersion:2,state:'waitlist',reasonCode:'test_pause'}).expect(200)).body;
+ assert.equal(paused.version,3);assert.equal(paused.state,'waitlist');
+ assert.equal((await f.database.query('SELECT publication_state FROM graph.dogs WHERE id=$1',[dogId])).rows[0].publication_state,'draft');
+ assert.equal((await f.database.query('SELECT count(*)::int AS n FROM graph.dog_availability WHERE dog_id=$1',[dogId])).rows[0].n,0);
+ assert.equal((await http.get('/v1/app/areas?countryCode=IN&query=Test%20City').expect(200)).body.areas[0].selectable,false);
+ const same=(await http.patch(path).set(auth).send({expectedVersion:3,state:'waitlist',reasonCode:'test_pause'}).expect(200)).body;assert.equal(same.version,3);
+ const audit=(await f.database.query("SELECT before,after FROM ops.audit_log WHERE action='area.rollout.update' AND subject_id=$1 ORDER BY id",[id])).rows;
+ assert.equal(audit.length,2);assert.deepEqual(audit[1].after,{state:'waitlist',version:3,reasonCode:'test_pause'});
 });
 test('report narrative requires exclusive claim and every read/action is audited without narrative',async()=>{
  const user=await f.user(),id=randomUUID(),text='PRIVATE CASE TEST';await f.database.query("INSERT INTO safety.reports(id,reporter_user_id,subject_type,subject_id,category,severity,narrative_encrypted) VALUES($1,$2,'user',$2,'other',1,$3)",[id,user.userId,cipher.wrap(Buffer.from(text),`report:${id}`)]);

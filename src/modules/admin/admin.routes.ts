@@ -1,8 +1,9 @@
 import { articleInput,type HelpService } from '../help/help.service.js';
+import { areaRolloutInput,type AreaAdminService } from '../app/area-admin.service.js';
 import { ReleaseLegalService,releaseInput,legalInput } from './release-legal.service.js';
 import { Router } from 'express';import { z } from 'zod';import { asyncHandler } from '../../http/async-handler.js';import { ApiError } from '../../middleware/error.js';import { pageQuery } from '../../http/pagination.js';
 import type { StaffAuth,StaffPrincipal,StaffRole } from './staff-auth.js';import type { AdminService } from './admin.service.js';
-export function adminRoutes(service:AdminService,auth:StaffAuth,releaseLegal:ReleaseLegalService,help:HelpService){const router=Router(),id=(v:unknown)=>z.string().uuid().parse(v);
+export function adminRoutes(service:AdminService,auth:StaffAuth,releaseLegal:ReleaseLegalService,help:HelpService,areas:AreaAdminService){const router=Router(),id=(v:unknown)=>z.string().uuid().parse(v);
  router.use(asyncHandler(async(req,res,next)=>{const header=req.get('Authorization');if(!header?.startsWith('Bearer ')||header.length>16000)throw new ApiError(401,'staff-unauthenticated','Staff bearer token required.');res.locals.staff=await auth.authenticate(header.slice(7));next();}));
  const staff=(res:{locals:Record<string,any>})=>res.locals.staff as StaffPrincipal;
  const role=(required:StaffRole)=>asyncHandler(async(_req,res,next)=>{if(!staff(res).roles.includes(required))throw new ApiError(403,'staff-forbidden','This staff role is required.');next();});
@@ -31,6 +32,8 @@ export function adminRoutes(service:AdminService,auth:StaffAuth,releaseLegal:Rel
  router.get('/appeals/:id',role('appeals'),asyncHandler(async(req,res)=>{res.json(await service.appeal(staff(res),id(req.params.id)));}));
  router.post('/appeals/:id/decide',role('appeals'),asyncHandler(async(req,res)=>{const q=z.object({decision:z.enum(['uphold','overturn']),outcome:z.string().trim().min(5).max(300)}).strict().parse(req.body);res.json(await service.decideAppeal(staff(res),id(req.params.id),q.outcome,q.decision));}));
  router.get('/places',role('city_ops'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await service.places(staff(res),q.limit,q.cursor));}));
+ router.get('/areas',role('city_ops'),asyncHandler(async(req,res)=>{const q=pageQuery.parse(req.query);res.json(await areas.list(staff(res),q.limit,q.cursor));}));
+ router.patch('/areas/:id',role('city_ops'),asyncHandler(async(req,res)=>{res.json(await areas.save(staff(res),id(req.params.id),areaRolloutInput.parse(req.body)));}));
  router.get('/places/:id',role('city_ops'),asyncHandler(async(req,res)=>{res.json(await service.place(staff(res),id(req.params.id)));}));
  router.patch('/places/:id',role('city_ops'),asyncHandler(async(req,res)=>{const q=z.object({state:z.enum(['approved','rejected','closed'])}).strict().parse(req.body);res.json(await service.decidePlace(staff(res),id(req.params.id),q.state));}));
  router.get('/notifications/jobs',role('operations'),asyncHandler(async(req,res)=>{const q=pageQuery.extend({state:z.enum(['awaiting_provider','pending','delivered','suppressed','dead_letter']).default('dead_letter')}).parse(req.query);res.json(await service.pushJobs(staff(res),q.state,q.limit,q.cursor));}));

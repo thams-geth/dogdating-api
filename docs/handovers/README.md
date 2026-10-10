@@ -4,7 +4,7 @@ Start with [shared conventions](COMMON.md) and the module for your screen. Every
 
 | Module | Handover | Status | APIs |
 | --- | --- | --- | --- |
-| M01 | [App lifecycle and reference data](M01.md) | Implemented foundation; see limitations | 9 |
+| M01 | [App lifecycle and reference data](M01.md) | Implemented foundation; see limitations | 11 |
 | M02 | [Authentication and sessions](M02.md) | Implemented foundation; see limitations | 9 |
 | M03 | [Guardian profile, consent and resumable onboarding](M03.md) | Implemented foundation; see limitations | 12 |
 | M04 | [Households and dog profiles](M04.md) | Implemented foundation; see limitations | 29 |
