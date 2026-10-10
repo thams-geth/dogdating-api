@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';import type { Pool } from 'pg';
 import { transaction } from '../../db/transaction.js';import { socialLock } from '../../db/social-lock.js';import { ApiError } from '../../middleware/error.js';
 import { ConnectionsRepository } from '../connections/connections.repository.js';import type { MessageCipher } from '../messages/message-cipher.js';
-export type PushResult={status:'delivered'|'invalid_token'|'transient_failure'|'permanent_failure'};
+export type PushResult={status:'delivered'|'invalid_token'|'transient_failure'|'permanent_failure';retryAfterSeconds?:number};
 export interface PushProvider {
  supports(provider:string):boolean;
- // Adapter must honor abort, and should use deliveryId as a collapse/deduplication key.
+ // Adapter must honor abort and include deliveryId so clients can deduplicate retries.
  send(input:{provider:string;token:string;deliveryId:string;payload:{notificationId:string;category:string;title:'Waggle update'};signal:AbortSignal}):Promise<PushResult>;
 }
 function quiet(preference:Record<string,any>){
@@ -47,7 +47,7 @@ export async function deliverPushBatch(db:Pool,cipher:MessageCipher,provider?:Pu
    const candidates=prepared.devices.filter(d=>provider.supports(d.provider));
    if(!candidates.length&&prepared.devices.length){await finish('awaiting_provider','unsupported_provider',3600,true);summary.deferred++;continue;}
    if(!candidates.length){const receipt=(await db.query('SELECT 1 FROM ops.push_delivery_receipts WHERE notification_id=$1 LIMIT 1',[job.notification_id])).rowCount;await finish(receipt?'delivered':'suppressed',null);receipt?summary.delivered++:summary.suppressed++;continue;}
-   let transient=false,permanent=false,delivered=false,suppressed=false,deferred=false;
+   let transient=false,permanent=false,delivered=false,suppressed=false,deferred=false,retryAfterSeconds=0;
    for(const candidate of candidates){
     if(!(await db.query('SELECT 1 FROM ops.push_jobs WHERE notification_id=$1 AND lease_token=$2 AND lease_until>now()',[job.notification_id,lease])).rowCount)break;
     prepared=await prepare(db,job.notification_id);if(prepared.state==='suppress'){suppressed=true;break;}if(prepared.state==='quiet'){deferred=true;break;}
@@ -56,12 +56,12 @@ export async function deliverPushBatch(db:Pool,cipher:MessageCipher,provider?:Pu
     if(result.status==='delivered'){
      await db.query('INSERT INTO ops.push_delivery_receipts(notification_id,installation_id) SELECT id,$2::uuid FROM identity.notifications WHERE id=$1 ON CONFLICT DO NOTHING',[job.notification_id,device.installation_id]);delivered=true;
     }else if(result.status==='invalid_token')await db.query('DELETE FROM identity.devices WHERE installation_id=$1 AND token_hash=$2',[device.installation_id,device.token_hash]);
-    else if(result.status==='permanent_failure')permanent=true;else transient=true;
+    else if(result.status==='permanent_failure')permanent=true;else {transient=true;const hint=result.retryAfterSeconds;retryAfterSeconds=Math.max(retryAfterSeconds,Number.isFinite(hint)?Math.min(3600,Math.max(0,Math.ceil(hint!))):0);}
    }
    if(suppressed){await finish('suppressed',null);summary.suppressed++;}
    else if(deferred){await finish('pending','quiet_hours',900,true);summary.deferred++;}
    else if(permanent||transient&&job.attempts>=5){await finish('dead_letter',permanent?'provider_rejected':'retries_exhausted');summary.deadLetter++;}
-   else if(transient){await finish('pending','provider_retry',Math.min(3600,30*2**(job.attempts-1)));summary.retrying++;}
+   else if(transient){await finish('pending','provider_retry',Math.max(Math.min(3600,30*2**(job.attempts-1)),retryAfterSeconds));summary.retrying++;}
    else if(prepared.state==='deliver'&&prepared.devices.some(d=>!provider.supports(d.provider))){await finish('awaiting_provider','unsupported_provider',3600,true);summary.deferred++;}
    else {await finish(delivered?'delivered':'suppressed',null);delivered?summary.delivered++:summary.suppressed++;}
   }catch{

@@ -187,6 +187,8 @@ Text first. Server assigns per-conversation sequence within the message transact
 
 Outbox drives match, message, meetup, moderation and verification updates. Retries have backoff, event deduplication and a dead-letter queue. Remove invalid registrations; transfer device ownership safely on account switch. Notification payloads avoid full messages, exact location and sensitive health/identity information. Delivery is best effort; durable inbox is authoritative.
 
+Current delivery: an FCM HTTP v1 adapter and manual bounded relay pass exist, but no Firebase credentials, production key wrapper or scheduler are configured. APNs/Web Push adapters remain planned; pushAvailable remains false.
+
 ### M10 — Meetups and places [L; groups/video G]
 
 | Method + path | Access | Purpose |

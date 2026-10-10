@@ -15,7 +15,7 @@ The local sign-in shortcut `+919000000001` / `000000` is available only through 
 | Verification | Signed-event adapter interface, replay ledger, state transitions, fixture signer in tests | Chosen provider, actual signature format, evidence/assurance policy, test credentials |
 | SMS | Existing durable phone/OTP limits and local sender | DLT registration, sender/template IDs, chosen transport and delivery receipts |
 | Media | Private upload and image normalization | Object storage, scanner/moderator, approved delivery and key management |
-| Push | Durable leased queue and provider-neutral sender interface | Vendor credentials/adapter and scheduled worker |
+| Push | Durable leased queue and FCM HTTP v1 adapter with test transport | Firebase project/ADC credentials, production key wrapping, scheduled worker and delivery monitoring; APNs/Web Push adapters if used |
 | Exports/deletion | Encrypted scoped export and tracked erasure requests | Reviewed retention, legal hold, shared-household and vendor deletion rules |
 | Billing | Free quotas only | Store products, receipt verification contract, webhook keys and refund rules |
 

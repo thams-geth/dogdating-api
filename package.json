@@ -24,12 +24,14 @@
     "privacy:exports": "tsx src/modules/safety/export-worker.ts",
     "meetups:reminders": "tsx src/modules/meetups/reminder-cli.ts",
     "maintenance:run": "tsx src/modules/ops/maintenance-cli.ts",
-    "verification:expire": "tsx src/modules/verification/expiry-cli.ts"
+    "verification:expire": "tsx src/modules/verification/expiry-cli.ts",
+    "push:deliver": "tsx src/modules/notifications/fcm-cli.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-rate-limit": "^8.7.1",
+    "google-auth-library": "^11.2.0",
     "jose": "^6.2.12",
     "pg": "^8.13.1",
     "sharp": "^0.35.5",

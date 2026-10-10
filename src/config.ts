@@ -9,6 +9,7 @@ const schema = z.object({
   MEDIA_MODE: z.enum(['disabled', 'local']).default('disabled'),
   MEDIA_LOCAL_DIR: z.string().min(1).default('.local/media'),
   DISCOVERY_MODE: z.enum(['disabled','development']).default('disabled'),
+  FCM_PROJECT_ID: z.preprocess(v=>v===''?undefined:v,z.string().regex(/^[a-z][a-z0-9-]{5,99}$/).optional()),
   STAFF_ISSUER:z.string().url().startsWith('https://').optional(),
   STAFF_JWKS_URL:z.string().url().startsWith('https://').optional(),
   STAFF_AUDIENCE:z.string().min(1).optional(),

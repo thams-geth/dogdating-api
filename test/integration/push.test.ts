@@ -21,6 +21,12 @@ test('transient failures back off durably and exhaust into dead letter without s
  await f.database.query("UPDATE ops.push_jobs SET attempts=4,available_at=now()-interval '1 second' WHERE notification_id=$1",[p.notification]);assert.equal((await deliverPushBatch(f.database,cipher,provider)).deadLetter,1);
  const row=(await f.database.query('SELECT state,last_error FROM ops.push_jobs WHERE notification_id=$1',[p.notification])).rows[0];assert.equal(row.state,'dead_letter');assert.equal(row.last_error,'retries_exhausted');
 });
+test('provider quota retry hint is persisted on the queued job',async()=>{
+ const p=await ready(),provider:PushProvider={supports:()=>true,async send(){return {status:'transient_failure',retryAfterSeconds:120};}};
+ assert.equal((await deliverPushBatch(f.database,cipher,provider)).retrying,1);
+ const row=(await f.database.query('SELECT available_at FROM ops.push_jobs WHERE notification_id=$1',[p.notification])).rows[0];
+ assert.ok(new Date(row.available_at).getTime()-Date.now()>110_000);
+});
 test('quiet hours defer without consuming attempts; subsequent block suppresses delivery',async()=>{
  const p=await ready(),now=new Date(),minute=now.getUTCHours()*60+now.getUTCMinutes();await f.database.query("UPDATE identity.notification_preferences SET timezone='UTC',quiet_start=$2,quiet_end=$3 WHERE user_id=$1",[p.b.userId,(minute+1439)%1440,(minute+3)%1440]);
  let calls=0;const provider:PushProvider={supports:()=>true,async send(){calls++;return {status:'delivered'};}};assert.equal((await deliverPushBatch(f.database,cipher,provider)).deferred,1);assert.equal((await f.database.query('SELECT attempts FROM ops.push_jobs')).rows[0].attempts,0);

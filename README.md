@@ -204,7 +204,7 @@ M12 now has dedicated release_ops/legal_ops roles, optimistic audited release-po
 
 ## Push queue relay (9 October 2026)
 
-Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials/adapter wiring and scheduling are still absent; pushAvailable remains false.
+Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. An FCM HTTP v1 adapter can be run manually with `npm run push:deliver` after setting `FCM_PROJECT_ID`, Google Application Default Credentials and the development `MESSAGE_KEY`; it sends only generic notification metadata. No Firebase credentials, scheduler or production key wrapper are configured. APNs/Web Push adapters remain absent, and `pushAvailable` remains false.
 
 Meetup reminder/expiry pass: `npm run meetups:reminders` (requires external scheduling). See [M10 handover](docs/handovers/M10.md).
 

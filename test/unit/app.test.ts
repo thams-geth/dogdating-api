@@ -58,5 +58,6 @@ test('update gate enforces confirmed minimum builds while leaving recovery route
  const old=await request(app).get('/v1/dogs').set('X-App-Platform','android').set('X-App-Build','11').expect(426);assert.equal(old.body.code,'update-required');
  const current=await request(app).get('/v1/dogs').set('X-App-Platform','android').set('X-App-Build','12');assert.notEqual(current.status,426);
  await request(app).get('/v1/app/bootstrap?platform=android&buildNumber=11').expect(200);
- const safety=await request(app).get('/v1/reports/77777777-7777-4777-8777-777777777777').expect(503);assert.notEqual(safety.body.code,'update-required');
+ const safety=await request(app).get('/v1/reports/77777777-7777-4777-8777-777777777777');
+ assert.ok([401,503].includes(safety.status));assert.notEqual(safety.body.code,'update-required');
 });

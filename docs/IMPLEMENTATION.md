@@ -21,7 +21,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | M11 blocking foundation | Complete | Private paginated block list, idempotent block/unblock; existing cross-household matches/conversations close |
 | M07 connections | Development core complete | Impression decisions, quotas, matching, withdrawal/unmatch; 072065f |
 | M08 messaging | Development text/realtime complete | Encrypted bodies, sequences, recovery, ticketed sockets; fa26512; production KMS/attachments pending |
-| M09 notifications | Provider-neutral relay complete | Durable inbox, encrypted devices, leased retry queue; real provider/scheduler pending |
+| M09 notifications | FCM adapter and relay implemented | Durable inbox, encrypted devices, leased retry queue and FCM HTTP v1 mapping; real credentials, production key wrapper and scheduler pending |
 | M10 meetups | Two-party flow implemented | Places, proposals, consented extensions, reminders, attendance, reviews; external scheduler/groups/video pending |
 | M11 safety/privacy | Scoped export foundation implemented | Reports/support/appeals and restricted privacy OTP; encrypted account_data_v1 export; full legal response/erasure pending |
 | M12 staff operations | Core case tooling implemented | OIDC/MFA, roles, reports/incidents/support/appeals, place/release/legal review and redacted audit browsing; provider/privacy tooling pending |
@@ -29,7 +29,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 
 ## Latest local verification
 
-- Typecheck/build passed; 10 unit/HTTP tests and 123 PostgreSQL integration tests at the latest full run.
+- Typecheck/build passed; 13 unit/HTTP tests and 124 PostgreSQL integration tests at the latest full run.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
 - Migrations through 0036. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
@@ -82,7 +82,7 @@ Encrypted text messages, deduplicated sends, bigint sequence history, private re
 
 ## M09 notification foundation delivered (8 October 2026)
 
-Atomic match/message inbox events, private read markers, preferences and encrypted session-bound device registration are implemented. Migration 0021. Push jobs remain awaiting_provider; external push delivery/retry/dead-letter worker is still pending. Logout revokes registrations. See docs/handovers/M09.md. Next: M10 meetups.
+Atomic match/message inbox events, private read markers, preferences and encrypted session-bound device registration are implemented. Migration 0021. Push jobs stay awaiting_provider until a configured worker runs; the relay and FCM adapter described below are implemented, but no live provider is connected. Logout revokes registrations. See docs/handovers/M09.md.
 
 ## M10 meetup core delivered (9 October 2026)
 
@@ -116,7 +116,9 @@ M12 now has dedicated release_ops/legal_ops roles, optimistic audited release-po
 
 ## Push queue relay (9 October 2026)
 
-Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials/adapter wiring and scheduling are still absent; pushAvailable remains false.
+Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials and scheduling are still absent; pushAvailable remains false.
+
+The FCM HTTP v1 adapter now maps accepted sends, explicit UNREGISTERED tokens, quota/server retries and permanent payload/configuration failures to the relay contract. Quota Retry-After is persisted; 429 waits at least 60 seconds. `npm run push:deliver` runs one manual pass using an FCM project ID and Google Application Default Credentials, provided the development MESSAGE_KEY can unwrap registered tokens. No credentials, scheduler, production key wrapping or APNs/Web Push adapter are installed; pushAvailable remains false. See the [M09 handover](handovers/M09.md) and [Firebase HTTP v1 guidance](https://firebase.google.com/docs/cloud-messaging/send/v1-api).
 
 ### M10 extension and reminder update (9 October 2026)
 

@@ -80,7 +80,7 @@ M12 now has dedicated release_ops/legal_ops roles, optimistic audited release-po
 
 ## Push queue relay (9 October 2026)
 
-Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. Actual provider credentials/adapter wiring and scheduling are still absent; pushAvailable remains false.
+Provider-neutral push relay now has durable leases, per-installation receipts, timeout/backoff, invalid-token handling, live permission/preference checks, quiet-hour deferral and dead-letter state. Staff operations can inspect/retry jobs. Migration 0030. FCM HTTP v1 adapter maps UNREGISTERED/quotas and accepts Google ADC credentials via a manual push:deliver pass. Real Firebase project/credentials, production key wrapper, scheduler and APNs/Web Push adapters remain absent; pushAvailable stays false.
 
 ## Meetup extensions and reminders (9 October 2026)
 
