@@ -2,6 +2,8 @@
 
 Updated 10 October 2026. The backend has working development APIs, but no public production launch is enabled. See [remaining work](REMAINING_WORK.md) for missing providers and reviewed policy.
 
+The proposed hosted dev/prod infrastructure and private S3 integration sequence are in [DEPLOYMENT_PLAN.md](DEPLOYMENT_PLAN.md); they are not yet deployed.
+
 ## Dummy data rule
 
 Synthetic guardians, dogs, photos, verification events, legal text, store receipts and push responses may be used only in disposable integration tests or an explicitly isolated demo environment. They must be labeled as fixtures. The production server does not seed them or interpret them as evidence. A successful dummy flow proves our API state transitions, not a provider's identity check, image review, SMS delivery, purchase, or legal approval.

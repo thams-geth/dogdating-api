@@ -1,6 +1,6 @@
 # Project memory
 
-Updated 10 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md.
+Updated 12 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md.
 
 ## User instructions
 
@@ -24,7 +24,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 - Repo: /Users/thamaraiselvan/ReactProject/dogdating-api.
 - Own PostgreSQL container dogdating-api-postgres, port 5433, database/user waggle. Dedicated integration DB waggle_api_test is disposable; tests refuse other database names.
 - Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
-- Migrations through 0036; applied SQL is immutable. Forward migrations only.
+- Migrations through 0038; applied SQL is immutable. Forward migrations only.
 - .env is ignored. setup:dev generates the local auth secret and enables terminal-only OTP for synthetic numbers. No real SMS.
 - With NODE_ENV=development and OTP_MODE=development, sign-in on +919000000001 uses fixed code 000000 only after a fresh request. Other numbers and privacy/phone-change codes remain random. Production cannot instantiate the development sender.
 - An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
@@ -123,3 +123,7 @@ M01 now checks X-App-Platform/X-App-Build on product routes against live persist
 ## Nonpublic area administration (10 October 2026)
 
 M01 city_ops can list India metros and change only prospect/seeding/waitlist/gated via versioned, audited PATCH. Migrations 0037–0038 add rollout version metadata; 0038 removes the staff FK so deprovisioning/test truncation cannot cascade into metros. Public opening, country administration and waitlist delivery remain unimplemented. Moving out of seeding resets affected dog publication to draft and cancels beacons; live onboarding/discovery also use the current state. Returning to seeding never republishes dogs automatically. OpenAPI has 171 operations. Use test phone +919000000001 and 000000 for local sign-in; photo/SMS providers remain deferred.
+
+## Deployment architecture draft (12 October 2026)
+
+The user requested a learnable plan for hosted dev and production, builds, photo storage and how the API connects. docs/DEPLOYMENT_PLAN.md proposes separate AWS dev/prod accounts in Mumbai, ECS Fargate + ALB, private RDS PostgreSQL, separate private S3 buckets, ECR, Secrets Manager, GitHub OIDC and scheduled ECS tasks. It is a proposal only: no cloud resources, Dockerfile, S3 adapter or production providers were created. Hosted dev can use the development OTP fixture with synthetic data; production `NODE_ENV=production` rejects local media, local message encryption and development OTP, and currently has no real sign-in sender. Next concrete code work: container artifact/IaC and an S3 `PhotoStorage` adapter while retaining API-mediated image validation. Do not expose S3 objects or put AWS keys in mobile apps.

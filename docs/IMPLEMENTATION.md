@@ -29,12 +29,13 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 
 ## Latest local verification
 
-- Typecheck/build passed; 13 unit/HTTP tests and 124 PostgreSQL integration tests at the latest full run.
+- Typecheck/build passed; 13 unit/HTTP tests and 125 PostgreSQL integration tests at the latest full run.
 - New M03 tests cover persisted progress, immutable documents, current-version acceptance, withdrawal, selected-dog authorization and expiring evidence.
 - New M04 tests cover household ownership, phone-bound/expired/single-use invitations, concurrent final-owner protection, private dog access, membership revocation, dates/allowlists, breed evidence, questionnaire/preferences/schedule validation, cursor scoping, publication and beacon lifecycle.
-- Migrations through 0036. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
+- Migrations through 0038. Integration tests run against waggle_api_test only. Fresh migration application and repeated migration checks are part of the test setup/CI.
 - 171 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
+- A proposed dev/prod AWS deployment and private S3 integration sequence is documented in [DEPLOYMENT_PLAN.md](DEPLOYMENT_PLAN.md). No cloud resources or production adapters were created by that plan.
 
 ## Explicit gaps and decisions
 

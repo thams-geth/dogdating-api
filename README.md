@@ -10,6 +10,7 @@ India-first dog social/matching backend built with TypeScript, Express and Postg
 - [Project memory](PROJECT_MEMORY.md): user decisions, environment and future-session handoff.
 - [OpenAPI](docs/openapi.yaml) and [HTTP examples](docs/requests.http): implemented endpoints only.
 - [Frontend handovers and wire diagrams](docs/handovers/README.md): module status, integration contracts, errors and screen flows.
+- [Dev and production deployment plan](docs/DEPLOYMENT_PLAN.md): proposed AWS environments, build/release flow, private image storage and the steps needed before launch.
 
 The provisional launch scope is dog playdates/walks. Breeding introductions and owner dating have separate rollout plans. The founder's launch-mode clarification is still pending; common platform work is underway.
 

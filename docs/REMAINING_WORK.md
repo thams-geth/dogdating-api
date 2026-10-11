@@ -2,6 +2,8 @@
 
 Updated 10 October 2026. The checked-in backend has 171 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md), [module handovers](handovers/README.md) and [production boundary note](PRODUCTION_READINESS.md).
 
+The proposed two-environment architecture and deployment order are in [DEPLOYMENT_PLAN.md](DEPLOYMENT_PLAN.md). It has not been provisioned.
+
 ## Required integration inputs
 
 | Input | Why it is needed | Current behavior |
