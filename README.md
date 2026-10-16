@@ -26,13 +26,15 @@ Requires Node 22+ and Docker. PostgreSQL uses port 5433 to coexist with other pr
 npm ci
 npm run setup:dev
 docker compose up -d postgres
-npm run migrate
+npm run migrate:dev
 npm run dev
 ```
 
-`setup:dev` creates/updates the ignored `.env`, generates a local authentication secret if absent and explicitly enables development OTP delivery. For local sign-in, request OTP for `+919000000001` and enter `000000`; the normal request, expiry, attempt and single-use rules still apply. Other numbers and privacy/phone-change purposes receive random codes printed to the local server terminal. **No SMS is sent, and this fixed test pair proves no phone ownership.** Authentication is disabled by default without the opt-in. The development sender cannot run in production. A production SMS adapter and DLT registration are still required.
+`setup:dev` creates/updates the ignored `.env.development`, generates a local authentication secret if absent and explicitly enables development OTP delivery. `npm run dev`, `npm run start:dev` and `npm run migrate:dev` load that file explicitly. For local sign-in, request OTP for `+919000000001` and enter `000000`; the normal request, expiry, attempt and single-use rules still apply. Other numbers and privacy/phone-change purposes receive random codes printed to the local server terminal. **No SMS is sent, and this fixed test pair proves no phone ownership.** Authentication is disabled by default without the opt-in. The development sender cannot run in production. A production SMS adapter and DLT registration are still required.
 
-If port 3000 is already occupied, stop your previous Waggle process or set `PORT` in `.env`. Redis is available in Compose on 6380 but is not yet used by these modules.
+Run `npm run setup:prod-env` once to create the ignored `.env.production` from [.env.production.example](.env.production.example). It deliberately has no database URL or secrets, so `npm run start:prod` and `npm run migrate:prod` fail until real production values are supplied. Hosted production should inject these values from its secret manager instead of copying an env file into the image. The legacy `.env` is no longer loaded by application code or the environment-specific commands.
+
+If port 3000 is already occupied, stop your previous Waggle process or set `PORT` in `.env.development`. Redis is available in Compose on 6380 but is not yet used by these modules.
 
 ## Implemented endpoints
 
@@ -102,7 +104,7 @@ Household/dog lists use `limit` (default 20, maximum 50) and a user/list-scoped 
 
 ## Private photo uploads
 
-Opt in locally with `MEDIA_MODE=local` in `.env` (default: disabled). Files go to ignored `.local/media`, or `MEDIA_LOCAL_DIR`. Local storage is forbidden in production and must never be exposed as static content.
+Opt in locally with `MEDIA_MODE=local` in `.env.development` when photo testing resumes. Files go to ignored `.local/media-development`, or `MEDIA_LOCAL_DIR`. Local storage is forbidden in production and must never be exposed as static content.
 
 1. `POST /v1/dogs/{dogId}/media/uploads` with `contentType` (`image/jpeg` or `image/png`), `sizeBytes` and lowercase SHA-256 of the original bytes.
 2. Send those bytes to the returned `PUT /v1/media/{id}/content` path using the uploader's bearer token and exact content type. The reservation lasts 15 minutes; content can be submitted once. On a lost response, read status before retrying.

@@ -18,6 +18,8 @@ Use **AWS Asia Pacific (Mumbai), `ap-south-1`**, for the first India deployment.
 
 The two environments use **the same source code and container image digest** when a release is promoted. Configuration, credentials and data remain separate. A development phone number or image must never be copied into production. Create different Android build flavors and iOS configurations so test builds call `api-dev` and release builds call `api`; do not make the mobile app choose production by editing a text field at runtime.
 
+The repository now has committed [.env.development.example](../.env.development.example) and [.env.production.example](../.env.production.example) templates. `npm run setup:dev` creates ignored `.env.development`; `npm run setup:prod-env` creates ignored, fail-closed `.env.production`. Local environment-specific commands load only their named file. Cloud deployments should inject the same variables through the task definition and secret manager, without shipping either local env file.
+
 “Two servers” here means two isolated **environments**. ECS may replace a running container or add more than one task without changing the dev/prod boundary. Restrict hosted dev access with a VPN or an explicit load-balancer allowlist, and use synthetic data only. A hard-to-guess `api-dev` URL is not access control. A browser-based web client also needs a reviewed CORS allowlist or a same-origin proxy; the current Express app does not configure CORS.
 
 ```mermaid
@@ -69,7 +71,7 @@ npm run check:openapi
 npm run check:handovers
 ```
 
-With a local PostgreSQL database configured, run `npm run migrate` before `npm start`. After the proposed Dockerfile is added, `docker build -t waggle-api:<git-sha> .` produces the container to test locally and push to ECR. The deployment pipeline must retain the resulting ECR digest; a mutable `latest` tag is not a release identifier.
+With local PostgreSQL configured, run `npm run migrate:dev` before `npm run dev`. A built local production check uses `npm run migrate:prod` and `npm run start:prod`, but only after `.env.production` has real values. In hosted deployments, generic `npm run migrate` and `npm start` consume variables injected into the process. After the proposed Dockerfile is added, `docker build -t waggle-api:<git-sha> .` produces the container to test locally and push to ECR. The deployment pipeline must retain the resulting ECR digest; a mutable `latest` tag is not a release identifier.
 
 Use GitHub Actions [OIDC federation](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws) with tightly scoped dev and prod deployment roles. It avoids long-lived AWS access keys in GitHub secrets. Keep production deployment behind a protected GitHub environment and human approval. Store runtime credentials in AWS Secrets Manager and inject them through ECS task definitions; do not bake them into the image or commit `.env`. [ECS secrets](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html)
 

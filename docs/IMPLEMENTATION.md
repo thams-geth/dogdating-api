@@ -1,6 +1,6 @@
 # Implementation ledger
 
-Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents delivered routes.
+Updated: 17 October 2026. API_PLAN.md is the overall inventory; OpenAPI documents delivered routes.
 
 | Module | State | Evidence / remaining work |
 | --- | --- | --- |
@@ -36,6 +36,7 @@ Updated: 10 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 - 171 OpenAPI operations. YAML, operation IDs and local references are checked; full schema conformance remains a later gate.
 - CI is configured but has not run remotely. No push or deployment performed.
 - A proposed dev/prod AWS deployment and private S3 integration sequence is documented in [DEPLOYMENT_PLAN.md](DEPLOYMENT_PLAN.md). No cloud resources or production adapters were created by that plan.
+- Explicit ignored `.env.development` and fail-closed `.env.production` files now have committed secret-free templates and separate local start/migration commands. Hosted processes continue to use injected environment variables.
 
 ## Explicit gaps and decisions
 

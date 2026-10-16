@@ -1,6 +1,6 @@
 # Project memory
 
-Updated 12 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md.
+Updated 17 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md.
 
 ## User instructions
 
@@ -25,7 +25,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 - Own PostgreSQL container dogdating-api-postgres, port 5433, database/user waggle. Dedicated integration DB waggle_api_test is disposable; tests refuse other database names.
 - Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
 - Migrations through 0038; applied SQL is immutable. Forward migrations only.
-- .env is ignored. setup:dev generates the local auth secret and enables terminal-only OTP for synthetic numbers. No real SMS.
+- `.env.development` and `.env.production` are ignored; their committed `.example` templates contain no secrets. setup:dev generates/retains the local auth secret and enables terminal-only OTP for synthetic numbers. setup:prod-env creates a fail-closed production file with blank database/secret values. Environment-specific npm commands load only their named file; application config no longer implicitly reads legacy `.env`.
 - With NODE_ENV=development and OTP_MODE=development, sign-in on +919000000001 uses fixed code 000000 only after a fresh request. Other numbers and privacy/phone-change codes remain random. Production cannot instantiate the development sender.
 - An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
 
