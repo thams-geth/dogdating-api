@@ -9,7 +9,10 @@ const server = app.listen(config.PORT, () => {
 
 const sockets=app.locals.realtime?attachRealtime(server,app.locals.realtime):undefined;
 
+let shuttingDown = false;
 function shutdown(): void {
+  if (shuttingDown) return;
+  shuttingDown = true;
   for(const socket of sockets?.clients??[])socket.close(1001,'Server shutting down');
   server.close(() => {
     pool.end().then(() => { process.exitCode = 0; }).catch((error: unknown) => {
