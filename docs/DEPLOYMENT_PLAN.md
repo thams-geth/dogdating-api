@@ -54,7 +54,7 @@ These are code-level gates in [config.ts](../src/config.ts) and [app.ts](../src/
 
 ## 3. Build once, release to dev, then promote
 
-1. Add a checked-in `Dockerfile` and `.dockerignore`. Build with Node 22 for the same CPU architecture as the ECS task. Install with `npm ci`, compile TypeScript, prune dev dependencies, and include `dist/`, production `node_modules/`, `package.json` and `migrations/`. Run as an unprivileged user. Keep `.env`, `.local/`, tests and raw secrets out of the image. The current repo has **no Dockerfile yet**.
+1. The checked-in multi-stage `Dockerfile` builds with Node 22, installs production dependencies in the runtime image, includes `dist/` and `migrations/`, and runs as the unprivileged `node` user. `.dockerignore` excludes environment files, local media, tests and repository metadata. Build it for the same CPU architecture selected in the ECS task definition.
 2. On each pull request, run the existing CI checks. A passing PR alone does not release anything.
 3. From an approved commit on `main`, build a container, scan it and push to Amazon ECR with the Git commit SHA. Record its **immutable image digest**. Use an ECR repository whose image can be pulled by both environment accounts through narrow cross-account permissions, or copy the exact image to each account and verify the digest. ECR supports image vulnerability scanning. [ECR scanning](https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html)
 4. Deploy that digest to dev. Run the matching migration image as a one-off ECS task. Then update the dev ECS service. Wait for `/v1/ready`, check bootstrap and exercise fixture-only sign-in and photo flows.
