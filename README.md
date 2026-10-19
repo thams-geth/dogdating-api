@@ -104,7 +104,7 @@ Household/dog lists use `limit` (default 20, maximum 50) and a user/list-scoped 
 
 ## Private photo uploads
 
-Opt in locally with `MEDIA_MODE=local` in `.env.development` when photo testing resumes. Files go to ignored `.local/media-development`, or `MEDIA_LOCAL_DIR`. Local storage is forbidden in production and must never be exposed as static content.
+Opt in locally with `MEDIA_MODE=local` in `.env.development` when photo testing resumes. Files go to ignored `.local/media-development`, or `MEDIA_LOCAL_DIR`. Local storage is forbidden in production and must never be exposed as static content. Hosted environments can use the private S3 adapter with `MEDIA_MODE=s3`, `MEDIA_BUCKET=<exact-private-bucket-name>` and `MEDIA_REGION=ap-south-1`; AWS credentials come from the ECS task role, never application environment files.
 
 1. `POST /v1/dogs/{dogId}/media/uploads` with `contentType` (`image/jpeg` or `image/png`), `sizeBytes` and lowercase SHA-256 of the original bytes.
 2. Send those bytes to the returned `PUT /v1/media/{id}/content` path using the uploader's bearer token and exact content type. The reservation lasts 15 minutes; content can be submitted once. On a lost response, read status before retrying.
@@ -114,7 +114,7 @@ Inputs are capped at 8 MiB and 20 megapixels, decoded and re-encoded as JPEG up 
 
 Use `GET /v1/dogs/{dogId}/media`, `GET /v1/media/{id}`, `PATCH /v1/dogs/{dogId}/media/order` (`mediaIds`: every live photo exactly once), and `DELETE /v1/dogs/{dogId}/media/{id}`. Responses contain metadata only; no photo download endpoint is enabled. Deletion resets dog publication and cancels its beacon.
 
-Run `npm run media:cleanup` regularly while using local uploads. Each run handles up to 100 expired reservations or pending deletions and can safely be repeated. Storage failures retain a cleanup flag; a failed delete may already have hidden the photo. Production object storage, scanning/moderation workers, approved-photo delivery and automated scheduling remain upcoming integrations.
+Run `npm run media:cleanup` regularly while using local or S3 uploads. Each run handles up to 100 expired reservations or pending deletions and can safely be repeated. Storage failures retain a cleanup flag; a failed delete may already have hidden the photo. S3 persistence is implemented; scanning/moderation workers, approved-photo delivery and automated scheduling remain upcoming integrations.
 
 ## Verification intake and health records
 

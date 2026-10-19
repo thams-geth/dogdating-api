@@ -8,7 +8,7 @@ Updated 17 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WOR
 - Continue modules automatically; commit each completed module with a meaningful message.
 - Maintain the API plan, implementation ledger, this memory and per-module mobile/web handovers with methods, statuses, errors, request/response contracts, examples, Mermaid flows and wireframes.
 - No remote push/deployment requested. Do not fabricate provider success, verified evidence, legal content or completion of privacy processing.
-- For the present development phase, skip photo integration and real SMS. Use one local-only sign-in fixture number/code, then continue independent modules. Photo/SMS remain production launch blockers.
+- Use one local-only sign-in fixture number/code while real SMS remains deferred. Private S3 photo persistence is now implemented; moderation and approved delivery remain production launch blockers.
 - Pack/playdates remains the provisional shared-platform scope. Breeding, owner dating and live safety have no explicit product approval.
 
 ## Source of truth
@@ -124,6 +124,6 @@ M01 now checks X-App-Platform/X-App-Build on product routes against live persist
 
 M01 city_ops can list India metros and change only prospect/seeding/waitlist/gated via versioned, audited PATCH. Migrations 0037–0038 add rollout version metadata; 0038 removes the staff FK so deprovisioning/test truncation cannot cascade into metros. Public opening, country administration and waitlist delivery remain unimplemented. Moving out of seeding resets affected dog publication to draft and cancels beacons; live onboarding/discovery also use the current state. Returning to seeding never republishes dogs automatically. OpenAPI has 171 operations. Use test phone +919000000001 and 000000 for local sign-in; photo/SMS providers remain deferred.
 
-## Deployment architecture draft (12 October 2026)
+## Deployment architecture and S3 persistence (19 October 2026)
 
-The user requested a learnable plan for hosted dev and production, builds, photo storage and how the API connects. docs/DEPLOYMENT_PLAN.md proposes separate AWS dev/prod accounts in Mumbai, ECS Fargate + ALB, private RDS PostgreSQL, separate private S3 buckets, ECR, Secrets Manager, GitHub OIDC and scheduled ECS tasks. It is a proposal only: no cloud resources, Dockerfile, S3 adapter or production providers were created. Hosted dev can use the development OTP fixture with synthetic data; production `NODE_ENV=production` rejects local media, local message encryption and development OTP, and currently has no real sign-in sender. Next concrete code work: container artifact/IaC and an S3 `PhotoStorage` adapter while retaining API-mediated image validation. Do not expose S3 objects or put AWS keys in mobile apps.
+The deployment plan proposes separate AWS dev/prod accounts in Mumbai, ECS Fargate + ALB, private RDS PostgreSQL, separate private S3 buckets, ECR, Secrets Manager, GitHub OIDC and scheduled ECS tasks. The user created the dev bucket, kept it private and added lifecycle cleanup. The API now supports `MEDIA_MODE=s3` with `MEDIA_BUCKET` and `MEDIA_REGION`, storing processed JPEGs under `photos/` through the AWS credential chain. ECS must grant its task role object access; no AWS keys belong in environment files. There is still no Dockerfile/IaC, moderation worker or approved-photo delivery. Hosted dev can use the OTP fixture with synthetic data; production still has no real sign-in sender.

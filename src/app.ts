@@ -45,7 +45,7 @@ import { dogRoutes } from './modules/dogs/dogs.routes.js';
 import { config } from './config.js';
 import { MediaService } from './modules/media/media.service.js';
 import { mediaRoutes } from './modules/media/media.routes.js';
-import { LocalPhotoStorage, type PhotoStorage } from './modules/media/media.storage.js';
+import { LocalPhotoStorage, S3PhotoStorage, type PhotoStorage } from './modules/media/media.storage.js';
 import { VerificationService } from './modules/verification/verification.service.js';
 import { verificationRoutes } from './modules/verification/verification.routes.js';
 import { LocationService } from './modules/location/location.service.js';
@@ -110,7 +110,11 @@ export function createApp(deps: { database?: Pool; policy?: AppPolicy; auth?: Au
   app.use('/v1/household-invitations',invitationRoutes(households,auth));
   app.use('/v1',transferRoutes(new TransfersService(database),auth));
   app.use('/v1/dogs',dogRoutes(new DogsService(database),auth));
-  const photos = deps.photoStorage ?? (config.MEDIA_MODE === 'local' ? new LocalPhotoStorage(config.MEDIA_LOCAL_DIR, config.NODE_ENV) : undefined);
+  const photos = deps.photoStorage ?? (config.MEDIA_MODE === 'local'
+    ? new LocalPhotoStorage(config.MEDIA_LOCAL_DIR, config.NODE_ENV)
+    : config.MEDIA_MODE === 's3'
+      ? new S3PhotoStorage(config.MEDIA_BUCKET!, config.MEDIA_REGION!)
+      : undefined);
   app.use('/v1', mediaRoutes(new MediaService(database, photos), auth));
   app.use('/v1', verificationRoutes(new VerificationService(database), auth));
   app.use('/v1',discoveryRoutes(new DiscoveryService(database,deps.discoverySecret ?? (config.DISCOVERY_MODE==='development'?config.AUTH_SECRET:undefined),!!messageCipher),auth));

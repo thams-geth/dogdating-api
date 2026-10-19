@@ -16,7 +16,7 @@ Updated: 17 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | M04 GPS/transfer extensions | Two-party transfer implemented | Manual owner transfer works; encrypted GPS/displaced anchor remains planned |
 | M05 private photo foundation | Complete for local development | Real JPEG/PNG uploads, checksum/type/size checks, EXIF removal, status/order/deletion and retryable cleanup; pending moderation only |
 | M05 verification intake / health metadata | Complete as a foundation | Request/status/withdrawal, requester permissions, deduplication, limits, private self-reported health records and provider-neutral callback/replay ledger; no real provider adapter or production badges |
-| M05 production integrations | Planned | Object storage, scan/moderation, approved-photo delivery, identity/document provider, vendor-specific signed callback adapter and authorized reviewer grants |
+| M05 production integrations | S3 persistence implemented; other integrations planned | Private S3 put/get/delete via the AWS task role; scan/moderation, approved-photo delivery, identity/document provider, vendor-specific signed callback adapter and authorized reviewer grants remain pending |
 | M06 home/discovery foundation | Complete for opt-in development | Home/tasks, city-only metadata feed, signed snapshots/impressions, live publisher eligibility, bilateral blocks/preferences, profile projection and durable exposure limits |
 | M11 blocking foundation | Complete | Private paginated block list, idempotent block/unblock; existing cross-household matches/conversations close |
 | M07 connections | Development core complete | Impression decisions, quotas, matching, withdrawal/unmatch; 072065f |
