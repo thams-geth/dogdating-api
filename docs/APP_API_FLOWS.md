@@ -11,7 +11,7 @@ flowchart LR
   subgraph Clients
     Android["Android app"]
     Web["Future web app"]
-    StaffUI["Future staff console"]
+    StaffUI["React staff console<br/>dogdating-admin"]
   end
 
   subgraph API["Express API - TypeScript"]
@@ -274,6 +274,8 @@ flowchart TD
 
 Staff APIs use a separate identity system and roles. Ordinary user JWTs cannot call `/admin/v1`. Account export has a scoped implementation; full legal erasure and retention processing remain pending.
 
+The sibling `../dogdating-admin` React application now provides the staff shell, operations dashboard, role-scoped queues, audit browser, exact user-ID lookup and release overview. Development accepts a short-lived OIDC bearer token in session storage. Production sign-in redirect still requires the selected identity provider, Authorization Code + PKCE and hosted configuration.
+
 ## 11. Background and scheduled work
 
 | Command | Responsibility | Deployment status |
@@ -339,4 +341,3 @@ Use `/v1/health` for process liveness and `/v1/ready` for database/schema readin
 7. [Deployment plan](DEPLOYMENT_PLAN.md) for AWS environment design.
 
 The OpenAPI contract and module handovers are the client integration authority. This document explains how those contracts work together.
-

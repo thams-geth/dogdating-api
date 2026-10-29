@@ -127,3 +127,7 @@ M01 city_ops can list India metros and change only prospect/seeding/waitlist/gat
 ## Deployment architecture and S3 persistence (19 October 2026)
 
 The deployment plan proposes separate AWS dev/prod accounts in Mumbai, ECS Fargate + ALB, private RDS PostgreSQL, separate private S3 buckets, ECR, Secrets Manager, GitHub OIDC and scheduled ECS tasks. The user created dev bucket `waggle-dev-media-123456789012`, kept it private, added lifecycle cleanup and created the media IAM policy. The API supports `MEDIA_MODE=s3` with `MEDIA_BUCKET` and `MEDIA_REGION`, storing processed JPEGs under `photos/` through the AWS credential chain. ECS must grant its task role object access; no AWS keys belong in environment files. A Node 22 multi-stage Dockerfile is checked in; ECR/ECS/RDS/IaC, moderation and approved-photo delivery remain pending. Hosted dev can use the OTP fixture with synthetic data; production still has no real sign-in sender.
+
+## Staff console foundation (29 October 2026)
+
+The sibling `/Users/thamaraiselvan/ReactProject/dogdating-admin` repository contains a React/TypeScript/Material UI staff console. It integrates only with implemented `/admin/v1` contracts and includes the staff shell, job dashboard, reports/support/appeals/incidents/places/push queues, audit events, exact user-ID lookup and release policy overview. Local Vite proxies `/admin` to this API. Manual short-lived OIDC bearer entry is development-only; real IdP redirect/PKCE, broad user/dog search, moderation and verification screens remain pending. Initial admin commit: `18c9a2a`.
