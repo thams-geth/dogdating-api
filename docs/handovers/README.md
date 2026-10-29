@@ -2,6 +2,8 @@
 
 Start with [shared conventions](COMMON.md) and the module for your screen. Every planned module has a document, a flow diagram and a wireframe. **Implemented foundations do not imply production launch readiness.**
 
+For the complete cross-module journey and backend architecture, read the [app and API flow guide](../APP_API_FLOWS.md) first.
+
 | Module | Handover | Status | APIs |
 | --- | --- | --- | --- |
 | M01 | [App lifecycle and reference data](M01.md) | Implemented foundation; see limitations | 11 |

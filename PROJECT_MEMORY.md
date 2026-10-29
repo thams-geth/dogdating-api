@@ -13,7 +13,7 @@ Updated 17 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WOR
 
 ## Source of truth
 
-Latest user instructions → docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md for actual state → docs/API_PLAN.md for planned scope. docs/openapi.yaml describes delivered HTTP routes. docs/handovers includes all 16 modules; unimplemented growth modules remain labeled planned.
+Latest user instructions → docs/IMPLEMENTATION.md and docs/REMAINING_WORK.md for actual state → docs/API_PLAN.md for planned scope. docs/APP_API_FLOWS.md provides the cross-module mental model and diagrams. docs/openapi.yaml describes delivered HTTP routes. docs/handovers includes all 16 modules; unimplemented growth modules remain labeled planned.
 
 Generate handovers from scripts/handover-notes.mjs and OpenAPI using npm run docs:handovers. Add route mapping in scripts/generate-handovers.mjs; verify npm run check:handovers. Do not hand-edit generated module files.
 

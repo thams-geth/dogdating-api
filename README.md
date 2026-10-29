@@ -4,6 +4,7 @@ India-first dog social/matching backend built with TypeScript, Express and Postg
 
 ## Plan and project memory
 
+- [App and API flow guide](docs/APP_API_FLOWS.md): start here for the product journey, architecture, data ownership, cross-module API flows, workers and AWS diagrams.
 - [API plan](docs/API_PLAN.md): full user journey, endpoint inventory across 16 modules, data rules, implementation order and launch gates.
 - [Research](docs/RESEARCH.md): dated primary sources and decisions drawn from them.
 - [Implementation ledger](docs/IMPLEMENTATION.md): delivered modules, limitations and next work.
