@@ -1,6 +1,6 @@
 # Remaining work and launch dependencies
 
-Updated 10 October 2026. The checked-in backend has 171 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md), [module handovers](handovers/README.md) and [production boundary note](PRODUCTION_READINESS.md).
+Updated 29 October 2026. The checked-in backend has 175 documented HTTP operations. The product is **not fully complete or ready for public launch**. Implemented foundations and unavailable integrations are distinguished in the [implementation ledger](IMPLEMENTATION.md), [module handovers](handovers/README.md) and [production boundary note](PRODUCTION_READINESS.md).
 
 The proposed two-environment architecture and deployment order are in [DEPLOYMENT_PLAN.md](DEPLOYMENT_PLAN.md). It has not been provisioned.
 
@@ -34,7 +34,7 @@ For the current development phase, photo integration and real SMS delivery are d
 | M09 | Firebase project/ADC credentials, production key wrapping, worker scheduling/monitoring and optional APNs/Web Push; FCM adapter, relay, receipts/backoff, invalid-token handling, quiet hours and dead-letter operations are implemented |
 | M10 | Reviewer response workflow and external scheduling for the implemented two-party extensions/reminders/expiry pass; optional groups/video |
 | M11 | Broader legal-response exports (photo files/shared/provider categories) and full erasure pipeline, shared-household ownership handling, vendor/search/cache/backup deletion, scoped holds and reviewed help article content and external deletion page; own meetup incident tracking and publishing workflow are implemented |
-| M12 | Verification review/provider evidence, reviewed audit retention, external maintenance scheduling, broader privacy job execution and operational metrics; report and meetup incident decisions support dismiss/escalate, with suspension handled separately |
+| M12 | Verification review/provider evidence, reviewed audit retention, external maintenance scheduling, broader privacy job execution and historical analytics; safe directories and a current aggregate operations snapshot are implemented, while report and meetup incident decisions support dismiss/escalate with suspension handled separately |
 | M13 | Store offerings, verified receipt/restore, subscription/cancellation/refund/grace rules, signed billing webhooks and referral/growth behavior |
 | M14 | Additional market configuration, local content/providers, quota-zone rules and reviewed residency/rollout policy |
 | M15 | Optional breeding mode requires explicit product approval and reviewed jurisdiction/evidence rules before implementation/enablement |

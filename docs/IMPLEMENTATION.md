@@ -24,7 +24,7 @@ Updated: 17 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | M09 notifications | FCM adapter and relay implemented | Durable inbox, encrypted devices, leased retry queue and FCM HTTP v1 mapping; real credentials, production key wrapper and scheduler pending |
 | M10 meetups | Two-party flow implemented | Places, proposals, consented extensions, reminders, attendance, reviews; external scheduler/groups/video pending |
 | M11 safety/privacy | Scoped export foundation implemented | Reports/support/appeals and restricted privacy OTP; encrypted account_data_v1 export; full legal response/erasure pending |
-| M12 staff operations | Core case tooling implemented | OIDC/MFA, roles, reports/incidents/support/appeals, place/release/legal review and redacted audit browsing; provider/privacy tooling pending |
+| M12 staff operations | Core case tooling implemented | OIDC/MFA, roles, safe user/dog directories, aggregate overview, reports/incidents/support/appeals, place/release/legal review and redacted audit browsing; provider/privacy tooling pending |
 | M13–M16 growth/expansion | Planned | Billing, country expansion, optional breeding/human dating/live safety |
 
 ## Latest local verification
@@ -145,6 +145,10 @@ A bounded expiry worker revokes lapsed grants with an audited `expired` reason. 
 ### M05 provider callback boundary (10 October 2026)
 
 Migration 0036 adds a replay ledger. `POST /webhooks/verification` receives raw JSON only when an injected provider verifier authenticates the exact bytes and returns a normalized, typed event. It atomically checks request state, requester eligibility and current dog ownership, records the provider event, then applies approved/rejected/needs_more_info. An approved event grants an expiring subject tier; exact replay is idempotent, while an event ID reused with different bytes is rejected. The server bootstrap injects no verifier, so the route returns 503. A timestamped HMAC signer exists only inside disposable integration tests; it is neither production evidence nor a vendor protocol. The provider contract, assurance policy, real credentials, document handling and account activation remain outstanding. See [production boundary](PRODUCTION_READINESS.md).
+
+### M12 staff directories and operations overview (29 October 2026)
+
+Support staff can browse paginated, audited user and dog directories and open redacted details. The projections exclude phone numbers, raw locations, private messages, object storage keys and evidence documents. Operations staff can read current aggregate user, dog, open-work and social counts. These routes power the first usable React staff directory and dashboard; they do not add moderation or verification decisions.
 
 ### M12 maintenance status (9 October 2026)
 

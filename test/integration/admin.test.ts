@@ -137,6 +137,22 @@ test('operations jobs view exposes only maintenance status and aggregate counts'
  assert.ok(!('privateNote' in jobs.maintenance));
  await http.get('/admin/v1/jobs').set('Authorization','Bearer support').expect(403);
 });
+test('support browses redacted user and dog directories while operations sees aggregate overview',async()=>{
+ const guardian=await f.user(),household=await f.household(guardian.userId),dogId=await f.dog(household);
+ const users=(await http.get('/admin/v1/users?limit=1').set('Authorization','Bearer support').expect(200)).body;
+ assert.equal(users.items.length,1);assert.ok(users.nextCursor);assert.ok(!('phoneE164' in users.items[0]));
+ const user=(await http.get(`/admin/v1/users/${guardian.userId}`).set('Authorization','Bearer support').expect(200)).body;
+ assert.equal(user.id,guardian.userId);assert.ok(user.memberships.some((m:{householdId:string})=>m.householdId===household));assert.ok(user.dogs.some((d:{id:string})=>d.id===dogId));assert.ok(!JSON.stringify(user).includes('+919'));
+ const dogs=(await http.get('/admin/v1/dogs?status=active&publicationState=draft').set('Authorization','Bearer support').expect(200)).body;
+ assert.ok(dogs.items.some((d:{id:string})=>d.id===dogId));
+ const dog=(await http.get(`/admin/v1/dogs/${dogId}`).set('Authorization','Bearer support').expect(200)).body;
+ assert.equal(dog.id,dogId);assert.ok(dog.members.some((m:{userId:string})=>m.userId===guardian.userId));assert.ok(!('storageKey' in dog));assert.ok(!JSON.stringify(dog).includes('document_storage_key'));
+ await http.get('/admin/v1/overview').set('Authorization','Bearer support').expect(403);
+ const overview=(await http.get('/admin/v1/overview').set('Authorization','Bearer one').expect(200)).body;
+ assert.ok(overview.users.total>=1);assert.ok(overview.dogs.total>=1);assert.equal(typeof overview.work.openReports,'number');
+ const actions=(await f.database.query("SELECT action FROM ops.audit_log WHERE actor_kind='staff' AND action IN('users.list','user.directory.read','dogs.list','dog.read','overview.read')")).rows.map(r=>r.action);
+ assert.deepEqual(new Set(actions),new Set(['users.list','user.directory.read','dogs.list','dog.read','overview.read']));
+});
 test('reviewed help articles remain private as drafts, publish immutably and can be retired',async()=>{
  const input={locale:'en-IN',slug:'meeting-safely',version:'v1',title:'Safe meeting guidance',body:'TEST FIXTURE GUIDANCE ONLY. Meet in a reviewed public place and keep control of your dog.',reviewReference:'TEST EDITORIAL REVIEW'};
  await http.post('/admin/v1/help/articles').set('Authorization','Bearer support').send(input).expect(403);

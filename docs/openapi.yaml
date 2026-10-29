@@ -10,13 +10,7 @@ paths:
     post:
       operationId: receiveVerificationProviderEvent
       summary: Process a verified provider event with replay protection
-      description: >-
-        Provider-only callback. The raw JSON body, authentication headers and
-        timestamp format depend on the selected provider adapter. No adapter
-        is installed by default, so the route returns 503. Mobile and web
-        clients must never call this route. The adapter must authenticate the
-        exact raw bytes before normalizing an event. Test fixtures are not a
-        production provider contract.
+      description: Provider-only callback. The raw JSON body, authentication headers and timestamp format depend on the selected provider adapter. No adapter is installed by default, so the route returns 503. Mobile and web clients must never call this route. The adapter must authenticate the exact raw bytes before normalizing an event. Test fixtures are not a production provider contract.
       security: []
       requestBody:
         required: true
@@ -34,7 +28,10 @@ paths:
               schema:
                 type: object
                 additionalProperties: false
-                required: [accepted, requestId, duplicate]
+                required:
+                  - accepted
+                  - requestId
+                  - duplicate
                 properties:
                   accepted:
                     const: true
@@ -93,8 +90,7 @@ paths:
       operationId: countries
       responses:
         "200":
-          description: Markets with rollout and locale settings; development is not a
-            public launch
+          description: Markets with rollout and locale settings; development is not a public launch
           content:
             application/json:
               schema:
@@ -272,9 +268,7 @@ paths:
   /v1/auth/otp/request:
     post:
       operationId: requestOtp
-      description: Generic acceptance; per-phone cooldown/limit suppression and
-        provider failure have the same response. Development sender only. Any valid supported phone uses code 000000 in the explicitly enabled
-        development sender after a fresh request; all normal expiry and attempt rules still apply.
+      description: Generic acceptance; per-phone cooldown/limit suppression and provider failure have the same response. Development sender only. Any valid supported phone uses code 000000 in the explicitly enabled development sender after a fresh request; all normal expiry and attempt rules still apply.
       requestBody:
         required: true
         content:
@@ -299,8 +293,7 @@ paths:
   /v1/auth/otp/verify:
     post:
       operationId: verifyOtp
-      description: Verify once; displayName required only for new accounts. New
-        accounts remain pending onboarding.
+      description: Verify once; displayName required only for new accounts. New accounts remain pending onboarding.
       requestBody:
         required: true
         content:
@@ -319,8 +312,7 @@ paths:
   /v1/auth/refresh:
     post:
       operationId: refresh
-      description: Rotate refresh token; reuse revokes the family. Clients must
-        serialize refresh requests.
+      description: Rotate refresh token; reuse revokes the family. Clients must serialize refresh requests.
       requestBody:
         required: true
         content:
@@ -376,8 +368,7 @@ paths:
   /v1/auth/sessions/{id}:
     delete:
       operationId: revokeSession
-      description: Revoke one of the current user's session families. Inaccessible
-        sessions return 404.
+      description: Revoke one of the current user's session families. Inaccessible sessions return 404.
       security:
         - bearerAuth: []
       parameters:
@@ -422,15 +413,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
     patch:
       operationId: updateMe
-      description: Allowlisted name, locale and timezone edits. No verification, role
-        or status edits.
+      description: Allowlisted name, locale and timezone edits. No verification, role or status edits.
       security:
         - bearerAuth: []
       requestBody:
@@ -463,16 +452,14 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
   /v1/legal/documents/{kind}:
     get:
       operationId: legalDocument
-      description: Read current or historical published text. Draft, missing and
-        future documents return 404. No legal text seeded.
+      description: Read current or historical published text. Draft, missing and future documents return 404. No legal text seeded.
       parameters:
         - name: kind
           in: path
@@ -512,8 +499,7 @@ paths:
   /v1/me/onboarding:
     get:
       operationId: onboarding
-      description: Live prerequisites; prior completion does not override missing or
-        expired evidence.
+      description: Live prerequisites; prior completion does not override missing or expired evidence.
       security:
         - bearerAuth: []
       responses:
@@ -540,8 +526,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -581,8 +566,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -622,8 +606,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -656,15 +639,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
     post:
       operationId: acceptConsent
-      description: Accept current published document once. Repeated acceptance does
-        not duplicate evidence.
+      description: Accept current published document once. Repeated acceptance does not duplicate evidence.
       security:
         - bearerAuth: []
       requestBody:
@@ -697,16 +678,14 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
   /v1/me/consents/{purpose}:
     delete:
       operationId: withdrawConsent
-      description: Append withdrawal; required/location withdrawal pauses discovery.
-        Repeating is harmless.
+      description: Append withdrawal; required/location withdrawal pauses discovery. Repeating is harmless.
       security:
         - bearerAuth: []
       parameters:
@@ -732,8 +711,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -747,8 +725,7 @@ paths:
   /v1/me/active-dog:
     put:
       operationId: selectActiveDog
-      description: Select an active household dog or clear with null. Checks accepted
-        membership.
+      description: Select an active household dog or clear with null. Checks accepted membership.
       security:
         - bearerAuth: []
       requestBody:
@@ -781,8 +758,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -815,8 +791,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -855,16 +830,14 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
   /v1/households:
     post:
       operationId: createHousehold
-      description: Creates household and accepted owner atomically. Maximum ten
-        households per user.
+      description: Creates household and accepted owner atomically. Maximum ten households per user.
       security:
         - bearerAuth: []
       requestBody:
@@ -897,8 +870,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -931,8 +903,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -971,8 +942,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1011,8 +981,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1057,8 +1026,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1076,8 +1044,7 @@ paths:
   /v1/households/{id}/members/{userId}:
     patch:
       operationId: changeMemberRole
-      description: Owner only. Serializes membership changes; cannot remove or demote
-        the final accepted owner.
+      description: Owner only. Serializes membership changes; cannot remove or demote the final accepted owner.
       security:
         - bearerAuth: []
       parameters:
@@ -1105,8 +1072,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1125,8 +1091,7 @@ paths:
           $ref: "#/components/responses/Problem"
     delete:
       operationId: removeMember
-      description: Owner only. Serializes membership changes; cannot remove or demote
-        the final accepted owner.
+      description: Owner only. Serializes membership changes; cannot remove or demote the final accepted owner.
       security:
         - bearerAuth: []
       parameters:
@@ -1154,8 +1119,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1169,8 +1133,7 @@ paths:
   /v1/households/{id}/invitations:
     post:
       operationId: inviteMember
-      description: Owner only; 20 invites per household/day. Token expires in seven
-        days and must be shared manually. No SMS is sent.
+      description: Owner only; 20 invites per household/day. Token expires in seven days and must be shared manually. No SMS is sent.
       security:
         - bearerAuth: []
       parameters:
@@ -1192,8 +1155,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1217,9 +1179,7 @@ paths:
   /v1/household-invitations/{token}/accept:
     post:
       operationId: acceptInvitation
-      description: Bound to the recipient verified phone. Consumed/expired tokens
-        return 409. Existing membership cannot be overwritten; inviter must
-        still be an owner.
+      description: Bound to the recipient verified phone. Consumed/expired tokens return 409. Existing membership cannot be overwritten; inviter must still be an owner.
       security:
         - bearerAuth: []
       parameters:
@@ -1241,8 +1201,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1266,8 +1225,7 @@ paths:
   /v1/dogs:
     post:
       operationId: createDog
-      description: Owner/co-guardian; draft by default, maximum 20 active dogs per
-        household.
+      description: Owner/co-guardian; draft by default, maximum 20 active dogs per household.
       security:
         - bearerAuth: []
       requestBody:
@@ -1300,8 +1258,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1334,8 +1291,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1353,8 +1309,7 @@ paths:
   /v1/dogs/{id}:
     get:
       operationId: getOwnDog
-      description: Accepted household members only. This is not a public discovery
-        projection.
+      description: Accepted household members only. This is not a public discovery projection.
       security:
         - bearerAuth: []
       parameters:
@@ -1376,8 +1331,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1394,8 +1348,7 @@ paths:
           $ref: "#/components/responses/Problem"
     patch:
       operationId: updateDog
-      description: Owner/co-guardian. Validates merged dates; profile edits reset
-        publication and identity changes revoke dog verification grants.
+      description: Owner/co-guardian. Validates merged dates; profile edits reset publication and identity changes revoke dog verification grants.
       security:
         - bearerAuth: []
       parameters:
@@ -1417,8 +1370,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1464,8 +1416,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1489,8 +1440,7 @@ paths:
   /v1/dogs/{id}/temperament:
     put:
       operationId: replaceTemperament
-      description: Version 1 self-reported dimensions. Not a medical compatibility
-        guarantee.
+      description: Version 1 self-reported dimensions. Not a medical compatibility guarantee.
       security:
         - bearerAuth: []
       parameters:
@@ -1512,8 +1462,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1537,8 +1486,7 @@ paths:
   /v1/dogs/{id}/preferences:
     put:
       operationId: replaceDogPreferences
-      description: PUT replaces all filters using documented defaults. Min/max ranges
-        must be ordered; acceptsReactive requires parallelWalkOnly.
+      description: PUT replaces all filters using documented defaults. Min/max ranges must be ordered; acceptsReactive requires parallelWalkOnly.
       security:
         - bearerAuth: []
       parameters:
@@ -1560,8 +1508,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1585,9 +1532,7 @@ paths:
   /v1/dogs/{id}/availability:
     put:
       operationId: replaceAvailability
-      description: "Weekly local-time windows: Sunday=0, minute offsets, no overlaps
-        or overnight windows. Split overnight windows across days; PUT replaces
-        schedule and preserves active beacon."
+      description: "Weekly local-time windows: Sunday=0, minute offsets, no overlaps or overnight windows. Split overnight windows across days; PUT replaces schedule and preserves active beacon."
       security:
         - bearerAuth: []
       parameters:
@@ -1609,8 +1554,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1656,8 +1600,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1703,8 +1646,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1728,8 +1670,7 @@ paths:
   /v1/dogs/{id}/memorialise:
     post:
       operationId: memorialiseDog
-      description: Owner only; irreversible through profile editing. Clears beacon and
-        removes active-dog eligibility.
+      description: Owner only; irreversible through profile editing. Clears beacon and removes active-dog eligibility.
       security:
         - bearerAuth: []
       parameters:
@@ -1751,8 +1692,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1776,8 +1716,7 @@ paths:
   /v1/dogs/{id}/beacon:
     post:
       operationId: startBeacon
-      description: Requires publication, current onboarding, active dog and discovery
-        enabled. Replaces prior beacon, capped at 90 minutes.
+      description: Requires publication, current onboarding, active dog and discovery enabled. Replaces prior beacon, capped at 90 minutes.
       security:
         - bearerAuth: []
       parameters:
@@ -1799,8 +1738,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1845,8 +1783,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1882,15 +1819,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
-          description: Reserve a private photo upload; local bearer PUT expires after 15
-            minutes
+          description: Reserve a private photo upload; local bearer PUT expires after 15 minutes
           content:
             application/json:
               schema:
@@ -1930,8 +1865,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -1979,8 +1913,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2040,8 +1973,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2055,8 +1987,7 @@ paths:
   /v1/media/{id}/content:
     put:
       operationId: uploadPhotoContent
-      summary: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20
-        megapixels
+      summary: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20 megapixels
       security:
         - bearerAuth: []
       parameters:
@@ -2078,15 +2009,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
-          description: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20
-            megapixels
+          description: Uploader-only single-use JPEG/PNG content, maximum 8 MiB and 20 megapixels
           content:
             application/json:
               schema:
@@ -2131,8 +2060,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2181,8 +2109,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2200,8 +2127,7 @@ paths:
   /v1/verifications:
     post:
       operationId: requestVerification
-      summary: Record verification intent; same active request is returned on retry,
-        no provider or badge is created
+      summary: Record verification intent; same active request is returned on retry, no provider or badge is created
       security:
         - bearerAuth: []
       parameters:
@@ -2217,15 +2143,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
-          description: Record verification intent; same active request is returned on
-            retry, no provider or badge is created
+          description: Record verification intent; same active request is returned on retry, no provider or badge is created
           content:
             application/json:
               schema:
@@ -2265,8 +2189,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2306,8 +2229,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2334,8 +2256,7 @@ paths:
   /v1/dogs/{dogId}/health-records:
     post:
       operationId: addHealthRecord
-      summary: Save a self-reported health record; no identity documents or
-        verification fields accepted
+      summary: Save a self-reported health record; no identity documents or verification fields accepted
       security:
         - bearerAuth: []
       parameters:
@@ -2357,15 +2278,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "201":
-          description: Save a self-reported health record; no identity documents or
-            verification fields accepted
+          description: Save a self-reported health record; no identity documents or verification fields accepted
           content:
             application/json:
               schema:
@@ -2416,15 +2335,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
-          description: List private household health records; expired evidence remains
-            marked
+          description: List private household health records; expired evidence remains marked
           content:
             application/json:
               schema:
@@ -2449,8 +2366,7 @@ paths:
   /v1/dogs/{dogId}/health-records/{id}:
     delete:
       operationId: deleteHealthRecord
-      summary: Idempotently remove a record; reviewed evidence removal revokes dog
-        health tiers and resets publication
+      summary: Idempotently remove a record; reviewed evidence removal revokes dog health tiers and resets publication
       security:
         - bearerAuth: []
       parameters:
@@ -2478,15 +2394,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
-          description: Idempotently remove a record; reviewed evidence removal revokes dog
-            health tiers and resets publication
+          description: Idempotently remove a record; reviewed evidence removal revokes dog health tiers and resets publication
         "426":
           $ref: "#/components/responses/UpgradeRequired"
         default:
@@ -2494,8 +2408,7 @@ paths:
   /v1/app/areas:
     get:
       operationId: listAreas
-      summary: List coarse areas; development and waitlist are not public launch
-        promises
+      summary: List coarse areas; development and waitlist are not public launch promises
       security: []
       parameters:
         - name: countryCode
@@ -2524,8 +2437,7 @@ paths:
             maxLength: 400
       responses:
         "200":
-          description: List coarse areas; development and waitlist are not public launch
-            promises
+          description: List coarse areas; development and waitlist are not public launch promises
           content:
             application/json:
               schema:
@@ -2570,8 +2482,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2588,8 +2499,7 @@ paths:
           $ref: "#/components/responses/Problem"
     put:
       operationId: setHouseholdLocation
-      summary: Select a city with current location consent; changes limited to once
-        per 24 hours
+      summary: Select a city with current location consent; changes limited to once per 24 hours
       security:
         - bearerAuth: []
       parameters:
@@ -2611,15 +2521,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "200":
-          description: Select a city with current location consent; changes limited to
-            once per 24 hours
+          description: Select a city with current location consent; changes limited to once per 24 hours
           content:
             application/json:
               schema:
@@ -2668,15 +2576,13 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
       responses:
         "204":
-          description: Clear household location and reset dog publication; cooldown is
-            retained
+          description: Clear household location and reset dog publication; cooldown is retained
         "426":
           $ref: "#/components/responses/UpgradeRequired"
         default:
@@ -2795,8 +2701,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2814,8 +2719,7 @@ paths:
   /v1/feed:
     get:
       operationId: getDiscoveryFeed
-      summary: Development city-only metadata feed with live eligibility and signed
-        snapshot pagination
+      summary: Development city-only metadata feed with live eligibility and signed snapshot pagination
       security:
         - bearerAuth: []
       parameters:
@@ -2853,8 +2757,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2893,8 +2796,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -2971,8 +2873,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3012,8 +2913,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3052,8 +2952,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3166,8 +3065,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3277,8 +3175,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3375,8 +3272,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3432,8 +3328,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3530,8 +3425,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3614,8 +3508,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3658,8 +3551,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3743,8 +3635,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3868,8 +3759,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -3967,8 +3857,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4073,8 +3962,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4147,8 +4035,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4224,8 +4111,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4288,8 +4174,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4370,8 +4255,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4497,8 +4381,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4599,8 +4482,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4656,8 +4538,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4748,8 +4629,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4829,8 +4709,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -4940,8 +4819,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -5032,8 +4910,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -5144,8 +5021,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -5298,8 +5174,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -5419,8 +5294,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -5594,8 +5468,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -5753,8 +5626,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -5880,8 +5752,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -6001,8 +5872,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -6122,8 +5992,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -6252,8 +6121,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -7770,30 +7638,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-                  status:
-                    type: string
-                  countryCode:
-                    type: string
-                  deletionRequestedAt:
-                    anyOf:
-                      - type: string
-                        format: date-time
-                      - type: "null"
-                  createdAt:
-                    type: string
-                    format: date-time
-                required:
-                  - id
-                  - status
-                  - countryCode
-                  - deletionRequestedAt
-                  - createdAt
+                $ref: "#/components/schemas/AdminUserDetail"
         "400":
           $ref: "#/components/responses/Problem"
         "401":
@@ -8709,8 +8554,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -8787,8 +8631,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -8864,8 +8707,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -9779,8 +9621,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -9919,8 +9760,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -10034,8 +9874,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -10118,8 +9957,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -10153,10 +9991,16 @@ paths:
       parameters:
         - name: limit
           in: query
-          schema: {type: integer, minimum: 1, maximum: 50, default: 20}
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
         - name: cursor
           in: query
-          schema: {type: string, maxLength: 400}
+          schema:
+            type: string
+            maxLength: 400
       responses:
         "200":
           description: Versioned India area page
@@ -10165,13 +10009,20 @@ paths:
               schema:
                 type: object
                 additionalProperties: false
-                required: [items, nextCursor]
+                required:
+                  - items
+                  - nextCursor
                 properties:
                   items:
                     type: array
-                    items: {$ref: "#/components/schemas/StaffArea"}
-                  nextCursor: {type: [string, "null"]}
-        default: {$ref: "#/components/responses/Problem"}
+                    items:
+                      $ref: "#/components/schemas/StaffArea"
+                  nextCursor:
+                    type:
+                      - string
+                      - "null"
+        default:
+          $ref: "#/components/responses/Problem"
   /admin/v1/areas/{id}:
     patch:
       operationId: staffUpdateAreaRollout
@@ -10182,7 +10033,9 @@ paths:
         - name: id
           in: path
           required: true
-          schema: {type: string, format: uuid}
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -10190,18 +10043,33 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required: [expectedVersion, state, reasonCode]
+              required:
+                - expectedVersion
+                - state
+                - reasonCode
               properties:
-                expectedVersion: {type: integer, minimum: 1}
-                state: {type: string, enum: [prospect, seeding, waitlist, gated]}
-                reasonCode: {type: string, pattern: '^[a-z0-9_-]{3,60}$'}
+                expectedVersion:
+                  type: integer
+                  minimum: 1
+                state:
+                  type: string
+                  enum:
+                    - prospect
+                    - seeding
+                    - waitlist
+                    - gated
+                reasonCode:
+                  type: string
+                  pattern: ^[a-z0-9_-]{3,60}$
       responses:
         "200":
           description: Current area rollout
           content:
             application/json:
-              schema: {$ref: "#/components/schemas/StaffArea"}
-        default: {$ref: "#/components/responses/Problem"}
+              schema:
+                $ref: "#/components/schemas/StaffArea"
+        default:
+          $ref: "#/components/responses/Problem"
   /admin/v1/app-releases:
     get:
       operationId: staffReleasePolicy
@@ -10922,8 +10790,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -11029,8 +10896,7 @@ paths:
         - name: X-App-Build
           in: header
           required: false
-          description: Positive integer app build; required with platform once a forced
-            update is active.
+          description: Positive integer app build; required with platform once a forced update is active.
           schema:
             type: string
             pattern: ^[1-9][0-9]{0,9}$
@@ -12262,6 +12128,169 @@ paths:
               additionalProperties: false
               properties: {}
               required: []
+  /admin/v1/overview:
+    get:
+      operationId: adminOverview
+      security:
+        - staffBearer: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOverview"
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/users:
+    get:
+      operationId: adminUsers
+      security:
+        - staffBearer: []
+      parameters:
+        - &a1
+          name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - &a2
+          name: cursor
+          in: query
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 500
+        - name: status
+          in: query
+          schema:
+            enum:
+              - pending
+              - active
+              - limited
+              - suspended
+              - banned
+              - deleted
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserList"
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/dogs:
+    get:
+      operationId: adminDogs
+      security:
+        - staffBearer: []
+      parameters:
+        - *a1
+        - *a2
+        - name: status
+          in: query
+          schema:
+            enum:
+              - active
+              - rehomed
+              - memorialised
+              - removed
+        - name: publicationState
+          in: query
+          schema:
+            enum:
+              - draft
+              - published
+              - paused
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDogList"
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /admin/v1/dogs/{id}:
+    get:
+      operationId: adminDog
+      security:
+        - staffBearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: &a3
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDogDetail"
+        "400":
+          $ref: "#/components/responses/Problem"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "410":
+          $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
+        "503":
+          $ref: "#/components/responses/Problem"
 components:
   responses:
     Problem:
@@ -12271,8 +12300,7 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
     UpgradeRequired:
-      description: A confirmed minimum app build is required. Fetch bootstrap for the
-        current store URL.
+      description: A confirmed minimum app build is required. Fetch bootstrap for the current store URL.
       content:
         application/problem+json:
           schema:
@@ -13848,16 +13876,46 @@ components:
     StaffArea:
       type: object
       additionalProperties: false
-      required: [id, name, countryCode, adminRegion, timezone, state, version, updatedAt]
+      required:
+        - id
+        - name
+        - countryCode
+        - adminRegion
+        - timezone
+        - state
+        - version
+        - updatedAt
       properties:
-        id: {type: string, format: uuid}
-        name: {type: string}
-        countryCode: {type: string, enum: [IN]}
-        adminRegion: {type: [string, "null"]}
-        timezone: {type: string}
-        state: {type: string, enum: [prospect, seeding, waitlist, soft_launch, gated, open]}
-        version: {type: integer, minimum: 1}
-        updatedAt: {type: string, format: date-time}
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        countryCode:
+          type: string
+          enum:
+            - IN
+        adminRegion:
+          type:
+            - string
+            - "null"
+        timezone:
+          type: string
+        state:
+          type: string
+          enum:
+            - prospect
+            - seeding
+            - waitlist
+            - soft_launch
+            - gated
+            - open
+        version:
+          type: integer
+          minimum: 1
+        updatedAt:
+          type: string
+          format: date-time
     Area:
       type: object
       additionalProperties: false
@@ -14367,6 +14425,381 @@ components:
         - effective
         - limits
         - mode
+    AdminOverview:
+      type: object
+      additionalProperties: false
+      properties:
+        users:
+          type: object
+          additionalProperties: false
+          properties:
+            total:
+              type: integer
+            active:
+              type: integer
+            pending:
+              type: integer
+            suspended:
+              type: integer
+            deletionRequested:
+              type: integer
+          required:
+            - total
+            - active
+            - pending
+            - suspended
+            - deletionRequested
+        dogs:
+          type: object
+          additionalProperties: false
+          properties:
+            total:
+              type: integer
+            active:
+              type: integer
+            memorialised:
+              type: integer
+            published:
+              type: integer
+          required:
+            - total
+            - active
+            - memorialised
+            - published
+        work:
+          type: object
+          additionalProperties: false
+          properties:
+            openReports:
+              type: integer
+            openSupport:
+              type: integer
+            pendingMedia:
+              type: integer
+            pendingVerification:
+              type: integer
+          required:
+            - openReports
+            - openSupport
+            - pendingMedia
+            - pendingVerification
+        social:
+          type: object
+          additionalProperties: false
+          properties:
+            activeMatches:
+              type: integer
+            activeMeetups:
+              type: integer
+          required:
+            - activeMatches
+            - activeMeetups
+      required:
+        - users
+        - dogs
+        - work
+        - social
+    AdminUserList:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id: *a3
+              displayName:
+                anyOf:
+                  - type: string
+                  - type: "null"
+              status:
+                type: string
+              countryCode:
+                type: string
+              adultVerified:
+                type: boolean
+              deletionRequestedAt:
+                anyOf:
+                  - &a4
+                    type: string
+                    format: date-time
+                  - type: "null"
+              createdAt: *a4
+              householdCount:
+                type: integer
+              dogCount:
+                type: integer
+            required:
+              - id
+              - displayName
+              - status
+              - countryCode
+              - adultVerified
+              - deletionRequestedAt
+              - createdAt
+              - householdCount
+              - dogCount
+        nextCursor:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - nextCursor
+    AdminUserDetail:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *a3
+        displayName:
+          anyOf:
+            - type: string
+            - type: "null"
+        status:
+          type: string
+        countryCode:
+          type: string
+        locale:
+          type: string
+        timezone:
+          type: string
+        adultVerified:
+          type: boolean
+        phoneVerified:
+          type: boolean
+        deletionRequestedAt:
+          anyOf:
+            - *a4
+            - type: "null"
+        createdAt: *a4
+        memberships:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              householdId: *a3
+              name:
+                type: string
+              role:
+                type: string
+              acceptedAt: *a4
+            required:
+              - householdId
+              - name
+              - role
+              - acceptedAt
+        dogs:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id: *a3
+              name:
+                type: string
+              status:
+                type: string
+              publicationState:
+                type: string
+              householdId: *a3
+            required:
+              - id
+              - name
+              - status
+              - publicationState
+              - householdId
+      required:
+        - id
+        - displayName
+        - status
+        - countryCode
+        - locale
+        - timezone
+        - adultVerified
+        - phoneVerified
+        - deletionRequestedAt
+        - createdAt
+        - memberships
+        - dogs
+    AdminDogList:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id: *a3
+              name:
+                type: string
+              sex:
+                type: string
+              sizeClass:
+                type: string
+              status:
+                type: string
+              publicationState:
+                type: string
+              householdId: *a3
+              createdAt: *a4
+              photoCount:
+                type: integer
+              approvedPhotoCount:
+                type: integer
+            required:
+              - id
+              - name
+              - sex
+              - sizeClass
+              - status
+              - publicationState
+              - householdId
+              - createdAt
+              - photoCount
+              - approvedPhotoCount
+        nextCursor:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - nextCursor
+    AdminDogDetail:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *a3
+        name:
+          type: string
+        dateOfBirth:
+          anyOf:
+            - type: string
+              format: date
+            - type: "null"
+        dobPrecision:
+          type: string
+        sex:
+          type: string
+        neutered:
+          anyOf:
+            - type: boolean
+            - type: "null"
+        weightGrams:
+          anyOf:
+            - type: integer
+            - type: "null"
+        sizeClass:
+          type: string
+        bio:
+          anyOf:
+            - type: string
+            - type: "null"
+        serviceAnimal:
+          type: boolean
+        status:
+          type: string
+        publicationState:
+          type: string
+        householdId: *a3
+        createdAt: *a4
+        updatedAt: *a4
+        members:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              userId: *a3
+              displayName:
+                anyOf:
+                  - type: string
+                  - type: "null"
+              role:
+                type: string
+            required:
+              - userId
+              - displayName
+              - role
+        photos:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id: *a3
+              ordinal:
+                type: integer
+              width:
+                anyOf:
+                  - type: integer
+                  - type: "null"
+              height:
+                anyOf:
+                  - type: integer
+                  - type: "null"
+              moderationState:
+                type: string
+              createdAt: *a4
+            required:
+              - id
+              - ordinal
+              - width
+              - height
+              - moderationState
+              - createdAt
+        verification:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              tier:
+                type: integer
+              grantedAt: *a4
+              expiresAt:
+                anyOf:
+                  - *a4
+                  - type: "null"
+            required:
+              - tier
+              - grantedAt
+              - expiresAt
+        healthRecords:
+          type: object
+          additionalProperties: false
+          properties:
+            total:
+              type: integer
+            verified:
+              type: integer
+          required:
+            - total
+            - verified
+      required:
+        - id
+        - name
+        - dateOfBirth
+        - dobPrecision
+        - sex
+        - neutered
+        - weightGrams
+        - sizeClass
+        - bio
+        - serviceAnimal
+        - status
+        - publicationState
+        - householdId
+        - createdAt
+        - updatedAt
+        - members
+        - photos
+        - verification
+        - healthRecords
   securitySchemes:
     bearerAuth:
       type: http

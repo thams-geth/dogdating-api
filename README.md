@@ -17,7 +17,7 @@ The provisional launch scope is dog playdates/walks. Breeding introductions and 
 
 ## Current status (10 October 2026)
 
-171 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md) and the [production boundary note](docs/PRODUCTION_READINESS.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
+175 documented HTTP operations across M01–M12, including connections, encrypted text chat/realtime, inbox, meetups, safety/support/privacy request tracking and staff operations. Home counters, waitlist and verified phone changes are included. **The app is not fully complete or production ready.** See [remaining work and required inputs](docs/REMAINING_WORK.md) and the [production boundary note](docs/PRODUCTION_READINESS.md). M13–M16 remain planned; account_data_v1 exports run through the encrypted export worker; erasure and external delivery remain incomplete.
 
 ## Local development
 
@@ -189,6 +189,8 @@ Private reports, encrypted support, notices/appeals, purpose-bound restricted pr
 ## M12 staff operations foundation (9 October 2026)
 
 Separate OIDC/MFA staff auth, database roles, exclusive report claims/audited narratives, support replies, suspend/reinstate, independent appeals, public-place reviews and job counts are implemented. Migration 0024. No staff identities are seeded; configure SSO and explicitly provision approved subjects. Verification grants, full release/legal administration, push and privacy processing remain unavailable. See docs/handovers/M12.md.
+
+Safe paginated user and dog directories, redacted details and an aggregate operations overview are available for the React staff console. Directory results omit phone numbers, raw location, message content, media storage keys and evidence documents. All reads are role scoped and audited.
 
 Home integration: GET /home now reports account-wide live connection/unread message/upcoming meetup/unread notification counts with current access and blocks enforced. Messaging stays unavailable/null without encryption configuration.
 

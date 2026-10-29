@@ -131,3 +131,9 @@ The deployment plan proposes separate AWS dev/prod accounts in Mumbai, ECS Farga
 ## Staff console foundation (29 October 2026)
 
 The sibling `/Users/thamaraiselvan/ReactProject/dogdating-admin` repository contains a React/TypeScript/Material UI staff console. It integrates only with implemented `/admin/v1` contracts and includes the staff shell, job dashboard, reports/support/appeals/incidents/places/push queues, audit events, exact user-ID lookup and release policy overview. Local Vite proxies `/admin` to this API. Manual short-lived OIDC bearer entry is development-only; real IdP redirect/PKCE, broad user/dog search, moderation and verification screens remain pending. Initial admin commit: `18c9a2a`.
+
+## 29 October 2026 — staff directory phase
+
+- M12 exposes support-role user and dog lists/details plus an operations-role aggregate overview under `/admin/v1`.
+- Staff directory projections intentionally exclude raw phone, household location, private messages, object keys, microchip identifiers and verification/health evidence documents.
+- The sibling `dogdating-admin` React application consumes these routes. Photo moderation and verification decisions stay pending until reviewed evidence and decision policies exist.

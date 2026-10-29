@@ -2,7 +2,7 @@
 
 Plan version: 1.1 • status reconciled 9 October 2026 • Backend: TypeScript + Express + PostgreSQL.
 
-This is the complete design inventory, not a claim that every listed API exists. Current implementation: 169 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md), [remaining work](REMAINING_WORK.md) and [production boundary](PRODUCTION_READINESS.md). M13–M16 remain planned.
+This is the complete design inventory, not a claim that every listed API exists. Current implementation: 175 documented HTTP operations across M01–M12. See [implementation ledger](IMPLEMENTATION.md), [handovers](handovers/README.md), [remaining work](REMAINING_WORK.md) and [production boundary](PRODUCTION_READINESS.md). M13–M16 remain planned.
 
 ## 1. Product and release boundaries
 
@@ -227,12 +227,12 @@ Use `/admin/v1` (not `/v1/admin`) with staff SSO/MFA and role checks. Every sens
 | --- | --- | --- |
 | GET `/reports`; POST `/reports/{id}/claim`, `/decide` | Moderator | Queue ownership, evidence, reasons, escalation |
 | GET `/verifications`; POST `/verifications/{id}/decide` | Reviewer | Manual evidence review, expiry and appeals |
-| GET `/users/{id}`; POST `/users/{id}/actions` | Support/moderator | Minimal support projection, suspend/reinstate with reason |
+| GET `/users`, `/users/{id}`; GET `/dogs`, `/dogs/{id}`; POST `/users/{id}/actions` | Support/moderator | Paginated safe directories and detail, suspend/reinstate with reason |
 | GET `/appeals`; POST `/appeals/{id}/decide` | Appeals | Different reviewer from original enforcement |
 | GET/POST/PATCH `/places` and `/{id}` | City ops | Safe public-place registry |
 | GET/PATCH `/countries/{code}`, `/app-releases/{platform}` | Release ops | Audit rollout/version changes; staged validation |
 | GET/POST `/help/articles`; GET `/{id}`; POST `/{id}/publish`, `/{id}/retire` | Legal ops | Reviewed help draft, publication and retirement |
-| GET `/jobs`, `/metrics`, `/audit-events` | Operations | Failed delivery/deletion, queue health, launch funnel |
+| GET `/overview`, `/jobs`, `/audit-events` | Operations | Aggregate operational snapshot, failed delivery/deletion and redacted audit metadata |
 
 Staff cannot retrieve raw household location or casually read private messages. Evidence access is case-scoped. Analytics initially covers onboarding funnel, eligible dogs by sufficiently large area, time to first match/conversation, meetup acceptance/completion, report resolution and crash/error rates. Never fabricate local supply counts.
 

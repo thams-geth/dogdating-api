@@ -17,7 +17,7 @@ For the complete cross-module journey and backend architecture, read the [app an
 | M09 | [Notifications and devices](M09.md) | Implemented foundation; see limitations | 6 |
 | M10 | [Meetups and places](M10.md) | Implemented foundation; see limitations | 14 |
 | M11 | [Trust, safety, privacy and support](M11.md) | Implemented foundation; see limitations | 23 |
-| M12 | [Operations and staff](M12.md) | Implemented foundation; see limitations | 34 |
+| M12 | [Operations and staff](M12.md) | Implemented foundation; see limitations | 38 |
 | M13 | [Billing and growth](M13.md) | Not implemented | 0 |
 | M14 | [Country expansion](M14.md) | Not implemented | 0 |
 | M15 | [Breeding introductions](M15.md) | Not implemented | 0 |

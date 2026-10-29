@@ -306,7 +306,7 @@ In AWS these should run as separate one-off or scheduled ECS tasks using the sam
 | M09 Notifications | notification preferences, devices, inbox | Durable inbox and FCM relay implemented; hosted provider setup pending |
 | M10 Meetups | `/v1/places*`, `/v1/meetups*` | Two-party flow implemented |
 | M11 Safety/privacy | blocks, reports, support, appeals, exports, deletion, incidents | Foundations implemented; full erasure pending |
-| M12 Staff operations | `/admin/v1/*` | Role-scoped operations implemented; real IdP/staffing pending |
+| M12 Staff operations | `/admin/v1/*` | Role-scoped queues, safe user/dog directories and aggregate overview implemented; real IdP/staffing pending |
 | M13-M16 | Billing, expansion and optional future modes | Not implemented |
 
 ## 13. AWS development deployment
