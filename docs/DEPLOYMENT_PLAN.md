@@ -13,7 +13,7 @@ Use **AWS Asia Pacific (Mumbai), `ap-south-1`**, for the first India deployment.
 | Database | Private RDS for PostgreSQL; disposable synthetic data | Private RDS for PostgreSQL; backups and restore drills |
 | Photos | Private S3 bucket `waggle-dev-photos-<unique-suffix>` | Different private S3 bucket `waggle-prod-photos-<unique-suffix>` |
 | Secrets | Dev Secrets Manager secrets and IAM roles | Independent production secrets and roles |
-| Authentication | `NODE_ENV=development`, development OTP sender; fixture number only | `NODE_ENV=production`, real SMS/DLT adapter required |
+| Authentication | `NODE_ENV=development`, development OTP sender; fixed sign-in code for valid supported numbers | `NODE_ENV=production`, real SMS/DLT adapter required |
 | Rollout | Testers and synthetic accounts only; limit access | No public traffic until launch gates pass |
 
 The two environments use **the same source code and container image digest** when a release is promoted. Configuration, credentials and data remain separate. A development phone number or image must never be copied into production. Create different Android build flavors and iOS configurations so test builds call `api-dev` and release builds call `api`; do not make the mobile app choose production by editing a text field at runtime.

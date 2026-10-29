@@ -8,7 +8,7 @@ Updated: 17 October 2026. API_PLAN.md is the overall inventory; OpenAPI document
 | Research/API plan | Complete, launch mode provisional | Research sources and 16-module journey; 898efff |
 | M01 lifecycle core | Complete | Countries/bootstrap, numeric update guidance, readiness/errors; f4236eb |
 | M01 rollout/content extensions | Waitlist, release/legal and nonpublic area operations implemented | Private waitlist; staff release policy and legal publishing; conditional product update gate; city_ops versioned India area edits among nonpublic states only |
-| M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me and one fixed local-only sign-in fixture; production SMS remains unavailable |
+| M02 auth/session core | Complete for local development | OTP, rotation/reuse, logout/all, sessions, private me and a fixed development-only sign-in code; production SMS remains unavailable |
 | M02 phone changes / production | Phone changes implemented; integrations pending | Recent-auth destination proof and revocation; SMS/DLT, distributed limits and optional recovery remain pending |
 | M03 consent/onboarding | Complete as a prerequisite engine | Immutable published documents, acceptance/withdrawal, live progress, active dog, preferences; 5da00c6 |
 | M04 household/dog profile core | Complete | Ownership, roles/invites, drafts, breed mix, structured temperament, preferences/schedule, gated publishing, pause, memorialisation, beacons |
@@ -44,7 +44,7 @@ No reviewed legal text is seeded; public policy reads return 404 until published
 
 OTP and invitations do not send real SMS. OTP needs explicit local terminal mode; household invitation tokens are shared manually. IP rate limits are per process; phone OTP limits are database-backed. Exact household location and secrets are absent from new household/dog responses.
 
-Current development sign-in fixture: request OTP for +919000000001, then verify with 000000. Only the development sender issues this code, and only for ordinary sign-in. It does not bypass challenge creation, expiry, one-use or attempt limits. Other phones and privacy/phone-change purposes use random codes. Production cannot use the development sender. Photo and real SMS integrations are deferred for development at the user's request; both remain public-launch dependencies.
+Current development sign-in shortcut: request OTP for any valid supported phone, then verify with 000000. Only the development sender issues this code, and only for ordinary sign-in. It does not bypass challenge creation, expiry, one-use or attempt limits. Privacy and phone-change purposes use random codes. Production cannot use the development sender. Photo and real SMS integrations are deferred for development at the user's request; both remain public-launch dependencies.
 
 M04 is the household/profile core, not every endpoint in the full plan. Current temperament input is versioned dimensions; twelve-question scoring is not delivered. Profile changes reset publication, and identity/breed changes invalidate dog verification evidence. Future discovery must check current consent, pauses, membership, blocks and verification; `publication_state='published'` alone is insufficient.
 

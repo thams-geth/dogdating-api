@@ -19,7 +19,7 @@ The proposed two-environment architecture and deployment order are in [DEPLOYMEN
 
 No credentials, provider selection, legal approval or operational response is inferred from a request to implement backend features.
 
-For the current development phase, photo integration and real SMS delivery are deferred at the user's request. Local sign-in can use the single test phone `+919000000001` with code `000000` after requesting a challenge. The shortcut is unavailable in production, and neither deferred integration is considered complete for public launch.
+For the current development phase, photo integration and real SMS delivery are deferred at the user's request. Development sign-in can use any valid supported phone with code `000000` after requesting a challenge. The shortcut is unavailable in production, and neither deferred integration is considered complete for public launch.
 
 ## Remaining backend work
 

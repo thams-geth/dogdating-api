@@ -8,7 +8,7 @@ Updated 17 October 2026. Read with docs/IMPLEMENTATION.md and docs/REMAINING_WOR
 - Continue modules automatically; commit each completed module with a meaningful message.
 - Maintain the API plan, implementation ledger, this memory and per-module mobile/web handovers with methods, statuses, errors, request/response contracts, examples, Mermaid flows and wireframes.
 - No remote push/deployment requested. Do not fabricate provider success, verified evidence, legal content or completion of privacy processing.
-- Use one local-only sign-in fixture number/code while real SMS remains deferred. Private S3 photo persistence is now implemented; moderation and approved delivery remain production launch blockers.
+- Use the fixed development-only sign-in code for valid supported phone numbers while real SMS remains deferred. Private S3 photo persistence is now implemented; moderation and approved delivery remain production launch blockers.
 - Pack/playdates remains the provisional shared-platform scope. Breeding, owner dating and live safety have no explicit product approval.
 
 ## Source of truth
@@ -26,7 +26,7 @@ Historical source: /Users/thamaraiselvan/Dog dating/waggle-plan and waggle. Thei
 - Ports 5432/6379 belong to campusone; never touch unrelated infrastructure. Redis 6380 exists but is not used.
 - Migrations through 0038; applied SQL is immutable. Forward migrations only.
 - `.env.development` and `.env.production` are ignored; their committed `.example` templates contain no secrets. setup:dev generates/retains the local auth secret and enables terminal-only OTP for synthetic numbers. setup:prod-env creates a fail-closed production file with blank database/secret values. Environment-specific npm commands load only their named file; application config no longer implicitly reads legacy `.env`.
-- With NODE_ENV=development and OTP_MODE=development, sign-in on +919000000001 uses fixed code 000000 only after a fresh request. Other numbers and privacy/phone-change codes remain random. Production cannot instantiate the development sender.
+- With NODE_ENV=development and OTP_MODE=development, any valid supported sign-in phone uses fixed code 000000 only after a fresh request. Privacy and phone-change codes remain random. Production cannot instantiate the development sender.
 - An older server may own 3000. Do not assume latest compiled code is running. No restart/deployment was performed.
 
 ## Delivered development modules
@@ -122,7 +122,7 @@ M01 now checks X-App-Platform/X-App-Build on product routes against live persist
 
 ## Nonpublic area administration (10 October 2026)
 
-M01 city_ops can list India metros and change only prospect/seeding/waitlist/gated via versioned, audited PATCH. Migrations 0037–0038 add rollout version metadata; 0038 removes the staff FK so deprovisioning/test truncation cannot cascade into metros. Public opening, country administration and waitlist delivery remain unimplemented. Moving out of seeding resets affected dog publication to draft and cancels beacons; live onboarding/discovery also use the current state. Returning to seeding never republishes dogs automatically. OpenAPI has 171 operations. Use test phone +919000000001 and 000000 for local sign-in; photo/SMS providers remain deferred.
+M01 city_ops can list India metros and change only prospect/seeding/waitlist/gated via versioned, audited PATCH. Migrations 0037–0038 add rollout version metadata; 0038 removes the staff FK so deprovisioning/test truncation cannot cascade into metros. Public opening, country administration and waitlist delivery remain unimplemented. Moving out of seeding resets affected dog publication to draft and cancels beacons; live onboarding/discovery also use the current state. Returning to seeding never republishes dogs automatically. OpenAPI has 171 operations. Use any valid supported phone and 000000 for development sign-in; photo/SMS providers remain deferred.
 
 ## Deployment architecture and S3 persistence (19 October 2026)
 
