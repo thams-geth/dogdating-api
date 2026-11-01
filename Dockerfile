@@ -15,25 +15,16 @@ COPY src ./src
 RUN npm run build
 
 
-# Download Amazon RDS CA certificates
+# Download official Amazon RDS CA certificates
 FROM node:22-bookworm-slim AS rds-ca
 
-RUN node --input-type=module -e '
-import { writeFile } from "node:fs/promises";
-
-const response = await fetch(
-  "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
-);
-
-if (!response.ok) {
-  throw new Error(`RDS certificate download failed: ${response.status}`);
-}
-
-await writeFile(
-  "/rds-global-bundle.pem",
-  Buffer.from(await response.arrayBuffer())
-);
-'
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl \
+    && curl -fsSL --retry 3 \
+       https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+       -o /rds-global-bundle.pem \
+    && test -s /rds-global-bundle.pem \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # Production runtime
@@ -50,14 +41,16 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=build /app/dist ./dist
-COPY --from=rds-ca /rds-global-bundle.pem /app/certs/rds-global-bundle.pem
 COPY migrations ./migrations
+
+# Add trusted Amazon RDS certificates
+COPY --from=rds-ca /rds-global-bundle.pem /app/certs/rds-global-bundle.pem
 
 USER node
 
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD ["node", "-e", "fetch('http://127.0.0.1:3000/v1/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+    CMD ["node", "-e", "fetch('http://127.0.0.1:3000/v1/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
 
 CMD ["node", "dist/server.js"]
