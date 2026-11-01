@@ -1,7 +1,7 @@
 # =============================================================================
 # Local development stack: Postgres 17 + Redis 7.
 #
-# Versions are PINNED to minor. "postgres:17" would silently move under us and a
+# Versions are PINNED to minor. "postgres:17" w ould silently move under us and a
 # database that upgrades itself between two developers' machines is a debugging
 # session nobody enjoys.
 # =============================================================================
